@@ -1,4 +1,5 @@
 ---
+related_content: []
 actual_word_count: 2211
 category: guides
 description: JWTs are the industry standard for stateless authentication. Understand

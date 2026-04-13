@@ -1,4 +1,5 @@
 ---
+related_content: []
 actual_word_count: 1637
 category: blog
 description: 'SQL vs NoSQL: learn key differences, performance characteristics, use

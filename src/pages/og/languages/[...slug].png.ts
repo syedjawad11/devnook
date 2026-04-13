@@ -16,15 +16,17 @@ export async function getStaticPaths() {
 export async function GET({ props }: any) {
   const { entry } = props;
   
-  const outfitRegular = await fetch(
+  const outfitCss = await fetch(
     'https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap'
   ).then((res) => res.text());
   
-  const outfitUrl = outfitRegular.match(/url\((https:\/\/[^)]+\.woff2)\)/)?.[1];
+  const outfitUrl = outfitCss.match(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/)?.[1];
   
-  const outfitFont = outfitUrl 
-    ? await fetch(outfitUrl).then((res) => res.arrayBuffer())
-    : null;
+  if (!outfitUrl) {
+    throw new Error('Failed to extract Outfit font URL from Google Fonts CSS');
+  }
+  
+  const outfitFont = await fetch(outfitUrl).then((res) => res.arrayBuffer());
 
   const svg = await satori(
     {
@@ -143,7 +145,7 @@ export async function GET({ props }: any) {
     {
       width: 1200,
       height: 630,
-      fonts: outfitFont ? [
+      fonts: [
         {
           name: 'Outfit',
           data: outfitFont,
@@ -162,7 +164,7 @@ export async function GET({ props }: any) {
           weight: 700,
           style: 'normal'
         }
-      ] : []
+      ]
     }
   );
 

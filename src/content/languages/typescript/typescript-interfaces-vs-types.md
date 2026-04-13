@@ -1,4 +1,5 @@
 ---
+related_content: []
 actual_word_count: 1115
 category: languages
 concept: interfaces-vs-types

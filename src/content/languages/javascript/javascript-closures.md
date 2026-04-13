@@ -1,4 +1,5 @@
 ---
+related_content: []
 actual_word_count: 1044
 category: languages
 concept: closures
