@@ -20,6 +20,8 @@ import json
 import sys
 from pathlib import Path
 from datetime import date
+
+import frontmatter
 from dotenv import load_dotenv
 
 # Ensure project root is in sys.path so `agents.utils` resolves correctly
@@ -140,35 +142,55 @@ def generate_seo_explainer(spec: dict) -> str:
     today = date.today().isoformat()
     features_str = "\n".join(f"- {f}" for f in spec.get("features", []))
     keywords_str = ", ".join(spec.get("seo_keywords", []))
-    related_tools_str = ", ".join(spec.get("related_tools", []))
 
-    prompt = f"""Write the SEO explainer Markdown file `src/content/tools/{spec['slug']}.md` for devnook.dev.
+    meta = {
+        "title": f"{spec['name']} — Free Online Tool",
+        "description": spec["description"],
+        "category": "tools",
+        "tool_slug": spec["slug"],
+        "template_id": spec.get("template_id", "tool-exp-v1"),
+        "tags": spec.get("tags", []),
+        "related_tools": spec.get("related_tools", []),
+        "related_content": spec.get("related_content", []),
+        "published_date": today,
+        "og_image": f"/og/tools/{spec['slug']}.png",
+    }
+
+    prompt = f"""Write the Markdown BODY for the SEO explainer page of {spec['name']} on devnook.dev.
 
 Tool: {spec['name']}
-Slug: {spec['slug']}
 Description: {spec['description']}
 Primary keyword: {spec['primary_keyword']}
 SEO keywords: {keywords_str}
-Related tools: {related_tools_str}
-Published date: {today}
-Template: {spec.get('template_id', 'tool-exp-v1')}
 
 Features:
 {features_str}
 
 Requirements:
-- Start with YAML frontmatter: title, description, publishedDate, primaryKeyword, seoKeywords (array), relatedTools (array), template, tier: "client-side"
-- Body: 200–300 words
+- DO NOT include YAML frontmatter — it will be added separately
+- 200–300 words total
 - Structure: What is [tool name] → How to use it → When to use it → FAQ (2–3 questions)
-- Naturally use the primary keyword 2–3 times
-- Use H2 for section headers
+- Use H2 (##) for section headers
+- Naturally use the primary keyword "{spec['primary_keyword']}" 2–3 times
 - Write in the devnook brand voice: direct, developer-friendly, no fluff
-- End with a brief CTA linking to the tool
+- End with a brief CTA linking to /tools/{spec['slug']}
 
-Return ONLY the Markdown file content. No code fences. No explanation."""
+Return ONLY the Markdown body. No YAML frontmatter. No surrounding code fences. No explanation."""
 
     result = route("tool_builder", SYSTEM_PROMPT, prompt, max_tokens=2000)
-    return result.text
+    body = result.text.strip()
+
+    # Strip any accidental surrounding fences the LLM might add
+    if body.startswith("```"):
+        lines = body.splitlines()
+        if lines[0].startswith("```"):
+            lines = lines[1:]
+        if lines and lines[-1].strip() == "```":
+            lines = lines[:-1]
+        body = "\n".join(lines).strip()
+
+    post = frontmatter.Post(body, **meta)
+    return frontmatter.dumps(post) + "\n"
 
 
 # ---------------------------------------------------------------------------
