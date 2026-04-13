@@ -1,0 +1,73 @@
+2026-04-13T15:47:09.201725Z	Cloning repository...
+2026-04-13T15:47:10.266266Z	From https://github.com/syedjawad11/DevNook-
+2026-04-13T15:47:10.266731Z	 * branch            799ea220d7ea7ad5d5ad3a02f9c9d9406b7caf06 -> FETCH_HEAD
+2026-04-13T15:47:10.266825Z	
+2026-04-13T15:47:10.3023Z	HEAD is now at 799ea22 feat: launch devnook.dev - 20 posts + 10 tools
+2026-04-13T15:47:10.302715Z	
+2026-04-13T15:47:10.35016Z	
+2026-04-13T15:47:10.350612Z	Using v2 root directory strategy
+2026-04-13T15:47:10.365776Z	Success: Finished cloning repository files
+2026-04-13T15:47:15.002842Z	Checking for configuration in a Wrangler configuration file (BETA)
+2026-04-13T15:47:15.003381Z	
+2026-04-13T15:47:16.118285Z	No Wrangler configuration file found. Continuing.
+2026-04-13T15:47:16.372343Z	Detected the following tools from environment: nodejs@20.20.0, npm@10.9.2
+2026-04-13T15:47:16.372984Z	Installing nodejs 20.20.0
+2026-04-13T15:47:17.371066Z	Trying to update node-build... ok
+2026-04-13T15:47:17.448988Z	To follow progress, use 'tail -f /tmp/node-build.20260413154717.799.log' or pass --verbose
+2026-04-13T15:47:17.501467Z	Downloading node-v20.20.0-linux-x64.tar.gz...
+2026-04-13T15:47:17.674161Z	-> https://nodejs.org/dist/v20.20.0/node-v20.20.0-linux-x64.tar.gz
+2026-04-13T15:47:20.133966Z	
+2026-04-13T15:47:20.134389Z	WARNING: node-v20.20.0-linux-x64 is in LTS Maintenance mode and nearing its end of life.
+2026-04-13T15:47:20.134617Z	It only receives *critical* security updates, *critical* bug fixes and documentation updates.
+2026-04-13T15:47:20.13468Z	
+2026-04-13T15:47:20.134742Z	Installing node-v20.20.0-linux-x64...
+2026-04-13T15:47:20.764673Z	Installed node-v20.20.0-linux-x64 to /opt/buildhome/.asdf/installs/nodejs/20.20.0
+2026-04-13T15:47:20.76506Z	
+2026-04-13T15:47:21.477069Z	Installing project dependencies: npm clean-install --progress=false
+2026-04-13T15:47:24.710183Z	npm warn deprecated sourcemap-codec@1.4.8: Please use @jridgewell/sourcemap-codec instead
+2026-04-13T15:47:24.747255Z	npm warn deprecated rollup-plugin-inject@3.0.2: This package has been deprecated and is no longer maintained. Please use @rollup/plugin-inject.
+2026-04-13T15:47:36.540809Z	
+2026-04-13T15:47:36.541724Z	added 499 packages, and audited 500 packages in 15s
+2026-04-13T15:47:36.541875Z	
+2026-04-13T15:47:36.541952Z	169 packages are looking for funding
+2026-04-13T15:47:36.542002Z	  run `npm fund` for details
+2026-04-13T15:47:36.659614Z	
+2026-04-13T15:47:36.659931Z	14 vulnerabilities (11 moderate, 3 high)
+2026-04-13T15:47:36.660004Z	
+2026-04-13T15:47:36.66005Z	To address issues that do not require attention, run:
+2026-04-13T15:47:36.660083Z	  npm audit fix
+2026-04-13T15:47:36.660115Z	
+2026-04-13T15:47:36.660144Z	To address all issues (including breaking changes), run:
+2026-04-13T15:47:36.660173Z	  npm audit fix --force
+2026-04-13T15:47:36.66021Z	
+2026-04-13T15:47:36.660255Z	Run `npm audit` for details.
+2026-04-13T15:47:36.710742Z	Executing user command: npm run build
+2026-04-13T15:47:37.062821Z	
+2026-04-13T15:47:37.063233Z	> devnook@1.0.0 build
+2026-04-13T15:47:37.06345Z	> astro build
+2026-04-13T15:47:37.063516Z	
+2026-04-13T15:47:39.140827Z	15:47:39 [WARN] The currently selected adapter `@astrojs/cloudflare` is not compatible with the image service "Sharp".
+2026-04-13T15:47:39.601499Z	15:47:39 [types] Generated 460ms
+2026-04-13T15:47:39.601937Z	15:47:39 [build] output: "hybrid"
+2026-04-13T15:47:39.601999Z	15:47:39 [build] directory: /opt/buildhome/repo/dist/
+2026-04-13T15:47:39.60204Z	15:47:39 [build] adapter: @astrojs/cloudflare
+2026-04-13T15:47:39.60209Z	15:47:39 [build] Collecting build info...
+2026-04-13T15:47:39.602733Z	15:47:39 [build] ✓ Completed in 513ms.
+2026-04-13T15:47:39.606384Z	15:47:39 [build] Building hybrid entrypoints...
+2026-04-13T15:47:40.623516Z	15:47:40 [ERROR] [vite] [31mx[39m Build failed in 973ms
+2026-04-13T15:47:41.553332Z	[InvalidContentEntryFrontmatterError] [astro:content-imports] tools → regex-tester-online-java.md frontmatter does not match collection schema.
+2026-04-13T15:47:41.553855Z	related_content: Required
+2026-04-13T15:47:41.55412Z	file: /opt/buildhome/repo/src/content/tools/regex-tester-online-java.md?astroContentCollectionEntry=true:0:0
+2026-04-13T15:47:41.554212Z	  Hint:
+2026-04-13T15:47:41.554272Z	    See https://docs.astro.build/en/guides/content-collections/ for more information on content schemas.
+2026-04-13T15:47:41.554328Z	  Error reference:
+2026-04-13T15:47:41.554413Z	    https://docs.astro.build/en/reference/errors/invalid-content-entry-frontmatter-error/
+2026-04-13T15:47:41.55451Z	  Location:
+2026-04-13T15:47:41.554572Z	    /opt/buildhome/repo/src/content/tools/regex-tester-online-java.md:0:0
+2026-04-13T15:47:41.554622Z	  Stack trace:
+2026-04-13T15:47:41.554675Z	    at getEntryDataAndImages (file:///opt/buildhome/repo/node_modules/astro/dist/content/utils.js:137:26)
+2026-04-13T15:47:41.554728Z	    at async getContentEntryModule (file:///opt/buildhome/repo/node_modules/astro/dist/content/vite-plugin-content-imports.js:171:35)
+2026-04-13T15:47:41.554801Z	    at async transform (file:///opt/buildhome/repo/node_modules/rollup/dist/es/shared/node-entry.js:21657:16)
+2026-04-13T15:47:41.603156Z	Failed: Error while executing user command. Exited with error code: 1
+2026-04-13T15:47:41.611955Z	Failed: build command exited with code: 1
+2026-04-13T15:47:42.450268Z	Failed: error occurred while running build command

@@ -1,4 +1,5 @@
 ---
+related_content: []
 actual_word_count: 1527
 category: guides
 description: Decode or encode Base64 strings instantly in your browser. Learn what

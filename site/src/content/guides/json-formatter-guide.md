@@ -1,4 +1,5 @@
 ---
+related_content: []
 actual_word_count: 1669
 category: guides
 description: Format and validate JSON instantly. Our free online JSON formatter catches

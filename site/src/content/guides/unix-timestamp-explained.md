@@ -1,4 +1,5 @@
 ---
+related_content: []
 actual_word_count: 1793
 category: guides
 description: Unix timestamps count seconds since January 1, 1970. Learn why developers

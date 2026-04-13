@@ -1,4 +1,5 @@
 ---
+related_content: []
 actual_word_count: 1219
 category: languages
 concept: goroutines

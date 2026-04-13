@@ -2,9 +2,17 @@ import { getCollection } from 'astro:content';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 
-const outfitFont = await fetch(
+const outfitCss = await fetch(
   'https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap'
-).then((res) => res.arrayBuffer());
+).then((res) => res.text());
+
+const outfitFontUrl = outfitCss.match(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/)?.[1];
+
+if (!outfitFontUrl) {
+  throw new Error('Failed to extract Outfit font URL from Google Fonts CSS');
+}
+
+const outfitFont = await fetch(outfitFontUrl).then((res) => res.arrayBuffer());
 
 export async function getStaticPaths() {
   const guides = await getCollection('guides');
@@ -89,7 +97,7 @@ export async function GET({ props }: { props: { guide: any } }) {
                   type: 'div',
                   props: {
                     style: {
-                      display: 'inline-block',
+                      display: 'flex',
                       padding: '8px 16px',
                       backgroundColor: '#6ee7b7',
                       color: '#0d0d0d',
