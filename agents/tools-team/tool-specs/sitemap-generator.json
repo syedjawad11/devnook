@@ -1,0 +1,35 @@
+{
+  "slug": "sitemap-generator",
+  "name": "XML Sitemap Generator",
+  "description": "Generate a valid XML sitemap from a list of URLs instantly in your browser. Set priority, change frequency, and download the sitemap.xml file.",
+  "tier": "client-side",
+  "batch": 3,
+  "category": "generator",
+  "icon": "map",
+  "tags": ["sitemap", "xml sitemap", "seo", "generator", "sitemap.xml"],
+  "seo_keywords": ["xml sitemap generator online", "sitemap generator free", "sitemap.xml creator", "generate sitemap", "seo sitemap tool"],
+  "primary_keyword": "xml sitemap generator online",
+  "related_tools": ["meta-tag-generator", "uuid-generator"],
+  "related_content": ["what-is-a-sitemap", "how-to-submit-sitemap-google"],
+  "input_label": "Enter URLs (one per line)",
+  "output_label": "sitemap.xml",
+  "features": [
+    "Generates valid XML sitemap (sitemap protocol 0.9)",
+    "Set lastmod date (today or custom)",
+    "Set change frequency per URL (always, hourly, daily, weekly, monthly, yearly, never)",
+    "Set priority per URL (0.0 to 1.0)",
+    "Apply settings globally or per URL",
+    "Download as sitemap.xml file",
+    "Copy XML to clipboard"
+  ],
+  "controls": [
+    {"type": "textarea", "label": "URLs (one per line)", "placeholder": "https://example.com/\nhttps://example.com/about\nhttps://example.com/blog"},
+    {"type": "select", "label": "Change frequency", "options": ["daily", "weekly", "monthly", "yearly", "always", "hourly", "never"], "default": "weekly"},
+    {"type": "select", "label": "Priority", "options": ["1.0", "0.9", "0.8", "0.7", "0.5", "0.3", "0.1"], "default": "0.8"},
+    {"type": "checkbox", "label": "Set lastmod to today", "default": true},
+    {"type": "button", "label": "Generate Sitemap", "action": "generate"},
+    {"type": "button", "label": "Download sitemap.xml", "action": "download"},
+    {"type": "button", "label": "Copy XML", "action": "copy"}
+  ],
+  "template_id": "tool-exp-v1"
+}

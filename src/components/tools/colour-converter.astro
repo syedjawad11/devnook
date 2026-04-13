@@ -1,0 +1,426 @@
+---
+// No server-side props needed — all tools are client-side
+---
+<div class="tool-container" id="tool-colour-converter">
+  <div class="tool-header">
+    <h2>Colour Converter</h2>
+    <p class="tool-desc">Convert between HEX, RGB, HSL, and named CSS colour values instantly in your browser.</p>
+  </div>
+  <div class="tool-body">
+    <div class="colour-preview-section">
+      <div class="colour-swatch" id="colour-swatch" aria-label="Colour preview swatch"></div>
+      <p class="preview-label">Live Preview</p>
+    </div>
+    <div class="input-section">
+      <div class="input-group">
+        <label for="hex-input">HEX</label>
+        <input 
+          type="text" 
+          id="hex-input" 
+          placeholder="#3b82f6" 
+          aria-label="HEX colour input"
+        />
+        <button 
+          class="copy-btn" 
+          data-target="hex-input" 
+          aria-label="Copy HEX value to clipboard"
+        >Copy</button>
+      </div>
+      <div class="input-group">
+        <label for="rgb-input">RGB</label>
+        <input 
+          type="text" 
+          id="rgb-input" 
+          placeholder="rgb(59, 130, 246)" 
+          aria-label="RGB colour input"
+        />
+        <button 
+          class="copy-btn" 
+          data-target="rgb-input" 
+          aria-label="Copy RGB value to clipboard"
+        >Copy</button>
+      </div>
+      <div class="input-group">
+        <label for="hsl-input">HSL</label>
+        <input 
+          type="text" 
+          id="hsl-input" 
+          placeholder="hsl(217, 91%, 60%)" 
+          aria-label="HSL colour input"
+        />
+        <button 
+          class="copy-btn" 
+          data-target="hsl-input" 
+          aria-label="Copy HSL value to clipboard"
+        >Copy</button>
+      </div>
+      <div class="input-group">
+        <label for="name-input">CSS Name</label>
+        <input 
+          type="text" 
+          id="name-input" 
+          placeholder="steelblue" 
+          aria-label="CSS named colour input"
+        />
+        <button 
+          class="copy-btn" 
+          data-target="name-input" 
+          aria-label="Copy CSS name to clipboard"
+        >Copy</button>
+      </div>
+    </div>
+    <div class="controls">
+      <button id="convert-btn" class="primary-btn" aria-label="Convert colour values">Convert</button>
+      <button id="clear-btn" class="secondary-btn" aria-label="Clear all colour values">Clear</button>
+    </div>
+  </div>
+  <div class="tool-status" id="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function() {
+  const hexInput = document.getElementById('hex-input');
+  const rgbInput = document.getElementById('rgb-input');
+  const hslInput = document.getElementById('hsl-input');
+  const nameInput = document.getElementById('name-input');
+  const convertBtn = document.getElementById('convert-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const status = document.getElementById('status');
+  const swatch = document.getElementById('colour-swatch');
+  const copyBtns = document.querySelectorAll('.copy-btn');
+
+  function showStatus(message, isError = false) {
+    status.textContent = message;
+    status.className = isError ? 'tool-status error' : 'tool-status success';
+    setTimeout(() => {
+      status.textContent = '';
+      status.className = 'tool-status';
+    }, 3000);
+  }
+
+  function hexToRgb(hex) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) {
+      hex = hex.split('').map(c => c + c).join('');
+    }
+    if (!/^[0-9A-Fa-f]{6}$/.test(hex)) {
+      return null;
+    }
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return { r, g, b };
+  }
+
+  function rgbToHex(r, g, b) {
+    return '#' + [r, g, b].map(x => {
+      const hex = x.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    }).join('');
+  }
+
+  function rgbToHsl(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h, s, l = (max + min) / 2;
+
+    if (max === min) {
+      h = s = 0;
+    } else {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      switch (max) {
+        case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+        case g: h = ((b - r) / d + 2) / 6; break;
+        case b: h = ((r - g) / d + 4) / 6; break;
+      }
+    }
+
+    return {
+      h: Math.round(h * 360),
+      s: Math.round(s * 100),
+      l: Math.round(l * 100)
+    };
+  }
+
+  function hslToRgb(h, s, l) {
+    h /= 360;
+    s /= 100;
+    l /= 100;
+    let r, g, b;
+
+    if (s === 0) {
+      r = g = b = l;
+    } else {
+      const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+      };
+      const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      const p = 2 * l - q;
+      r = hue2rgb(p, q, h + 1/3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1/3);
+    }
+
+    return {
+      r: Math.round(r * 255),
+      g: Math.round(g * 255),
+      b: Math.round(b * 255)
+    };
+  }
+
+  function parseInput() {
+    if (hexInput.value.trim()) {
+      const hex = hexInput.value.trim();
+      const rgb = hexToRgb(hex);
+      if (!rgb) throw new Error('Invalid HEX format');
+      return rgb;
+    }
+    
+    if (rgbInput.value.trim()) {
+      const match = rgbInput.value.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+      if (!match) throw new Error('Invalid RGB format');
+      return {
+        r: parseInt(match[1]),
+        g: parseInt(match[2]),
+        b: parseInt(match[3])
+      };
+    }
+
+    if (hslInput.value.trim()) {
+      const match = hslInput.value.match(/hsla?\(\s*(\d+)\s*,\s*(\d+)%?\s*,\s*(\d+)%?/);
+      if (!match) throw new Error('Invalid HSL format');
+      const h = parseInt(match[1]);
+      const s = parseInt(match[2]);
+      const l = parseInt(match[3]);
+      return hslToRgb(h, s, l);
+    }
+
+    if (nameInput.value.trim()) {
+      const temp = document.createElement('div');
+      temp.style.color = nameInput.value.trim();
+      document.body.appendChild(temp);
+      const computed = window.getComputedStyle(temp).color;
+      document.body.removeChild(temp);
+      
+      const match = computed.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+      if (!match) throw new Error('Invalid CSS colour name');
+      return {
+        r: parseInt(match[1]),
+        g: parseInt(match[2]),
+        b: parseInt(match[3])
+      };
+    }
+
+    throw new Error('Please enter a colour value in any field');
+  }
+
+  function convert() {
+    try {
+      const rgb = parseInput();
+      const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+      const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+      hexInput.value = hex;
+      rgbInput.value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+      hslInput.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+      
+      swatch.style.backgroundColor = hex;
+      showStatus('Colour converted successfully');
+    } catch (error) {
+      showStatus(error.message, true);
+    }
+  }
+
+  function clear() {
+    hexInput.value = '';
+    rgbInput.value = '';
+    hslInput.value = '';
+    nameInput.value = '';
+    swatch.style.backgroundColor = 'var(--color-surface)';
+    showStatus('All fields cleared');
+  }
+
+  function copyToClipboard(targetId) {
+    const input = document.getElementById(targetId);
+    if (!input.value) {
+      showStatus('No value to copy', true);
+      return;
+    }
+    
+    navigator.clipboard.writeText(input.value).then(() => {
+      const btn = document.querySelector(`[data-target="${targetId}"]`);
+      const originalText = btn.textContent;
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = originalText;
+        btn.classList.remove('copied');
+      }, 2000);
+    }).catch(() => {
+      showStatus('Failed to copy to clipboard', true);
+    });
+  }
+
+  convertBtn.addEventListener('click', convert);
+  clearBtn.addEventListener('click', clear);
+
+  [hexInput, rgbInput, hslInput, nameInput].forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') convert();
+    });
+  });
+
+  copyBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      copyToClipboard(btn.dataset.target);
+    });
+  });
+})();
+</script>
+
+<style>
+.tool-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-5);
+}
+
+.tool-header h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.tool-body {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.colour-preview-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--space-5);
+  gap: var(--space-2);
+}
+
+.colour-swatch {
+  width: 120px;
+  height: 120px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.preview-label {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.input-group {
+  display: grid;
+  grid-template-columns: 100px 1fr auto;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.input-group label {
+  color: var(--color-text);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.input-group input {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  padding: var(--space-2) var(--space-3);
+  width: 100%;
+}
+
+.input-group input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.input-group input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.copy-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: var(--space-2) var(--space-3);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.copy-btn:hover {
+  background: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+.copy-btn.copied {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+.controls {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: flex-start;
+}
+
+.primary-btn,
+.secondary-btn {
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: var(--space-2) var(--space-4);
+  transition: all 0.2s;
+}
+
+.primary-btn {
+  background: var(--color-accent);
+  border: none;
+  color: var(--color-bg

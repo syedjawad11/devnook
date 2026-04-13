@@ -1,0 +1,413 @@
+---
+// URL Encoder/Decoder - Client-side only
+---
+<div class="tool-container" id="tool-url-encoder">
+  <div class="tool-header">
+    <h2>URL Encoder/Decoder</h2>
+    <p class="tool-desc">Encode and decode URLs and query strings instantly in your browser</p>
+  </div>
+  
+  <div class="tool-body">
+    <div class="tool-input-section">
+      <label for="url-input">URL or text to encode/decode</label>
+      <textarea 
+        id="url-input" 
+        placeholder="Paste your URL or text here..."
+        rows="6"
+        aria-label="URL or text to encode or decode"
+      ></textarea>
+    </div>
+
+    <div class="tool-controls">
+      <button 
+        id="encode-url-btn" 
+        class="btn-primary"
+        aria-label="Encode full URL"
+      >
+        Encode URL
+      </button>
+      <button 
+        id="encode-component-btn" 
+        class="btn-primary"
+        aria-label="Encode URI component"
+      >
+        Encode Component
+      </button>
+      <button 
+        id="decode-btn" 
+        class="btn-primary"
+        aria-label="Decode URL"
+      >
+        Decode
+      </button>
+      <button 
+        id="clear-btn" 
+        class="btn-secondary"
+        aria-label="Clear all fields"
+      >
+        Clear
+      </button>
+    </div>
+
+    <div class="tool-output-section">
+      <div class="output-header">
+        <label for="url-output">Result</label>
+        <button 
+          id="copy-btn" 
+          class="btn-copy"
+          aria-label="Copy result to clipboard"
+        >
+          Copy
+        </button>
+      </div>
+      <textarea 
+        id="url-output" 
+        readonly
+        placeholder="Encoded or decoded result will appear here..."
+        rows="6"
+        aria-label="Encoded or decoded result"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="tool-status" aria-live="polite" role="status"></div>
+</div>
+
+<script>
+(function() {
+  const inputEl = document.getElementById('url-input');
+  const outputEl = document.getElementById('url-output');
+  const encodeUrlBtn = document.getElementById('encode-url-btn');
+  const encodeComponentBtn = document.getElementById('encode-component-btn');
+  const decodeBtn = document.getElementById('decode-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const copyBtn = document.getElementById('copy-btn');
+  const statusEl = document.querySelector('.tool-status');
+
+  function showStatus(message, isError = false) {
+    statusEl.textContent = message;
+    statusEl.className = 'tool-status' + (isError ? ' error' : ' success');
+    statusEl.style.display = 'block';
+    
+    if (!isError) {
+      setTimeout(() => {
+        statusEl.style.display = 'none';
+      }, 3000);
+    }
+  }
+
+  function hideStatus() {
+    statusEl.style.display = 'none';
+  }
+
+  function encodeURL() {
+    const input = inputEl.value.trim();
+    
+    if (!input) {
+      showStatus('Please enter a URL or text to encode', true);
+      return;
+    }
+
+    try {
+      const encoded = encodeURI(input);
+      outputEl.value = encoded;
+      hideStatus();
+    } catch (error) {
+      showStatus('Error encoding URL: Invalid input', true);
+      outputEl.value = '';
+    }
+  }
+
+  function encodeComponent() {
+    const input = inputEl.value.trim();
+    
+    if (!input) {
+      showStatus('Please enter text to encode', true);
+      return;
+    }
+
+    try {
+      const encoded = encodeURIComponent(input);
+      outputEl.value = encoded;
+      hideStatus();
+    } catch (error) {
+      showStatus('Error encoding component: Invalid input', true);
+      outputEl.value = '';
+    }
+  }
+
+  function decode() {
+    const input = inputEl.value.trim();
+    
+    if (!input) {
+      showStatus('Please enter an encoded URL or text to decode', true);
+      return;
+    }
+
+    try {
+      let decoded = decodeURIComponent(input);
+      outputEl.value = decoded;
+      hideStatus();
+    } catch (error) {
+      try {
+        let decoded = decodeURI(input);
+        outputEl.value = decoded;
+        hideStatus();
+      } catch (error2) {
+        showStatus('Error decoding: Malformed URL encoding', true);
+        outputEl.value = '';
+      }
+    }
+  }
+
+  function clearAll() {
+    inputEl.value = '';
+    outputEl.value = '';
+    hideStatus();
+    inputEl.focus();
+  }
+
+  async function copyToClipboard() {
+    const output = outputEl.value.trim();
+    
+    if (!output) {
+      showStatus('Nothing to copy', true);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(output);
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+        copyBtn.classList.remove('copied');
+      }, 2000);
+      
+      showStatus('Copied to clipboard');
+    } catch (error) {
+      showStatus('Failed to copy to clipboard', true);
+    }
+  }
+
+  encodeUrlBtn.addEventListener('click', encodeURL);
+  encodeComponentBtn.addEventListener('click', encodeComponent);
+  decodeBtn.addEventListener('click', decode);
+  clearBtn.addEventListener('click', clearAll);
+  copyBtn.addEventListener('click', copyToClipboard);
+
+  inputEl.addEventListener('input', hideStatus);
+})();
+</script>
+
+<style>
+.tool-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-5);
+}
+
+.tool-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+  font-family: var(--font-body);
+}
+
+.tool-desc {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.tool-body {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.tool-input-section,
+.tool-output-section {
+  margin-bottom: var(--space-4);
+}
+
+.tool-output-section {
+  margin-bottom: 0;
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-body);
+}
+
+textarea {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+textarea[readonly] {
+  cursor: default;
+  background: var(--color-bg);
+  opacity: 0.9;
+}
+
+.tool-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.output-header label {
+  margin-bottom: 0;
+}
+
+button {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.btn-primary:hover {
+  background: var(--color-accent);
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+.btn-copy {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-accent-2);
+  color: var(--color-text);
+  font-size: 0.8125rem;
+}
+
+.btn-copy:hover {
+  background: var(--color-accent-2);
+  opacity: 0.9;
+}
+
+.btn-copy.copied {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.tool-status {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  display: none;
+  font-family: var(--font-body);
+}
+
+.tool-status.success {
+  background: rgba(110, 231, 183, 0.1);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.tool-status.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+@media (max-width: 768px) {
+  .tool-container {
+    padding: var(--space-3);
+  }
+
+  .tool-body {
+    padding: var(--space-4);
+  }
+
+  .tool-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .tool-controls {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .output-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+  }
+
+  .btn-copy {
+    align-self: flex-start;
+  }
+
+  textarea {
+    font-size: 0.8125rem;
+  }
+}
+</style>

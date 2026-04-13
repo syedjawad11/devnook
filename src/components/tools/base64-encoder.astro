@@ -1,0 +1,396 @@
+---
+// No server-side props needed — all tools are client-side
+---
+<div class="tool-container" id="tool-base64-encoder">
+  <div class="tool-header">
+    <h2>Base64 Encoder/Decoder</h2>
+    <p class="tool-desc">Encode and decode Base64 strings instantly in your browser. Supports text and URL-safe Base64.</p>
+  </div>
+  <div class="tool-body">
+    <div class="input-section">
+      <label for="base64-input">Text or Base64 string</label>
+      <textarea 
+        id="base64-input" 
+        aria-label="Text or Base64 string input"
+        placeholder="Enter text to encode or Base64 string to decode..."
+        rows="8"
+      ></textarea>
+    </div>
+    <div class="controls">
+      <div class="button-group">
+        <button 
+          id="encode-btn" 
+          class="primary-btn"
+          aria-label="Encode to Base64"
+        >
+          Encode
+        </button>
+        <button 
+          id="decode-btn" 
+          class="primary-btn"
+          aria-label="Decode from Base64"
+        >
+          Decode
+        </button>
+      </div>
+      <div class="checkbox-group">
+        <input 
+          type="checkbox" 
+          id="url-safe-checkbox"
+          aria-label="Enable URL-safe mode"
+        />
+        <label for="url-safe-checkbox">URL-safe mode</label>
+      </div>
+      <div class="action-group">
+        <button 
+          id="copy-btn" 
+          class="secondary-btn"
+          aria-label="Copy result to clipboard"
+        >
+          Copy
+        </button>
+        <button 
+          id="clear-btn" 
+          class="secondary-btn"
+          aria-label="Clear all fields"
+        >
+          Clear
+        </button>
+      </div>
+    </div>
+    <div class="output-section">
+      <label for="base64-output">Result</label>
+      <textarea 
+        id="base64-output" 
+        aria-label="Result output"
+        placeholder="Result will appear here..."
+        rows="8"
+        readonly
+      ></textarea>
+    </div>
+  </div>
+  <div class="tool-status" aria-live="polite" id="status-message"></div>
+</div>
+<script>
+  (function() {
+    const inputEl = document.getElementById('base64-input') as HTMLTextAreaElement;
+    const outputEl = document.getElementById('base64-output') as HTMLTextAreaElement;
+    const encodeBtn = document.getElementById('encode-btn') as HTMLButtonElement;
+    const decodeBtn = document.getElementById('decode-btn') as HTMLButtonElement;
+    const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement;
+    const clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
+    const urlSafeCheckbox = document.getElementById('url-safe-checkbox') as HTMLInputElement;
+    const statusEl = document.getElementById('status-message') as HTMLDivElement;
+
+    function showStatus(message: string, type: 'success' | 'error' = 'success') {
+      statusEl.textContent = message;
+      statusEl.className = `tool-status ${type}`;
+      statusEl.style.display = 'block';
+      
+      if (type === 'success') {
+        setTimeout(() => {
+          statusEl.style.display = 'none';
+        }, 2000);
+      }
+    }
+
+    function clearStatus() {
+      statusEl.style.display = 'none';
+      statusEl.textContent = '';
+      statusEl.className = 'tool-status';
+    }
+
+    function toUrlSafe(base64: string): string {
+      return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    }
+
+    function fromUrlSafe(base64: string): string {
+      let result = base64.replace(/-/g, '+').replace(/_/g, '/');
+      while (result.length % 4) {
+        result += '=';
+      }
+      return result;
+    }
+
+    function encodeText() {
+      clearStatus();
+      const input = inputEl.value.trim();
+      
+      if (!input) {
+        showStatus('Please enter text to encode', 'error');
+        return;
+      }
+
+      try {
+        let encoded = btoa(unescape(encodeURIComponent(input)));
+        
+        if (urlSafeCheckbox.checked) {
+          encoded = toUrlSafe(encoded);
+        }
+        
+        outputEl.value = encoded;
+        showStatus('Text encoded successfully');
+      } catch (error) {
+        showStatus('Encoding failed. Please check your input.', 'error');
+      }
+    }
+
+    function decodeText() {
+      clearStatus();
+      let input = inputEl.value.trim();
+      
+      if (!input) {
+        showStatus('Please enter Base64 string to decode', 'error');
+        return;
+      }
+
+      try {
+        if (urlSafeCheckbox.checked) {
+          input = fromUrlSafe(input);
+        }
+        
+        const decoded = decodeURIComponent(escape(atob(input)));
+        outputEl.value = decoded;
+        showStatus('Base64 decoded successfully');
+      } catch (error) {
+        showStatus('Decoding failed. Please check your Base64 string.', 'error');
+      }
+    }
+
+    function copyToClipboard() {
+      clearStatus();
+      const output = outputEl.value;
+      
+      if (!output) {
+        showStatus('Nothing to copy', 'error');
+        return;
+      }
+
+      navigator.clipboard.writeText(output).then(() => {
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        showStatus('Copied to clipboard');
+        
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      }).catch(() => {
+        showStatus('Copy failed. Please try again.', 'error');
+      });
+    }
+
+    function clearAll() {
+      inputEl.value = '';
+      outputEl.value = '';
+      urlSafeCheckbox.checked = false;
+      clearStatus();
+    }
+
+    encodeBtn.addEventListener('click', encodeText);
+    decodeBtn.addEventListener('click', decodeText);
+    copyBtn.addEventListener('click', copyToClipboard);
+    clearBtn.addEventListener('click', clearAll);
+
+    inputEl.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        encodeText();
+      }
+    });
+  })();
+</script>
+<style>
+  .tool-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-4);
+  }
+
+  .tool-header {
+    margin-bottom: var(--space-5);
+  }
+
+  .tool-header h2 {
+    font-family: var(--font-body);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-2) 0;
+  }
+
+  .tool-desc {
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .tool-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .input-section,
+  .output-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  label {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  textarea {
+    width: 100%;
+    padding: var(--space-3);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    resize: vertical;
+    min-height: 120px;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+
+  textarea::placeholder {
+    color: var(--color-text-muted);
+  }
+
+  textarea[readonly] {
+    opacity: 0.8;
+    cursor: default;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .button-group,
+  .action-group {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-accent);
+  }
+
+  .checkbox-group label {
+    text-transform: none;
+    font-weight: 400;
+    font-size: 0.9375rem;
+    letter-spacing: normal;
+    cursor: pointer;
+    margin: 0;
+  }
+
+  button {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    padding: var(--space-2) var(--space-4);
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .primary-btn {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  .primary-btn:hover {
+    background: #5dd4a3;
+    transform: translateY(-1px);
+  }
+
+  .primary-btn:active {
+    transform: translateY(0);
+  }
+
+  .secondary-btn {
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+
+  .secondary-btn:hover {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .tool-status {
+    display: none;
+    margin-top: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .tool-status.success {
+    background: rgba(110, 231, 183, 0.1);
+    color: var(--color-accent);
+    border: 1px solid var(--color-accent);
+  }
+
+  .tool-status.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid #ef4444;
+  }
+
+  @media (max-width: 768px) {
+    .tool-container {
+      padding: var(--space-3);
+    }
+
+    .tool-header h2 {
+      font-size: 1.5rem;
+    }
+
+    textarea {
+      font-size: 0.8125rem;
+      min-height: 100px;
+    }
+
+    .button-group,
+    .action-group {
+      flex-direction: column;
+    }
+
+    button {
+      width: 100%;
+    }
+  }
+</style>

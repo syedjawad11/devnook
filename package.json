@@ -1,0 +1,31 @@
+{
+  "name": "devnook",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "Developer resource hub with tools, guides, and language references",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/cloudflare": "^11.1.0",
+    "@astrojs/sitemap": "^3.2.1",
+    "@resvg/resvg-js": "^2.6.2",
+    "astro": "^4.16.18",
+    "fuse.js": "^7.0.0",
+    "satori": "^0.11.2",
+    "sharp": "^0.33.5",
+    "typescript": "^5.7.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

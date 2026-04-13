@@ -1,0 +1,31 @@
+{
+  "slug": "hash-generator",
+  "name": "Hash Generator",
+  "description": "Generate MD5, SHA-1, SHA-256, and SHA-512 hashes from any text. Uses the browser's native SubtleCrypto API — no data leaves your browser.",
+  "tier": "client-side",
+  "batch": 2,
+  "category": "encoder",
+  "icon": "hash",
+  "tags": ["hash", "sha256", "sha512", "md5", "sha1", "crypto", "checksum"],
+  "seo_keywords": ["hash generator online", "sha256 generator", "md5 hash online", "sha512 hash", "text hash generator"],
+  "primary_keyword": "hash generator online",
+  "related_tools": ["base64-encoder", "uuid-generator"],
+  "related_content": ["what-is-hashing", "sha256-vs-md5"],
+  "input_label": "Text to hash",
+  "output_label": "Hash output",
+  "features": [
+    "SHA-256 hash generation",
+    "SHA-512 hash generation",
+    "SHA-1 hash generation",
+    "MD5 simulation (note: MD5 not in SubtleCrypto — uses pure JS fallback)",
+    "All hashing done in-browser via SubtleCrypto",
+    "Copy hash to clipboard",
+    "Instant hashing on input"
+  ],
+  "controls": [
+    {"type": "select", "label": "Algorithm", "options": ["SHA-256", "SHA-512", "SHA-1", "MD5"], "default": "SHA-256"},
+    {"type": "button", "label": "Generate Hash", "action": "hash"},
+    {"type": "checkbox", "label": "Uppercase output", "default": false}
+  ],
+  "template_id": "tool-exp-v1"
+}

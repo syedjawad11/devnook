@@ -1,0 +1,9 @@
+.env
+node_modules/
+dist/
+.astro/
+__pycache__/
+*.pyc
+agents/content-team/registry.db
+content-staging/
+.gemini/

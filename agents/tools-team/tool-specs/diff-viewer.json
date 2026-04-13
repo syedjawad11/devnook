@@ -1,0 +1,31 @@
+{
+  "slug": "diff-viewer",
+  "name": "Diff Checker",
+  "description": "Compare two text blocks side-by-side and see differences highlighted. Line-by-line diff with additions and deletions.",
+  "tier": "client-side",
+  "batch": 4,
+  "category": "utility",
+  "icon": "git-compare",
+  "tags": ["diff", "compare", "text comparison", "side-by-side", "changes"],
+  "seo_keywords": ["text diff online", "diff checker online", "compare text online", "text comparison tool", "diff checker"],
+  "primary_keyword": "diff checker online",
+  "related_tools": ["markdown-to-html", "regex-tester"],
+  "related_content": ["how-diff-works", "git-diff-explained"],
+  "input_label": "Original text",
+  "output_label": "Changed text",
+  "features": [
+    "Side-by-side diff view",
+    "Line-level diff highlighting",
+    "Additions shown in green",
+    "Deletions shown in red",
+    "Character-level diff within changed lines",
+    "Summary: N lines added, M lines removed"
+  ],
+  "controls": [
+    {"type": "button", "label": "Compare", "action": "compare"},
+    {"type": "button", "label": "Swap", "action": "swap"},
+    {"type": "button", "label": "Clear", "action": "clear"},
+    {"type": "select", "label": "View", "options": ["Side by side", "Unified"], "default": "Side by side"}
+  ],
+  "template_id": "tool-exp-v1"
+}

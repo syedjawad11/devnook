@@ -1,0 +1,244 @@
+---
+interface Props {
+  code: string;
+  lang?: string;
+  filename?: string;
+}
+
+const { code, lang = 'text', filename } = Astro.props;
+
+// Generate a unique ID for this code block instance
+const blockId = `code-${Math.random().toString(36).slice(2, 11)}`;
+---
+
+<div class="code-block">
+  {filename && (
+    <div class="code-header">
+      <span class="filename">{filename}</span>
+      <button
+        class="copy-button"
+        data-code-id={blockId}
+        aria-label="Copy code to clipboard"
+      >
+        <svg class="copy-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5.5 4.5V2.5C5.5 1.94772 5.94772 1.5 6.5 1.5H13.5C14.0523 1.5 14.5 1.94772 14.5 2.5V9.5C14.5 10.0523 14.0523 10.5 13.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="1.5" y="5.5" width="8" height="9" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <svg class="check-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8L6.5 11.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="copy-text">Copy</span>
+        <span class="copied-text">Copied!</span>
+      </button>
+    </div>
+  )}
+  <div class={`code-wrapper ${!filename ? 'no-header' : ''}`}>
+    {!filename && (
+      <button
+        class="copy-button floating"
+        data-code-id={blockId}
+        aria-label="Copy code to clipboard"
+      >
+        <svg class="copy-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5.5 4.5V2.5C5.5 1.94772 5.94772 1.5 6.5 1.5H13.5C14.0523 1.5 14.5 1.94772 14.5 2.5V9.5C14.5 10.0523 14.0523 10.5 13.5 10.5H11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="1.5" y="5.5" width="8" height="9" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <svg class="check-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 8L6.5 11.5L13 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    )}
+    <pre id={blockId} class={`language-${lang}`}><code>{code}</code></pre>
+  </div>
+</div>
+
+<script>
+  function initCodeBlocks() {
+    const copyButtons = document.querySelectorAll('.copy-button');
+    
+    copyButtons.forEach(button => {
+      button.addEventListener('click', async () => {
+        const codeId = button.getAttribute('data-code-id');
+        if (!codeId) return;
+        
+        const codeBlock = document.getElementById(codeId);
+        if (!codeBlock) return;
+        
+        const code = codeBlock.textContent || '';
+        
+        try {
+          await navigator.clipboard.writeText(code);
+          
+          // Add copied state
+          button.classList.add('copied');
+          
+          // Remove copied state after 2 seconds
+          setTimeout(() => {
+            button.classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Failed to copy code:', err);
+        }
+      });
+    });
+  }
+
+  // Initialize on page load
+  initCodeBlocks();
+
+  // Re-initialize on view transitions (Astro)
+  document.addEventListener('astro:page-load', initCodeBlocks);
+</script>
+
+<style>
+  .code-block {
+    width: 100%;
+    margin: var(--space-4) 0;
+  }
+
+  .code-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+  }
+
+  .filename {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--color-text-muted);
+    font-weight: 500;
+  }
+
+  .code-wrapper {
+    position: relative;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    overflow: hidden;
+  }
+
+  .code-wrapper.no-header {
+    border-radius: var(--radius-md);
+  }
+
+  pre {
+    margin: 0;
+    padding: var(--space-4);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text);
+    background: transparent;
+  }
+
+  code {
+    font-family: inherit;
+    font-size: inherit;
+    background: transparent;
+    padding: 0;
+  }
+
+  .copy-button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-2);
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .copy-button:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .copy-button.floating {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    padding: var(--space-1);
+    z-index: 1;
+  }
+
+  .copy-button svg {
+    flex-shrink: 0;
+  }
+
+  .check-icon,
+  .copied-text {
+    display: none;
+  }
+
+  .copy-button.copied .copy-icon,
+  .copy-button.copied .copy-text {
+    display: none;
+  }
+
+  .copy-button.copied .check-icon,
+  .copy-button.copied .copied-text {
+    display: block;
+  }
+
+  .copy-button.copied {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+
+  /* Scrollbar styling for code blocks */
+  pre::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  pre::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-sm);
+  }
+
+  pre::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  pre::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-muted);
+  }
+
+  /* Mobile adjustments */
+  @media (max-width: 768px) {
+    pre {
+      font-size: 13px;
+      padding: var(--space-3);
+    }
+
+    .code-header {
+      padding: var(--space-2);
+    }
+
+    .filename {
+      font-size: 12px;
+    }
+
+    .copy-text,
+    .copied-text {
+      display: none;
+    }
+
+    .copy-button {
+      padding: var(--space-1);
+    }
+  }
+</style>

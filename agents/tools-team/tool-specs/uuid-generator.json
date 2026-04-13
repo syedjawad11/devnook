@@ -1,0 +1,30 @@
+{
+  "slug": "uuid-generator",
+  "name": "UUID v4 Generator",
+  "description": "Generate cryptographically secure UUID v4 identifiers instantly. Generate one or in bulk — all client-side.",
+  "tier": "client-side",
+  "batch": 3,
+  "category": "generator",
+  "icon": "fingerprint",
+  "tags": ["uuid", "guid", "v4", "unique-id", "generator"],
+  "seo_keywords": ["uuid generator online", "uuid v4 generator", "guid generator", "random uuid", "generate uuid"],
+  "primary_keyword": "uuid generator online",
+  "related_tools": ["hash-generator", "sitemap-generator"],
+  "related_content": ["what-is-uuid", "uuid-vs-nanoid"],
+  "input_label": null,
+  "output_label": "Generated UUIDs",
+  "features": [
+    "Generate single UUID v4",
+    "Bulk generate up to 100 UUIDs",
+    "Uppercase or lowercase output",
+    "Copy individual or all UUIDs",
+    "Uses crypto.randomUUID() or SubtleCrypto fallback"
+  ],
+  "controls": [
+    {"type": "number-input", "label": "Count", "min": 1, "max": 100, "default": 1},
+    {"type": "button", "label": "Generate", "action": "generate"},
+    {"type": "checkbox", "label": "Uppercase", "default": false},
+    {"type": "button", "label": "Copy All", "action": "copyAll"}
+  ],
+  "template_id": "tool-exp-v1"
+}

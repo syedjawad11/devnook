@@ -1,0 +1,464 @@
+---
+// No server-side props needed — all tools are client-side
+---
+<div class="tool-container" id="tool-json-formatter">
+  <div class="tool-header">
+    <h2>JSON Formatter & Validator</h2>
+    <p class="tool-desc">Format, validate, and minify JSON instantly in your browser. No data sent to servers.</p>
+  </div>
+  
+  <div class="tool-body">
+    <div class="tool-input-section">
+      <label for="json-input" class="tool-label">Paste JSON here</label>
+      <textarea 
+        id="json-input" 
+        class="tool-textarea"
+        placeholder='{"name": "example", "value": 123}'
+        rows="12"
+        aria-label="JSON input"
+        spellcheck="false"
+      ></textarea>
+    </div>
+
+    <div class="tool-controls">
+      <div class="control-group">
+        <button id="btn-format" class="tool-button primary" aria-label="Format JSON">
+          Format
+        </button>
+        <button id="btn-minify" class="tool-button" aria-label="Minify JSON">
+          Minify
+        </button>
+        <button id="btn-validate" class="tool-button" aria-label="Validate JSON">
+          Validate
+        </button>
+      </div>
+      
+      <div class="control-group">
+        <label for="indent-select" class="indent-label">Indent:</label>
+        <select id="indent-select" class="tool-select" aria-label="Select indentation style">
+          <option value="2">2 spaces</option>
+          <option value="4">4 spaces</option>
+          <option value="tab">Tabs</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <button id="btn-copy" class="tool-button secondary" aria-label="Copy formatted JSON to clipboard">
+          Copy
+        </button>
+        <button id="btn-clear" class="tool-button secondary" aria-label="Clear all content">
+          Clear
+        </button>
+      </div>
+    </div>
+
+    <div class="tool-output-section">
+      <label for="json-output" class="tool-label">Formatted JSON</label>
+      <textarea 
+        id="json-output" 
+        class="tool-textarea"
+        rows="12"
+        readonly
+        aria-label="JSON output"
+        spellcheck="false"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="tool-status" id="status-message" aria-live="polite" aria-atomic="true"></div>
+</div>
+
+<script>
+(function() {
+  const inputEl = document.getElementById('json-input');
+  const outputEl = document.getElementById('json-output');
+  const statusEl = document.getElementById('status-message');
+  const indentSelect = document.getElementById('indent-select');
+  
+  const btnFormat = document.getElementById('btn-format');
+  const btnMinify = document.getElementById('btn-minify');
+  const btnValidate = document.getElementById('btn-validate');
+  const btnCopy = document.getElementById('btn-copy');
+  const btnClear = document.getElementById('btn-clear');
+
+  let statusTimeout = null;
+
+  function showStatus(message, type = 'info') {
+    clearTimeout(statusTimeout);
+    statusEl.textContent = message;
+    statusEl.className = `tool-status ${type}`;
+    
+    if (type === 'success' || type === 'info') {
+      statusTimeout = setTimeout(() => {
+        statusEl.textContent = '';
+        statusEl.className = 'tool-status';
+      }, 3000);
+    }
+  }
+
+  function getIndentValue() {
+    const value = indentSelect.value;
+    if (value === 'tab') {
+      return '\t';
+    }
+    return parseInt(value, 10);
+  }
+
+  function parseJSON(jsonString) {
+    try {
+      return { success: true, data: JSON.parse(jsonString) };
+    } catch (error) {
+      const match = error.message.match(/position (\d+)/);
+      let errorMsg = error.message;
+      
+      if (match) {
+        const position = parseInt(match[1], 10);
+        const lines = jsonString.substring(0, position).split('\n');
+        const lineNumber = lines.length;
+        const columnNumber = lines[lines.length - 1].length + 1;
+        errorMsg = `Invalid JSON at line ${lineNumber}, column ${columnNumber}: ${error.message}`;
+      } else {
+        errorMsg = `Invalid JSON: ${error.message}`;
+      }
+      
+      return { success: false, error: errorMsg };
+    }
+  }
+
+  function formatJSON() {
+    const input = inputEl.value.trim();
+    
+    if (!input) {
+      showStatus('Please enter some JSON to format', 'error');
+      outputEl.value = '';
+      return;
+    }
+
+    const result = parseJSON(input);
+    
+    if (!result.success) {
+      showStatus(result.error, 'error');
+      outputEl.value = '';
+      return;
+    }
+
+    try {
+      const formatted = JSON.stringify(result.data, null, getIndentValue());
+      outputEl.value = formatted;
+      showStatus('JSON formatted successfully', 'success');
+    } catch (error) {
+      showStatus(`Error formatting JSON: ${error.message}`, 'error');
+      outputEl.value = '';
+    }
+  }
+
+  function minifyJSON() {
+    const input = inputEl.value.trim();
+    
+    if (!input) {
+      showStatus('Please enter some JSON to minify', 'error');
+      outputEl.value = '';
+      return;
+    }
+
+    const result = parseJSON(input);
+    
+    if (!result.success) {
+      showStatus(result.error, 'error');
+      outputEl.value = '';
+      return;
+    }
+
+    try {
+      const minified = JSON.stringify(result.data);
+      outputEl.value = minified;
+      showStatus('JSON minified successfully', 'success');
+    } catch (error) {
+      showStatus(`Error minifying JSON: ${error.message}`, 'error');
+      outputEl.value = '';
+    }
+  }
+
+  function validateJSON() {
+    const input = inputEl.value.trim();
+    
+    if (!input) {
+      showStatus('Please enter some JSON to validate', 'error');
+      return;
+    }
+
+    const result = parseJSON(input);
+    
+    if (!result.success) {
+      showStatus(result.error, 'error');
+    } else {
+      showStatus('Valid JSON', 'success');
+    }
+  }
+
+  function copyToClipboard() {
+    const output = outputEl.value;
+    
+    if (!output) {
+      showStatus('Nothing to copy', 'error');
+      return;
+    }
+
+    if (!navigator.clipboard) {
+      showStatus('Clipboard API not supported in this browser', 'error');
+      return;
+    }
+
+    navigator.clipboard.writeText(output)
+      .then(() => {
+        const originalText = btnCopy.textContent;
+        btnCopy.textContent = 'Copied!';
+        btnCopy.classList.add('copied');
+        
+        setTimeout(() => {
+          btnCopy.textContent = originalText;
+          btnCopy.classList.remove('copied');
+        }, 2000);
+        
+        showStatus('Copied to clipboard', 'success');
+      })
+      .catch((error) => {
+        showStatus(`Failed to copy: ${error.message}`, 'error');
+      });
+  }
+
+  function clearAll() {
+    inputEl.value = '';
+    outputEl.value = '';
+    statusEl.textContent = '';
+    statusEl.className = 'tool-status';
+    indentSelect.value = '2';
+    showStatus('Cleared', 'info');
+  }
+
+  btnFormat.addEventListener('click', formatJSON);
+  btnMinify.addEventListener('click', minifyJSON);
+  btnValidate.addEventListener('click', validateJSON);
+  btnCopy.addEventListener('click', copyToClipboard);
+  btnClear.addEventListener('click', clearAll);
+
+  inputEl.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      formatJSON();
+    }
+  });
+})();
+</script>
+
+<style>
+.tool-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-5);
+}
+
+.tool-header h2 {
+  font-family: var(--font-body);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.tool-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tool-input-section,
+.tool-output-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tool-label {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tool-textarea {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.tool-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.tool-textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.tool-textarea[readonly] {
+  background: var(--color-bg);
+  cursor: default;
+}
+
+.tool-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tool-button {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-button:hover {
+  background: var(--color-border);
+  border-color: var(--color-text-muted);
+}
+
+.tool-button:active {
+  transform: translateY(1px);
+}
+
+.tool-button.primary {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.tool-button.primary:hover {
+  background: var(--color-accent);
+  opacity: 0.9;
+  border-color: var(--color-accent);
+}
+
+.tool-button.secondary {
+  background: transparent;
+}
+
+.tool-button.copied {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.indent-label {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.tool-select {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.tool-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.tool-status {
+  min-height: 24px;
+  padding: var(--space-2) var(--space-3);
+  margin-top: var(--space-3);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.tool-status.success {
+  background: rgba(110, 231, 183, 0.1);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.tool-status.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  border: 1px solid #ef4444;
+}
+
+.tool-status.info {
+  background: rgba(124, 58, 237, 0.1);
+  color: var(--color-accent-2);
+  border: 1px solid var(--color-accent-2);
+}
+
+@media (min-width: 768px) {
+  .tool-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: var(--space-5);
+  }
+
+  .tool-input-section {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .tool-output-section {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .tool-controls {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+  }
+}
+</style>

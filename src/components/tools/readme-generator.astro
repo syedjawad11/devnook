@@ -1,0 +1,408 @@
+---
+// README Template Generator — No server-side props needed
+---
+<div class="tool-container" id="tool-readme-generator">
+  <div class="tool-header">
+    <h2>README Template Generator</h2>
+    <p class="tool-desc">Generate a professional README.md template for your project. Fill in the fields and get a ready-to-use markdown file instantly.</p>
+  </div>
+
+  <div class="tool-body">
+    <div class="tool-input-section">
+      <div class="form-group">
+        <label for="project-name">Project name</label>
+        <input
+          type="text"
+          id="project-name"
+          placeholder="my-awesome-tool"
+          aria-label="Project name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="project-description">Short description</label>
+        <textarea
+          id="project-description"
+          rows="3"
+          placeholder="A tool that does X"
+          aria-label="Short description"
+        ></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="project-type">Project type</label>
+          <select id="project-type" aria-label="Project type">
+            <option value="CLI tool">CLI tool</option>
+            <option value="Library/Package">Library/Package</option>
+            <option value="Web app" selected>Web app</option>
+            <option value="API">API</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="license">License</label>
+          <select id="license" aria-label="License">
+            <option value="MIT" selected>MIT</option>
+            <option value="Apache 2.0">Apache 2.0</option>
+            <option value="GPL v3">GPL v3</option>
+            <option value="None">None</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" id="include-badges" checked aria-label="Include badges section" />
+          <span>Include badges section</span>
+        </label>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <label>
+          <input type="checkbox" id="include-contributing" checked aria-label="Include contributing section" />
+          <span>Include contributing section</span>
+        </label>
+      </div>
+
+      <div class="tool-controls">
+        <button id="generate-btn" class="btn-primary" aria-label="Generate README">Generate README</button>
+        <button id="copy-btn" class="btn-secondary" aria-label="Copy Markdown to clipboard" disabled>Copy Markdown</button>
+        <button id="clear-btn" class="btn-tertiary" aria-label="Clear all fields">Clear</button>
+      </div>
+    </div>
+
+    <div class="tool-output-section">
+      <div class="output-header">
+        <label for="output">Generated README.md</label>
+      </div>
+      <textarea
+        id="output"
+        readonly
+        placeholder="Your README will appear here..."
+        aria-label="Generated README markdown"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="tool-status" aria-live="polite"></div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const projectName = document.getElementById('project-name') as HTMLInputElement;
+    const projectDescription = document.getElementById('project-description') as HTMLTextAreaElement;
+    const projectType = document.getElementById('project-type') as HTMLSelectElement;
+    const license = document.getElementById('license') as HTMLSelectElement;
+    const includeBadges = document.getElementById('include-badges') as HTMLInputElement;
+    const includeContributing = document.getElementById('include-contributing') as HTMLInputElement;
+    const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement;
+    const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement;
+    const clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
+    const output = document.getElementById('output') as HTMLTextAreaElement;
+    const status = document.querySelector('.tool-status') as HTMLDivElement;
+
+    function showStatus(message: string, isError = false) {
+      status.textContent = message;
+      status.className = `tool-status ${isError ? 'error' : 'success'}`;
+      if (!isError) {
+        setTimeout(() => {
+          status.textContent = '';
+          status.className = 'tool-status';
+        }, 3000);
+      }
+    }
+
+    function generateReadme() {
+      const name = projectName.value.trim();
+      const description = projectDescription.value.trim();
+      const type = projectType.value;
+      const licenseType = license.value;
+      const badges = includeBadges.checked;
+      const contributing = includeContributing.checked;
+
+      if (!name) {
+        showStatus('Please enter a project name', true);
+        projectName.focus();
+        return;
+      }
+
+      if (!description) {
+        showStatus('Please enter a project description', true);
+        projectDescription.focus();
+        return;
+      }
+
+      let readme = `# ${name}\n\n`;
+
+      if (badges) {
+        readme += `![License](https://img.shields.io/badge/license-${encodeURIComponent(licenseType === 'None' ? 'Unlicensed' : licenseType)}-blue.svg)\n`;
+        readme += `![Version](https://img.shields.io/badge/version-1.0.0-green.svg)\n\n`;
+      }
+
+      readme += `${description}\n\n`;
+
+      readme += `## Table of Contents\n\n`;
+      readme += `- [Features](#features)\n`;
+      readme += `- [Installation](#installation)\n`;
+      readme += `- [Usage](#usage)\n`;
+      if (type === 'CLI tool') {
+        readme += `- [Commands](#commands)\n`;
+      } else if (type === 'Library/Package' || type === 'API') {
+        readme += `- [API Reference](#api-reference)\n`;
+      }
+      if (contributing) {
+        readme += `- [Contributing](#contributing)\n`;
+      }
+      if (licenseType !== 'None') {
+        readme += `- [License](#license)\n`;
+      }
+      readme += `\n`;
+
+      readme += `## Features\n\n`;
+      readme += `- Feature 1\n`;
+      readme += `- Feature 2\n`;
+      readme += `- Feature 3\n\n`;
+
+      readme += `## Installation\n\n`;
+      if (type === 'Library/Package') {
+        readme += `\`\`\`bash\nnpm install ${name}\n\`\`\`\n\n`;
+      } else if (type === 'CLI tool') {
+        readme += `\`\`\`bash\nnpm install -g ${name}\n\`\`\`\n\n`;
+      } else {
+        readme += `\`\`\`bash\ngit clone https://github.com/yourusername/${name}.git\ncd ${name}\nnpm install\n\`\`\`\n\n`;
+      }
+
+      readme += `## Usage\n\n`;
+      if (type === 'CLI tool') {
+        readme += `\`\`\`bash\n${name} [command] [options]\n\`\`\`\n\n`;
+        readme += `### Commands\n\n`;
+        readme += `- \`${name} init\` — Initialize a new project\n`;
+        readme += `- \`${name} build\` — Build the project\n`;
+        readme += `- \`${name} deploy\` — Deploy the project\n\n`;
+      } else if (type === 'Library/Package') {
+        readme += `\`\`\`javascript\nconst ${name.replace(/-/g, '')} = require('${name}');\n\n// Example usage\nconst result = ${name.replace(/-/g, '')}.doSomething();\nconsole.log(result);\n\`\`\`\n\n`;
+        readme += `### API Reference\n\n`;
+        readme += `#### \`doSomething(param)\`\n\n`;
+        readme += `Description of what this function does.\n\n`;
+        readme += `**Parameters:**\n`;
+        readme += `- \`param\` (string): Description of parameter\n\n`;
+        readme += `**Returns:** Description of return value\n\n`;
+      } else if (type === 'API') {
+        readme += `Base URL: \`https://api.example.com\`\n\n`;
+        readme += `### Endpoints\n\n`;
+        readme += `#### GET /api/resource\n\n`;
+        readme += `Fetches a list of resources.\n\n`;
+        readme += `**Response:**\n`;
+        readme += `\`\`\`json\n{\n  "data": [],\n  "status": "success"\n}\n\`\`\`\n\n`;
+      } else if (type === 'Web app') {
+        readme += `\`\`\`bash\nnpm start\n\`\`\`\n\n`;
+        readme += `Open [http://localhost:3000](http://localhost:3000) to view it in the browser.\n\n`;
+      } else {
+        readme += `Provide instructions for using your project here.\n\n`;
+      }
+
+      if (contributing) {
+        readme += `## Contributing\n\n`;
+        readme += `Contributions are welcome! Please follow these steps:\n\n`;
+        readme += `1. Fork the repository\n`;
+        readme += `2. Create a feature branch (\`git checkout -b feature/amazing-feature\`)\n`;
+        readme += `3. Commit your changes (\`git commit -m 'Add amazing feature'\`)\n`;
+        readme += `4. Push to the branch (\`git push origin feature/amazing-feature\`)\n`;
+        readme += `5. Open a Pull Request\n\n`;
+      }
+
+      if (licenseType !== 'None') {
+        readme += `## License\n\n`;
+        readme += `This project is licensed under the ${licenseType} License. See the [LICENSE](LICENSE) file for details.\n\n`;
+      }
+
+      readme += `---\n\n`;
+      readme += `Created with [DevNook README Generator](https://devnook.dev/tools/readme-generator)\n`;
+
+      output.value = readme;
+      copyBtn.disabled = false;
+      showStatus('README generated successfully!');
+    }
+
+    async function copyToClipboard() {
+      if (!output.value) {
+        showStatus('Nothing to copy', true);
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(output.value);
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        showStatus('Copied to clipboard!');
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+        }, 2000);
+      } catch (err) {
+        showStatus('Failed to copy to clipboard', true);
+      }
+    }
+
+    function clearFields() {
+      projectName.value = '';
+      projectDescription.value = '';
+      projectType.selectedIndex = 2;
+      license.selectedIndex = 0;
+      includeBadges.checked = true;
+      includeContributing.checked = true;
+      output.value = '';
+      copyBtn.disabled = true;
+      status.textContent = '';
+      status.className = 'tool-status';
+      projectName.focus();
+    }
+
+    generateBtn.addEventListener('click', generateReadme);
+    copyBtn.addEventListener('click', copyToClipboard);
+    clearBtn.addEventListener('click', clearFields);
+
+    projectName.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') generateReadme();
+    });
+  });
+</script>
+
+<style>
+  .tool-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .tool-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .tool-header h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 var(--space-2) 0;
+  }
+
+  .tool-desc {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  .tool-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 768px) {
+    .tool-body {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .tool-input-section,
+  .tool-output-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text);
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: var(--font-mono);
+    line-height: 1.5;
+  }
+
+  #output {
+    min-height: 500px;
+    font-size: 0.8125rem;
+  }
+
+  select {
+    cursor: pointer;
+  }
+
+  .checkbox-group {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-accent);
+  }
+
+  .tool-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+  }
+
+  button {
+    padding: var(--space-3) var(--space-5);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--color-

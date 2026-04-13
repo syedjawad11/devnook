@@ -1,0 +1,31 @@
+{
+  "slug": "cron-parser",
+  "name": "Cron Expression Builder",
+  "description": "Build, parse, and understand cron expressions in plain English. See the next 5 run times and validate your cron schedule.",
+  "tier": "client-side",
+  "batch": 3,
+  "category": "utility",
+  "icon": "clock",
+  "tags": ["cron", "scheduler", "cron expression", "devops", "automation"],
+  "seo_keywords": ["cron expression builder", "cron parser online", "cron expression parser", "cron explainer", "cron schedule validator"],
+  "primary_keyword": "cron expression builder",
+  "related_tools": ["regex-tester", "uuid-generator"],
+  "related_content": ["cron-syntax-guide", "cron-expressions-explained"],
+  "input_label": "Enter cron expression",
+  "output_label": "Explanation & next runs",
+  "features": [
+    "Plain English explanation of cron expression",
+    "Next 5 scheduled run times",
+    "Supports standard 5-field and 6-field (with seconds) cron",
+    "Common preset expressions (every minute, hourly, daily, weekly, monthly)",
+    "Validation with helpful error messages",
+    "Timezone selector"
+  ],
+  "controls": [
+    {"type": "text-input", "label": "Cron expression", "placeholder": "0 9 * * 1-5"},
+    {"type": "select", "label": "Timezone", "options": ["UTC", "Local"], "default": "UTC"},
+    {"type": "button", "label": "Parse", "action": "parse"},
+    {"type": "select", "label": "Presets", "options": ["Every minute", "Every hour", "Daily at midnight", "Weekly Monday", "Monthly 1st"], "default": ""}
+  ],
+  "template_id": "tool-exp-v1"
+}

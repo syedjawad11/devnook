@@ -1,0 +1,312 @@
+@import './tokens.css';
+
+/* CSS Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base Styles */
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Base Link Styles */
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Base Code Styles */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--color-surface);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  background: var(--color-surface);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  font-size: inherit;
+}
+
+/* Prose Styles */
+.prose {
+  color: var(--color-text);
+  max-width: 65ch;
+}
+
+.prose > * + * {
+  margin-top: var(--space-4);
+}
+
+.prose h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-4);
+  color: var(--color-text);
+}
+
+.prose h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin-top: var(--space-7);
+  margin-bottom: var(--space-3);
+  color: var(--color-text);
+}
+
+.prose h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-3);
+  color: var(--color-text);
+}
+
+.prose h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-2);
+  color: var(--color-text);
+}
+
+.prose p {
+  line-height: 1.7;
+  color: var(--color-text);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: var(--space-5);
+  line-height: 1.7;
+}
+
+.prose li {
+  margin-top: var(--space-2);
+  color: var(--color-text);
+}
+
+.prose li::marker {
+  color: var(--color-text-muted);
+}
+
+.prose blockquote {
+  border-left: 4px solid var(--color-accent);
+  padding-left: var(--space-4);
+  margin-left: 0;
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
+  font-size: 0.9375rem;
+}
+
+.prose table thead {
+  border-bottom: 2px solid var(--color-border);
+}
+
+.prose table th {
+  text-align: left;
+  font-weight: 600;
+  padding: var(--space-3);
+  color: var(--color-text);
+  background: var(--color-surface);
+}
+
+.prose table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.prose table tbody tr:hover {
+  background: var(--color-surface);
+}
+
+.prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+.prose a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--color-surface);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  color: var(--color-accent);
+}
+
+.prose pre {
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.prose pre code {
+  background: transparent;
+  padding: 0;
+  border: none;
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  margin-top: var(--space-5);
+  margin-bottom: var(--space-5);
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.prose em {
+  font-style: italic;
+}
+
+/* Utility Classes */
+.container {
+  max-width: var(--max-w-site);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Focus Styles */
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Selection Styles */
+::selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+::-moz-selection {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}

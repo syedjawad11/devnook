@@ -1,0 +1,116 @@
+---
+interface Props {
+  posts: Array<{
+    title: string;
+    slug: string;
+    category: string;
+  }>;
+}
+
+const { posts } = Astro.props;
+---
+
+{posts && posts.length > 0 && (
+  <section class="related-posts">
+    <h2 class="related-posts__heading">Related Posts</h2>
+    <ul class="related-posts__list">
+      {posts.map((post) => (
+        <li class="related-posts__item">
+          <a href={post.slug} class="related-posts__link">
+            <span class="related-posts__title">{post.title}</span>
+            <span class="related-posts__category">{post.category}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  .related-posts {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+  }
+
+  .related-posts__heading {
+    font-family: var(--font-body);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .related-posts__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .related-posts__item {
+    margin: 0;
+    padding: 0;
+  }
+
+  .related-posts__link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    transition: background 0.2s ease;
+  }
+
+  .related-posts__link:hover {
+    background: var(--color-bg);
+  }
+
+  .related-posts__title {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--color-text);
+    flex: 1;
+    transition: color 0.2s ease;
+  }
+
+  .related-posts__link:hover .related-posts__title {
+    color: var(--color-accent);
+  }
+
+  .related-posts__category {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 768px) {
+    .related-posts {
+      padding: var(--space-4);
+    }
+
+    .related-posts__heading {
+      font-size: 1rem;
+    }
+
+    .related-posts__link {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .related-posts__category {
+      font-size: 0.6875rem;
+    }
+  }
+</style>

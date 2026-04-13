@@ -1,0 +1,455 @@
+---
+// No server-side props needed — all tools are client-side
+---
+<div class="tool-container" id="tool-html-formatter">
+  <div class="tool-header">
+    <h2>HTML Formatter & Minifier</h2>
+    <p class="tool-desc">Beautify and minify HTML code instantly with proper indentation or production-ready compression.</p>
+  </div>
+  <div class="tool-body">
+    <div class="tool-input-section">
+      <div class="input-header">
+        <label for="html-input">Paste HTML here</label>
+        <span class="char-count" id="input-count">0 characters</span>
+      </div>
+      <textarea 
+        id="html-input" 
+        class="tool-textarea"
+        placeholder="<html>&#10;  <body>&#10;    <h1>Hello World</h1>&#10;  </body>&#10;</html>"
+        spellcheck="false"
+        aria-label="HTML input"
+      ></textarea>
+    </div>
+    <div class="tool-controls">
+      <button 
+        id="format-btn" 
+        class="tool-btn tool-btn-primary"
+        aria-label="Format HTML with indentation"
+      >
+        Format
+      </button>
+      <button 
+        id="minify-btn" 
+        class="tool-btn tool-btn-secondary"
+        aria-label="Minify HTML by removing whitespace"
+      >
+        Minify
+      </button>
+      <div class="control-group">
+        <label for="indent-select">Indent</label>
+        <select 
+          id="indent-select" 
+          class="tool-select"
+          aria-label="Select indentation style"
+        >
+          <option value="2">2 spaces</option>
+          <option value="4">4 spaces</option>
+          <option value="tab">tabs</option>
+        </select>
+      </div>
+      <button 
+        id="clear-btn" 
+        class="tool-btn tool-btn-ghost"
+        aria-label="Clear all fields"
+      >
+        Clear
+      </button>
+    </div>
+    <div class="tool-output-section">
+      <div class="output-header">
+        <label for="html-output">Formatted/minified HTML</label>
+        <div class="output-actions">
+          <span class="char-count" id="output-count">0 characters</span>
+          <button 
+            id="copy-btn" 
+            class="tool-btn tool-btn-small"
+            aria-label="Copy output to clipboard"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+      <textarea 
+        id="html-output" 
+        class="tool-textarea"
+        readonly
+        placeholder="Formatted or minified HTML will appear here..."
+        spellcheck="false"
+        aria-label="HTML output"
+      ></textarea>
+    </div>
+  </div>
+  <div class="tool-status" id="status-message" aria-live="polite"></div>
+</div>
+
+<script>
+(function() {
+  const inputArea = document.getElementById('html-input');
+  const outputArea = document.getElementById('html-output');
+  const formatBtn = document.getElementById('format-btn');
+  const minifyBtn = document.getElementById('minify-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const copyBtn = document.getElementById('copy-btn');
+  const indentSelect = document.getElementById('indent-select');
+  const statusMessage = document.getElementById('status-message');
+  const inputCount = document.getElementById('input-count');
+  const outputCount = document.getElementById('output-count');
+
+  function updateCharCount(element, countElement) {
+    const count = element.value.length;
+    countElement.textContent = `${count.toLocaleString()} character${count !== 1 ? 's' : ''}`;
+  }
+
+  function showStatus(message, isError = false) {
+    statusMessage.textContent = message;
+    statusMessage.className = 'tool-status' + (isError ? ' error' : ' success');
+    statusMessage.style.display = 'block';
+    setTimeout(() => {
+      statusMessage.style.display = 'none';
+    }, 3000);
+  }
+
+  function getIndentString() {
+    const value = indentSelect.value;
+    if (value === 'tab') return '\t';
+    return ' '.repeat(parseInt(value));
+  }
+
+  function formatHTML(html) {
+    const indentStr = getIndentString();
+    let formatted = '';
+    let indent = 0;
+    const tokens = html.split(/(<[^>]+>)/g).filter(token => token.trim());
+    
+    const inlineElements = new Set([
+      'a', 'abbr', 'b', 'bdi', 'bdo', 'br', 'cite', 'code', 'data', 'dfn', 
+      'em', 'i', 'kbd', 'mark', 'q', 's', 'samp', 'small', 'span', 'strong', 
+      'sub', 'sup', 'time', 'u', 'var', 'wbr'
+    ]);
+
+    const selfClosing = new Set([
+      'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 
+      'link', 'meta', 'param', 'source', 'track', 'wbr'
+    ]);
+
+    let previousWasText = false;
+    let previousWasInline = false;
+
+    for (let i = 0; i < tokens.length; i++) {
+      const token = tokens[i];
+      
+      if (token.startsWith('<!--')) {
+        formatted += indentStr.repeat(indent) + token + '\n';
+        previousWasText = false;
+        previousWasInline = false;
+      } else if (token.startsWith('</')) {
+        const tagName = token.match(/<\/([a-z0-9-]+)/i)?.[1]?.toLowerCase();
+        const isInline = tagName && inlineElements.has(tagName);
+        
+        if (!isInline && !previousWasInline) {
+          indent = Math.max(0, indent - 1);
+          formatted += indentStr.repeat(indent) + token + '\n';
+        } else {
+          formatted += token;
+          if (!isInline) formatted += '\n';
+        }
+        previousWasText = false;
+        previousWasInline = isInline;
+      } else if (token.startsWith('<')) {
+        const tagMatch = token.match(/<([a-z0-9-]+)/i);
+        const tagName = tagMatch?.[1]?.toLowerCase();
+        const isInline = tagName && inlineElements.has(tagName);
+        const isSelfClosing = tagName && (selfClosing.has(tagName) || token.endsWith('/>'));
+        
+        if (!isInline && !previousWasInline && !previousWasText) {
+          formatted += indentStr.repeat(indent) + token + '\n';
+          if (!isSelfClosing) indent++;
+        } else {
+          formatted += token;
+          if (!isInline && !isSelfClosing) {
+            formatted += '\n';
+            indent++;
+          }
+        }
+        previousWasText = false;
+        previousWasInline = isInline;
+      } else {
+        const trimmed = token.trim();
+        if (trimmed) {
+          if (!previousWasInline) {
+            formatted += indentStr.repeat(indent) + trimmed + '\n';
+          } else {
+            formatted += trimmed;
+          }
+          previousWasText = true;
+        }
+        previousWasInline = false;
+      }
+    }
+    
+    return formatted.trim();
+  }
+
+  function minifyHTML(html) {
+    return html
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/>\s+</g, '><')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  }
+
+  function handleFormat() {
+    const input = inputArea.value.trim();
+    if (!input) {
+      showStatus('Please paste HTML code to format.', true);
+      return;
+    }
+
+    try {
+      const formatted = formatHTML(input);
+      outputArea.value = formatted;
+      updateCharCount(outputArea, outputCount);
+      showStatus('HTML formatted successfully!');
+    } catch (error) {
+      showStatus('Failed to format HTML. Please check your input.', true);
+    }
+  }
+
+  function handleMinify() {
+    const input = inputArea.value.trim();
+    if (!input) {
+      showStatus('Please paste HTML code to minify.', true);
+      return;
+    }
+
+    try {
+      const minified = minifyHTML(input);
+      outputArea.value = minified;
+      updateCharCount(outputArea, outputCount);
+      const reduction = ((1 - minified.length / input.length) * 100).toFixed(1);
+      showStatus(`HTML minified successfully! Size reduced by ${reduction}%`);
+    } catch (error) {
+      showStatus('Failed to minify HTML. Please check your input.', true);
+    }
+  }
+
+  function handleClear() {
+    inputArea.value = '';
+    outputArea.value = '';
+    updateCharCount(inputArea, inputCount);
+    updateCharCount(outputArea, outputCount);
+    showStatus('All fields cleared.');
+  }
+
+  async function handleCopy() {
+    const output = outputArea.value.trim();
+    if (!output) {
+      showStatus('No output to copy.', true);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(output);
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    } catch (error) {
+      showStatus('Failed to copy to clipboard.', true);
+    }
+  }
+
+  formatBtn.addEventListener('click', handleFormat);
+  minifyBtn.addEventListener('click', handleMinify);
+  clearBtn.addEventListener('click', handleClear);
+  copyBtn.addEventListener('click', handleCopy);
+  
+  inputArea.addEventListener('input', () => {
+    updateCharCount(inputArea, inputCount);
+  });
+
+  updateCharCount(inputArea, inputCount);
+  updateCharCount(outputArea, outputCount);
+})();
+</script>
+
+<style>
+.tool-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-5);
+}
+
+.tool-header h2 {
+  font-family: var(--font-body);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.tool-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tool-input-section,
+.tool-output-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.input-header,
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.input-header label,
+.output-header label {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.char-count {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.output-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.tool-textarea {
+  width: 100%;
+  min-height: 240px;
+  padding: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.tool-textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.tool-textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.tool-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.control-group label {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.tool-select {
+  padding: var(--space-2) var(--space-3);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.tool-select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.tool-btn {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tool-btn-primary {
+  color: var(--color-bg);
+  background: var(--color-accent);
+}
+
+.tool-btn-primary:hover {
+  opacity: 0.9;
+}
+
+.tool-btn-secondary {
+  color: var(--color-text);
+  background: var(--color-accent-2);
+}
+
+.tool-btn-secondary:hover {
+  opacity: 0.9;
+}
+
+.tool-btn-ghost {
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid var(--color-border);
+}
+
+.tool-btn-ghost:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+.tool-btn-small {
+  padding: var(--space-1) var(--space-3);
+  font-size: 0.8125rem;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 1px solid var(
