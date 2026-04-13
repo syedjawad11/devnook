@@ -1,0 +1,135 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+
+export async function getStaticPaths() {
+  const LANGUAGE_NAME_MAP: Record<string, string> = {
+    python: 'Python',
+    javascript: 'JavaScript',
+    typescript: 'TypeScript',
+    go: 'Go',
+    rust: 'Rust',
+    java: 'Java',
+    csharp: 'C#',
+    php: 'PHP',
+    ruby: 'Ruby',
+    swift: 'Swift',
+    kotlin: 'Kotlin',
+    cpp: 'C++'
+  };
+  const formatLanguageName = (slug: string): string =>
+    LANGUAGE_NAME_MAP[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
+
+  const allLanguagePosts = await getCollection('languages');
+
+  const languageMap = new Map<string, { displayName: string; posts: any[] }>();
+
+  allLanguagePosts.forEach(post => {
+    const lang = post.data.language;
+    if (!languageMap.has(lang)) {
+      languageMap.set(lang, {
+        displayName: formatLanguageName(lang),
+        posts: []
+      });
+    }
+    languageMap.get(lang)!.posts.push(post);
+  });
+
+  return Array.from(languageMap.entries()).map(([lang, data]) => ({
+    params: { lang },
+    props: {
+      language: lang,
+      displayName: data.displayName,
+      posts: data.posts.sort((a, b) =>
+        new Date(b.data.published_date).getTime() - new Date(a.data.published_date).getTime()
+      )
+    }
+  }));
+}
+
+const { language, displayName, posts } = Astro.props;
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Languages', href: '/languages/' },
+  { label: displayName, href: `/languages/${language}` }
+];
+
+const pageTitle = `${displayName} Tutorials & Concepts`;
+const pageDescription = `Learn ${displayName} with ${posts.length} tutorials covering core concepts, syntax, and best practices. Clear examples and explanations for developers.`;
+---
+
+<BaseLayout 
+  title={pageTitle}
+  description={pageDescription}
+  breadcrumbs={breadcrumbs}
+>
+  <div class="language-hub">
+    <header class="hub-header">
+      <h1>{displayName}</h1>
+      <p class="post-count">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</p>
+    </header>
+
+    <div class="posts-grid">
+      {posts.map(post => (
+        <PostCard
+          title={post.data.title}
+          description={post.data.description}
+          href={`/languages/${language}/${post.data.concept}`}
+          tags={post.data.tags}
+          publishedDate={post.data.published_date}
+        />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .language-hub {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .hub-header {
+    margin-bottom: var(--space-7);
+    text-align: center;
+  }
+
+  .hub-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-3) 0;
+    font-family: var(--font-body);
+  }
+
+  .post-count {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    font-family: var(--font-body);
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 768px) {
+    .language-hub {
+      padding: var(--space-7) var(--space-5);
+    }
+
+    .hub-header h1 {
+      font-size: 3rem;
+    }
+
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-6);
+    }
+  }
+</style>

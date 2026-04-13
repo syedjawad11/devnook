@@ -1,0 +1,61 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import PostLayout from '../../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const languagePosts = await getCollection('languages');
+  
+  return languagePosts.map((entry) => ({
+    params: {
+      lang: entry.data.language,
+      concept: entry.data.concept,
+    },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'languages'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Languages', href: '/languages/' },
+  { 
+    label: entry.data.language.charAt(0).toUpperCase() + entry.data.language.slice(1), 
+    href: `/languages/${entry.data.language}` 
+  },
+  { label: entry.data.title, href: '' },
+];
+
+const languageDisplay = entry.data.language.charAt(0).toUpperCase() + entry.data.language.slice(1);
+---
+
+<PostLayout frontmatter={entry.data}>
+  <div class="language-badge">
+    <span class="badge-text">{languageDisplay}</span>
+  </div>
+  <Content />
+</PostLayout>
+
+<style>
+  .language-badge {
+    display: inline-block;
+    margin-bottom: var(--space-4);
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .badge-text {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--color-accent);
+    font-weight: 500;
+    text-transform: lowercase;
+  }
+</style>

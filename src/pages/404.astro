@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout 
+  title="404 — Page Not Found | DevNook"
+  description="The page you're looking for doesn't exist. Return to DevNook for developer tools, guides, and language references."
+>
+  <div class="error-container">
+    <h1 class="error-code">404</h1>
+    <h2 class="error-title">Page Not Found</h2>
+    <p class="error-message">
+      The page you're looking for doesn't exist or has been moved.
+    </p>
+    <a href="/" class="home-link">
+      Return to Homepage
+    </a>
+  </div>
+</BaseLayout>
+
+<style>
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+  }
+
+  .error-code {
+    font-size: 8rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-accent);
+    margin: 0;
+    letter-spacing: -0.05em;
+  }
+
+  .error-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: var(--space-4) 0 var(--space-3);
+  }
+
+  .error-message {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    max-width: 32rem;
+    margin: 0 0 var(--space-5);
+    line-height: 1.6;
+  }
+
+  .home-link {
+    display: inline-block;
+    padding: var(--space-3) var(--space-5);
+    background: var(--color-accent);
+    color: var(--color-bg);
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .home-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(110, 231, 183, 0.3);
+  }
+
+  .home-link:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 768px) {
+    .error-code {
+      font-size: 6rem;
+    }
+
+    .error-title {
+      font-size: 1.5rem;
+    }
+
+    .error-message {
+      font-size: 1rem;
+    }
+  }
+</style>

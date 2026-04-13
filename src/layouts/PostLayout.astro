@@ -26,18 +26,21 @@ const formattedDate = new Date(frontmatter.published_date).toLocaleDateString('e
   day: 'numeric'
 });
 
-const breadcrumbItems = [];
+const breadcrumbItems: { label: string; href: string | null }[] = [
+  { label: 'Home', href: '/' },
+];
 const pathParts = Astro.url.pathname.split('/').filter(Boolean);
 
 if (pathParts.length > 0) {
   breadcrumbItems.push({ label: pathParts[0], href: `/${pathParts[0]}` });
 }
 if (pathParts.length > 1 && frontmatter.language) {
-  breadcrumbItems.push({ 
-    label: frontmatter.language, 
-    href: `/languages/${frontmatter.language}` 
+  breadcrumbItems.push({
+    label: frontmatter.language,
+    href: `/languages/${frontmatter.language}`
   });
 }
+breadcrumbItems.push({ label: frontmatter.title, href: null });
 ---
 
 <BaseLayout 
@@ -48,7 +51,7 @@ if (pathParts.length > 1 && frontmatter.language) {
   <article class="post-layout">
     <div class="container">
       <div class="post-header">
-        <Breadcrumb items={breadcrumbItems} />
+        <Breadcrumb crumbs={breadcrumbItems} />
         <h1>{frontmatter.title}</h1>
         <div class="meta-bar">
           <time datetime={frontmatter.published_date}>{formattedDate}</time>

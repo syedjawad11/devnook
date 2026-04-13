@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const guides = await getCollection('guides');
+const sortedGuides = guides.sort((a, b) => {
+  const dateA = new Date(a.data.published_date || '2024-01-01');
+  const dateB = new Date(b.data.published_date || '2024-01-01');
+  return dateB.getTime() - dateA.getTime();
+});
+
+const title = 'Developer Guides — DevNook';
+const description = 'In-depth guides and tutorials for developers. Learn programming concepts, best practices, and advanced techniques.';
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="guides-index">
+    <header class="page-header">
+      <h1>Developer Guides</h1>
+      <p class="subtitle">In-depth tutorials and comprehensive guides for modern development</p>
+    </header>
+
+    <div class="guides-grid">
+      {sortedGuides.map(guide => (
+        <PostCard
+          title={guide.data.title}
+          description={guide.data.description}
+          url={`/guides/${guide.slug}`}
+          tags={guide.data.tags}
+          date={guide.data.published_date}
+        />
+      ))}
+    </div>
+
+    {sortedGuides.length === 0 && (
+      <div class="empty-state">
+        <p>No guides available yet. Check back soon!</p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .guides-index {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-7);
+    text-align: center;
+  }
+
+  .page-header h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-3) 0;
+    line-height: 1.1;
+  }
+
+  .subtitle {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .guides-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+    color: var(--color-text-muted);
+  }
+
+  .empty-state p {
+    font-size: 1.125rem;
+    margin: 0;
+  }
+
+  @media (min-width: 768px) {
+    .guides-index {
+      padding: var(--space-8) var(--space-6);
+    }
+
+    .page-header h1 {
+      font-size: 4rem;
+    }
+
+    .guides-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-5);
+    }
+  }
+</style>

@@ -1,0 +1,327 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolCard from '../components/ToolCard.astro';
+import LanguageCard from '../components/LanguageCard.astro';
+import PostCard from '../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('languages');
+const allGuides = await getCollection('guides');
+const allBlogPosts = await getCollection('blog');
+
+const combinedContent = [
+  ...allPosts.map(post => ({ ...post, collection: 'languages' })),
+  ...allGuides.map(guide => ({ ...guide, collection: 'guides' })),
+  ...allBlogPosts.map(blog => ({ ...blog, collection: 'blog' }))
+];
+
+const recentPosts = combinedContent
+  .sort((a, b) => new Date(b.data.published_date).getTime() - new Date(a.data.published_date).getTime())
+  .slice(0, 6);
+
+const featuredTools = [
+  {
+    slug: 'json-formatter',
+    name: 'JSON Formatter',
+    description: 'Format and validate JSON with syntax highlighting',
+    tier: 'free',
+    icon: '{ }'
+  },
+  {
+    slug: 'base64-encoder',
+    name: 'Base64 Encoder/Decoder',
+    description: 'Encode and decode Base64 strings instantly',
+    tier: 'free',
+    icon: '⇄'
+  },
+  {
+    slug: 'regex-tester',
+    name: 'Regex Tester',
+    description: 'Test regular expressions with live matching',
+    tier: 'free',
+    icon: '.*'
+  },
+  {
+    slug: 'color-picker',
+    name: 'Color Picker',
+    description: 'Convert between HEX, RGB, HSL color formats',
+    tier: 'free',
+    icon: '🎨'
+  },
+  {
+    slug: 'timestamp-converter',
+    name: 'Timestamp Converter',
+    description: 'Convert Unix timestamps to human-readable dates',
+    tier: 'free',
+    icon: '⏱'
+  },
+  {
+    slug: 'jwt-decoder',
+    name: 'JWT Decoder',
+    description: 'Decode and inspect JSON Web Tokens',
+    tier: 'free',
+    icon: '🔐'
+  }
+];
+
+const languages = [
+  { slug: 'python', name: 'Python', logo: '🐍', postCount: 0 },
+  { slug: 'javascript', name: 'JavaScript', logo: 'JS', postCount: 0 },
+  { slug: 'typescript', name: 'TypeScript', logo: 'TS', postCount: 0 },
+  { slug: 'go', name: 'Go', logo: 'Go', postCount: 0 },
+  { slug: 'rust', name: 'Rust', logo: '🦀', postCount: 0 },
+  { slug: 'java', name: 'Java', logo: '☕', postCount: 0 },
+  { slug: 'csharp', name: 'C#', logo: 'C#', postCount: 0 },
+  { slug: 'php', name: 'PHP', logo: '🐘', postCount: 0 },
+  { slug: 'ruby', name: 'Ruby', logo: '💎', postCount: 0 },
+  { slug: 'swift', name: 'Swift', logo: '🕊', postCount: 0 },
+  { slug: 'kotlin', name: 'Kotlin', logo: 'K', postCount: 0 },
+  { slug: 'cpp', name: 'C++', logo: 'C++', postCount: 0 }
+];
+
+languages.forEach(lang => {
+  lang.postCount = allPosts.filter(post => post.data.language === lang.slug).length;
+});
+---
+
+<BaseLayout
+  title="DevNook — Developer Resources, Fast"
+  description="Free developer tools, language references, and coding guides. Fast, clean, and always available."
+>
+  <div class="homepage">
+    <section class="hero">
+      <h1 class="hero-title">Developer Resources, Fast.</h1>
+      <p class="hero-text">
+        Free tools, language guides, and references for developers.
+        No ads, no tracking, just the information you need.
+      </p>
+      <div class="hero-actions">
+        <a href="/tools/" class="btn btn-primary">Browse Tools</a>
+        <a href="/languages/" class="btn btn-secondary">Explore Languages</a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Featured Tools</h2>
+        <a href="/tools/" class="section-link">View all tools →</a>
+      </div>
+      <div class="tools-grid">
+        {featuredTools.map(tool => (
+          <ToolCard
+            slug={tool.slug}
+            name={tool.name}
+            description={tool.description}
+            tier={tool.tier}
+            icon={tool.icon}
+          />
+        ))}
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Languages</h2>
+        <a href="/languages/" class="section-link">View all languages →</a>
+      </div>
+      <div class="languages-grid">
+        {languages.map(lang => (
+          <LanguageCard
+            slug={lang.slug}
+            name={lang.name}
+            logo={lang.logo}
+            postCount={lang.postCount}
+            featuredTopics={[]}
+          />
+        ))}
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Posts</h2>
+        <a href="/guides/" class="section-link">View all guides →</a>
+      </div>
+      <div class="posts-grid">
+        {recentPosts.map(post => {
+          const baseUrl = post.collection === 'languages'
+            ? `/languages/${post.data.language}/${post.slug.split('/').pop()}`
+            : `/${post.collection}/${post.slug}`;
+          
+          return (
+            <PostCard
+              title={post.data.title}
+              description={post.data.description}
+              url={baseUrl}
+              tags={post.data.tags}
+              publishedDate={post.data.published_date}
+            />
+          );
+        })}
+      </div>
+    </section>
+
+    <section class="footer-cta">
+      <p class="footer-cta-text">More guides and references coming daily.</p>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .homepage {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-4);
+  }
+
+  .hero {
+    text-align: center;
+    padding: var(--space-8) 0;
+    margin-bottom: var(--space-7);
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-4) 0;
+    line-height: 1.1;
+  }
+
+  .hero-text {
+    font-size: 1.25rem;
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto var(--space-6) auto;
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: var(--space-3) var(--space-5);
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all 0.2s ease;
+    font-family: var(--font-body);
+  }
+
+  .btn-primary {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  .btn-primary:hover {
+    background: #5dd4a3;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .section {
+    margin-bottom: var(--space-8);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-5);
+  }
+
+  .section-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .section-link {
+    color: var(--color-accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .section-link:hover {
+    color: #5dd4a3;
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .languages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .footer-cta {
+    text-align: center;
+    padding: var(--space-7) 0;
+    margin-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .footer-cta-text {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    margin: 0;
+  }
+
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .hero-text {
+      font-size: 1rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+    }
+
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-2);
+    }
+
+    .tools-grid,
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .languages-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

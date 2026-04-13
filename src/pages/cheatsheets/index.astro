@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const cheatsheets = (await getCollection('cheatsheets'))
+  .sort((a, b) => {
+    const dateA = new Date(a.data.published_date || '1970-01-01');
+    const dateB = new Date(b.data.published_date || '1970-01-01');
+    return dateB.getTime() - dateA.getTime();
+  });
+
+const pageTitle = 'Developer Cheat Sheets — DevNook';
+const pageDescription = 'Quick reference guides and cheat sheets for developers. Syntax references, command lists, and task-oriented references for popular programming languages and tools.';
+---
+
+<BaseLayout 
+  title={pageTitle}
+  description={pageDescription}
+  ogImage="/og/cheatsheets/index.png"
+>
+  <div class="cheatsheets-index">
+    <header class="page-header">
+      <h1>Developer Cheat Sheets</h1>
+      <p class="subtitle">Quick reference guides for developers — syntax, commands, and task-oriented references.</p>
+    </header>
+
+    <div class="cheatsheets-grid">
+      {cheatsheets.map((sheet) => (
+        <PostCard
+          title={sheet.data.title}
+          description={sheet.data.description}
+          url={`/cheatsheets/${sheet.slug}`}
+          tags={sheet.data.tags}
+          date={sheet.data.published_date}
+          category={sheet.data.category}
+        />
+      ))}
+    </div>
+
+    {cheatsheets.length === 0 && (
+      <div class="empty-state">
+        <p>No cheat sheets available yet. Check back soon!</p>
+      </div>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .cheatsheets-index {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .page-header {
+    margin-bottom: var(--space-7);
+    text-align: center;
+  }
+
+  .page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+    font-family: var(--font-body);
+  }
+
+  .subtitle {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .cheatsheets-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--space-8) var(--space-4);
+  }
+
+  .empty-state p {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+  }
+
+  @media (min-width: 768px) {
+    .cheatsheets-index {
+      padding: var(--space-7) var(--space-5);
+    }
+
+    .page-header h1 {
+      font-size: 3rem;
+    }
+
+    .cheatsheets-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-5);
+    }
+  }
+</style>

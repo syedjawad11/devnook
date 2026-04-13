@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import LanguageCard from '../../components/LanguageCard.astro';
+import { getCollection } from 'astro:content';
+
+const allLanguagePosts = await getCollection('languages');
+
+const languages = [
+  { slug: 'python', name: 'Python', color: '#3776ab' },
+  { slug: 'javascript', name: 'JavaScript', color: '#f7df1e' },
+  { slug: 'typescript', name: 'TypeScript', color: '#3178c6' },
+  { slug: 'go', name: 'Go', color: '#00add8' },
+  { slug: 'rust', name: 'Rust', color: '#ce422b' },
+  { slug: 'java', name: 'Java', color: '#007396' },
+  { slug: 'csharp', name: 'C#', color: '#239120' },
+  { slug: 'php', name: 'PHP', color: '#777bb4' },
+  { slug: 'ruby', name: 'Ruby', color: '#cc342d' },
+  { slug: 'swift', name: 'Swift', color: '#f05138' },
+  { slug: 'kotlin', name: 'Kotlin', color: '#7f52ff' },
+  { slug: 'cpp', name: 'C++', color: '#00599c' }
+];
+
+const postCountsByLanguage = allLanguagePosts.reduce((acc, post) => {
+  const lang = post.data.language;
+  acc[lang] = (acc[lang] || 0) + 1;
+  return acc;
+}, {} as Record<string, number>);
+
+const languagesByPostCount = allLanguagePosts.reduce((acc, post) => {
+  const lang = post.data.language;
+  if (!acc[lang]) {
+    acc[lang] = [];
+  }
+  acc[lang].push(post);
+  return acc;
+}, {} as Record<string, typeof allLanguagePosts>);
+
+const getFeaturedTopics = (langSlug: string) => {
+  const posts = languagesByPostCount[langSlug] || [];
+  return posts
+    .sort((a, b) => new Date(b.data.published_date).getTime() - new Date(a.data.published_date).getTime())
+    .slice(0, 3)
+    .map(p => p.data.concept);
+};
+
+const languageData = languages.map(lang => ({
+  ...lang,
+  postCount: postCountsByLanguage[lang.slug] || 0,
+  featuredTopics: getFeaturedTopics(lang.slug)
+}));
+---
+
+<BaseLayout 
+  title="Programming Languages — DevNook"
+  description="Learn programming concepts across 12 popular languages: Python, JavaScript, TypeScript, Go, Rust, Java, C#, PHP, Ruby, Swift, Kotlin, and C++."
+>
+  <div class="languages-index">
+    <header class="page-header">
+      <h1>Programming Languages</h1>
+      <p class="subtitle">
+        Deep-dive tutorials and concept guides across {languages.length} popular programming languages.
+      </p>
+    </header>
+
+    <div class="languages-grid">
+      {languageData.map(lang => (
+        <LanguageCard
+          slug={lang.slug}
+          name={lang.name}
+          color={lang.color}
+          postCount={lang.postCount}
+          featuredTopics={lang.featuredTopics}
+        />
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .languages-index {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: var(--space-7);
+  }
+
+  .page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin-bottom: var(--space-3);
+    font-family: var(--font-body);
+  }
+
+  .subtitle {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .languages-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 768px) {
+    .page-header h1 {
+      font-size: 3rem;
+    }
+
+    .languages-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-5);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .languages-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>
