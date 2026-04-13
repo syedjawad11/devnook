@@ -1,0 +1,459 @@
+---
+// JWT Decoder — client-side only, no verification
+---
+<div class="tool-container" id="tool-jwt-decoder">
+  <div class="tool-header">
+    <h2>JWT Decoder</h2>
+    <p class="tool-desc">Decode and inspect JWT tokens instantly in your browser. No verification — client-side only.</p>
+  </div>
+  <div class="tool-body">
+    <div class="input-section">
+      <label for="jwt-input">Paste JWT token here</label>
+      <textarea 
+        id="jwt-input" 
+        aria-label="Paste JWT token here"
+        placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        rows="4"
+      ></textarea>
+    </div>
+    <div class="tool-controls">
+      <button id="decode-btn" aria-label="Decode JWT token">Decode</button>
+      <button id="clear-btn" aria-label="Clear all fields" class="secondary">Clear</button>
+    </div>
+    <div class="output-section">
+      <div class="output-group">
+        <div class="output-header">
+          <label for="header-output">Header</label>
+          <button id="copy-header-btn" aria-label="Copy header to clipboard" class="copy-btn">Copy</button>
+        </div>
+        <textarea 
+          id="header-output" 
+          aria-label="Decoded JWT header"
+          readonly
+          rows="4"
+        ></textarea>
+      </div>
+      <div class="output-group">
+        <div class="output-header">
+          <label for="payload-output">Payload</label>
+          <button id="copy-payload-btn" aria-label="Copy payload to clipboard" class="copy-btn">Copy</button>
+        </div>
+        <textarea 
+          id="payload-output" 
+          aria-label="Decoded JWT payload"
+          readonly
+          rows="8"
+        ></textarea>
+      </div>
+      <div id="expiry-info" class="expiry-info"></div>
+    </div>
+  </div>
+  <div class="tool-status" aria-live="polite"></div>
+  <div class="privacy-note">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+    </svg>
+    <span>Privacy guarantee: All decoding happens in your browser. No data is sent to any server.</span>
+  </div>
+</div>
+
+<script>
+(function() {
+  const jwtInput = document.getElementById('jwt-input');
+  const headerOutput = document.getElementById('header-output');
+  const payloadOutput = document.getElementById('payload-output');
+  const expiryInfo = document.getElementById('expiry-info');
+  const decodeBtn = document.getElementById('decode-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const copyHeaderBtn = document.getElementById('copy-header-btn');
+  const copyPayloadBtn = document.getElementById('copy-payload-btn');
+  const statusDiv = document.querySelector('.tool-status');
+
+  function showStatus(message, isError = false) {
+    statusDiv.textContent = message;
+    statusDiv.className = 'tool-status';
+    if (isError) {
+      statusDiv.classList.add('error');
+    } else {
+      statusDiv.classList.add('success');
+    }
+    setTimeout(() => {
+      statusDiv.textContent = '';
+      statusDiv.className = 'tool-status';
+    }, 3000);
+  }
+
+  function base64UrlDecode(str) {
+    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = base64.length % 4;
+    if (pad) {
+      if (pad === 1) {
+        throw new Error('Invalid base64 string');
+      }
+      base64 += new Array(5 - pad).join('=');
+    }
+    const decoded = atob(base64);
+    return decodeURIComponent(decoded.split('').map(c => {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+  }
+
+  function formatJSON(jsonString) {
+    try {
+      const obj = JSON.parse(jsonString);
+      return JSON.stringify(obj, null, 2);
+    } catch (e) {
+      return jsonString;
+    }
+  }
+
+  function decodeJWT() {
+    const token = jwtInput.value.trim();
+    
+    if (!token) {
+      showStatus('Please paste a JWT token', true);
+      return;
+    }
+
+    const parts = token.split('.');
+    
+    if (parts.length !== 3) {
+      showStatus('Invalid JWT format. Expected 3 parts separated by dots.', true);
+      headerOutput.value = '';
+      payloadOutput.value = '';
+      expiryInfo.innerHTML = '';
+      return;
+    }
+
+    try {
+      const headerDecoded = base64UrlDecode(parts[0]);
+      const payloadDecoded = base64UrlDecode(parts[1]);
+      
+      headerOutput.value = formatJSON(headerDecoded);
+      payloadOutput.value = formatJSON(payloadDecoded);
+      
+      const payload = JSON.parse(payloadDecoded);
+      displayExpiryInfo(payload);
+      
+      showStatus('JWT decoded successfully');
+    } catch (e) {
+      showStatus('Error decoding JWT: Invalid encoding or format', true);
+      headerOutput.value = '';
+      payloadOutput.value = '';
+      expiryInfo.innerHTML = '';
+    }
+  }
+
+  function displayExpiryInfo(payload) {
+    expiryInfo.innerHTML = '';
+    
+    if (payload.exp) {
+      const expDate = new Date(payload.exp * 1000);
+      const now = new Date();
+      const isExpired = expDate < now;
+      
+      const expiryDiv = document.createElement('div');
+      expiryDiv.className = 'expiry-item';
+      if (isExpired) {
+        expiryDiv.classList.add('expired');
+      }
+      
+      const label = document.createElement('strong');
+      label.textContent = 'Expires: ';
+      
+      const value = document.createElement('span');
+      value.textContent = expDate.toLocaleString();
+      
+      expiryDiv.appendChild(label);
+      expiryDiv.appendChild(value);
+      
+      if (isExpired) {
+        const expiredBadge = document.createElement('span');
+        expiredBadge.className = 'expired-badge';
+        expiredBadge.textContent = 'EXPIRED';
+        expiryDiv.appendChild(expiredBadge);
+      }
+      
+      expiryInfo.appendChild(expiryDiv);
+    }
+    
+    if (payload.iat) {
+      const iatDate = new Date(payload.iat * 1000);
+      const iatDiv = document.createElement('div');
+      iatDiv.className = 'expiry-item';
+      
+      const label = document.createElement('strong');
+      label.textContent = 'Issued at: ';
+      
+      const value = document.createElement('span');
+      value.textContent = iatDate.toLocaleString();
+      
+      iatDiv.appendChild(label);
+      iatDiv.appendChild(value);
+      expiryInfo.appendChild(iatDiv);
+    }
+    
+    if (payload.nbf) {
+      const nbfDate = new Date(payload.nbf * 1000);
+      const nbfDiv = document.createElement('div');
+      nbfDiv.className = 'expiry-item';
+      
+      const label = document.createElement('strong');
+      label.textContent = 'Not before: ';
+      
+      const value = document.createElement('span');
+      value.textContent = nbfDate.toLocaleString();
+      
+      nbfDiv.appendChild(label);
+      nbfDiv.appendChild(value);
+      expiryInfo.appendChild(nbfDiv);
+    }
+  }
+
+  function clearAll() {
+    jwtInput.value = '';
+    headerOutput.value = '';
+    payloadOutput.value = '';
+    expiryInfo.innerHTML = '';
+    statusDiv.textContent = '';
+    statusDiv.className = 'tool-status';
+  }
+
+  async function copyToClipboard(text, button) {
+    try {
+      await navigator.clipboard.writeText(text);
+      const originalText = button.textContent;
+      button.textContent = 'Copied!';
+      button.classList.add('copied');
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.classList.remove('copied');
+      }, 2000);
+    } catch (err) {
+      showStatus('Failed to copy to clipboard', true);
+    }
+  }
+
+  decodeBtn.addEventListener('click', decodeJWT);
+  clearBtn.addEventListener('click', clearAll);
+  
+  copyHeaderBtn.addEventListener('click', () => {
+    if (headerOutput.value) {
+      copyToClipboard(headerOutput.value, copyHeaderBtn);
+    }
+  });
+  
+  copyPayloadBtn.addEventListener('click', () => {
+    if (payloadOutput.value) {
+      copyToClipboard(payloadOutput.value, copyPayloadBtn);
+    }
+  });
+
+  jwtInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+      decodeJWT();
+    }
+  });
+})();
+</script>
+
+<style>
+.tool-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.tool-header {
+  margin-bottom: var(--space-4);
+}
+
+.tool-header h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+.tool-body {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.input-section {
+  margin-bottom: var(--space-4);
+}
+
+label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+textarea {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.tool-controls {
+  display: flex;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+button {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button.secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.output-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.output-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-2);
+}
+
+.copy-btn {
+  padding: var(--space-1) var(--space-3);
+  background: transparent;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  font-size: 0.8125rem;
+}
+
+.copy-btn.copied {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.expiry-info {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.expiry-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.expiry-item strong {
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.expiry-item.expired {
+  color: #ef4444;
+}
+
+.expired-badge {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  background: #ef4444;
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-left: var(--space-2);
+}
+
+.privacy-note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.privacy-note svg {
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.tool-status {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.tool-status.success {
+  background: rgba(110, 231, 183, 0.1);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);

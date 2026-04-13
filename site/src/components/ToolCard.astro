@@ -1,0 +1,136 @@
+---
+interface Props {
+  name: string;
+  description: string;
+  slug: string;
+  category?: string;
+  tier: string;
+  icon?: string;
+}
+
+const { name, description, slug, category = '', tier, icon = '' } = Astro.props;
+
+const tierLabel = tier === 'free' ? 'Free' : tier === 'client-side' ? 'Client-side' : tier;
+---
+
+<article class="tool-card">
+  <div class="card-header">
+    <div class="icon-label">{icon}</div>
+    <span class="tier-badge">{tierLabel}</span>
+  </div>
+  
+  <h3 class="tool-name">
+    <a href={`/tools/${slug}`}>{name}</a>
+  </h3>
+  
+  <p class="tool-description">{description}</p>
+  
+  <div class="card-footer">
+    <span class="category-label">{category}</span>
+  </div>
+</article>
+
+<style>
+  .tool-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    height: 100%;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-accent);
+    box-shadow: 0 4px 12px rgba(110, 231, 183, 0.1);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .icon-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    background: var(--color-bg);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+  }
+
+  .tier-badge {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    background: rgba(110, 231, 183, 0.1);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-accent);
+    white-space: nowrap;
+  }
+
+  .tool-name {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .tool-name a {
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .tool-name a:hover {
+    color: var(--color-accent);
+  }
+
+  .tool-description {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    flex-grow: 1;
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .category-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 768px) {
+    .tool-card {
+      padding: var(--space-4);
+    }
+
+    .tool-name {
+      font-size: 1.125rem;
+    }
+
+    .tool-description {
+      font-size: 0.875rem;
+    }
+  }
+</style>

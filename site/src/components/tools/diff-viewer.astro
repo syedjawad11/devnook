@@ -1,0 +1,386 @@
+---
+// No server-side props needed — all tools are client-side
+---
+<div class="tool-container" id="tool-diff-viewer">
+  <div class="tool-header">
+    <h2>Diff Checker</h2>
+    <p class="tool-desc">Compare two text blocks side-by-side and see differences highlighted</p>
+  </div>
+  
+  <div class="tool-controls">
+    <div class="control-group">
+      <label for="view-mode">View</label>
+      <select id="view-mode" aria-label="Select diff view mode">
+        <option value="side-by-side">Side by side</option>
+        <option value="unified">Unified</option>
+      </select>
+    </div>
+    <div class="button-group">
+      <button id="compare-btn" aria-label="Compare texts">Compare</button>
+      <button id="swap-btn" aria-label="Swap original and changed texts">Swap</button>
+      <button id="clear-btn" aria-label="Clear all text">Clear</button>
+    </div>
+  </div>
+
+  <div class="tool-body">
+    <div class="input-section">
+      <label for="original-text">Original text</label>
+      <textarea 
+        id="original-text" 
+        placeholder="Paste your original text here..."
+        aria-label="Original text input"
+        spellcheck="false"
+      ></textarea>
+    </div>
+    <div class="input-section">
+      <label for="changed-text">Changed text</label>
+      <textarea 
+        id="changed-text" 
+        placeholder="Paste your changed text here..."
+        aria-label="Changed text input"
+        spellcheck="false"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="tool-status" aria-live="polite" role="status"></div>
+
+  <div class="diff-output" id="diff-output" aria-live="polite"></div>
+</div>
+
+<script>
+(function() {
+  const originalTextarea = document.getElementById('original-text');
+  const changedTextarea = document.getElementById('changed-text');
+  const compareBtn = document.getElementById('compare-btn');
+  const swapBtn = document.getElementById('swap-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const viewModeSelect = document.getElementById('view-mode');
+  const statusDiv = document.querySelector('.tool-status');
+  const diffOutput = document.getElementById('diff-output');
+
+  function showStatus(message, type = 'info') {
+    statusDiv.textContent = message;
+    statusDiv.className = `tool-status ${type}`;
+    statusDiv.style.display = 'block';
+    
+    if (type === 'success') {
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 3000);
+    }
+  }
+
+  function clearStatus() {
+    statusDiv.style.display = 'none';
+    statusDiv.textContent = '';
+  }
+
+  function getLCS(a, b) {
+    const m = a.length;
+    const n = b.length;
+    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+    
+    for (let i = 1; i <= m; i++) {
+      for (let j = 1; j <= n; j++) {
+        if (a[i - 1] === b[j - 1]) {
+          dp[i][j] = dp[i - 1][j - 1] + 1;
+        } else {
+          dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        }
+      }
+    }
+    
+    return dp;
+  }
+
+  function computeDiff(original, changed) {
+    const originalLines = original.split('\n');
+    const changedLines = changed.split('\n');
+    const dp = getLCS(originalLines, changedLines);
+    
+    const diff = [];
+    let i = originalLines.length;
+    let j = changedLines.length;
+    
+    while (i > 0 || j > 0) {
+      if (i > 0 && j > 0 && originalLines[i - 1] === changedLines[j - 1]) {
+        diff.unshift({ type: 'unchanged', original: originalLines[i - 1], changed: changedLines[j - 1], originalLine: i, changedLine: j });
+        i--;
+        j--;
+      } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+        diff.unshift({ type: 'added', original: null, changed: changedLines[j - 1], originalLine: null, changedLine: j });
+        j--;
+      } else if (i > 0 && (j === 0 || dp[i][j - 1] < dp[i - 1][j])) {
+        diff.unshift({ type: 'deleted', original: originalLines[i - 1], changed: null, originalLine: i, changedLine: null });
+        i--;
+      }
+    }
+    
+    return diff;
+  }
+
+  function getCharDiff(str1, str2) {
+    if (!str1 || !str2) return { str1Html: escapeHtml(str1 || ''), str2Html: escapeHtml(str2 || '') };
+    
+    const chars1 = str1.split('');
+    const chars2 = str2.split('');
+    const dp = getLCS(chars1, chars2);
+    
+    let i = chars1.length;
+    let j = chars2.length;
+    let str1Html = '';
+    let str2Html = '';
+    
+    while (i > 0 || j > 0) {
+      if (i > 0 && j > 0 && chars1[i - 1] === chars2[j - 1]) {
+        str1Html = escapeHtml(chars1[i - 1]) + str1Html;
+        str2Html = escapeHtml(chars2[j - 1]) + str2Html;
+        i--;
+        j--;
+      } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+        str2Html = '<span class="char-added">' + escapeHtml(chars2[j - 1]) + '</span>' + str2Html;
+        j--;
+      } else if (i > 0) {
+        str1Html = '<span class="char-deleted">' + escapeHtml(chars1[i - 1]) + '</span>' + str1Html;
+        i--;
+      }
+    }
+    
+    return { str1Html, str2Html };
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function renderSideBySide(diff) {
+    let added = 0;
+    let deleted = 0;
+    
+    let html = '<div class="diff-side-by-side">';
+    html += '<div class="diff-pane diff-pane-left"><div class="diff-header">Original</div>';
+    html += '<div class="diff-lines">';
+    
+    diff.forEach(item => {
+      if (item.type === 'deleted') {
+        deleted++;
+        html += `<div class="diff-line diff-line-deleted" data-line="${item.originalLine}"><span class="line-number">${item.originalLine}</span><span class="line-content">${escapeHtml(item.original)}</span></div>`;
+      } else if (item.type === 'unchanged') {
+        html += `<div class="diff-line" data-line="${item.originalLine}"><span class="line-number">${item.originalLine}</span><span class="line-content">${escapeHtml(item.original)}</span></div>`;
+      } else {
+        html += `<div class="diff-line diff-line-empty"><span class="line-number"></span><span class="line-content"></span></div>`;
+      }
+    });
+    
+    html += '</div></div>';
+    html += '<div class="diff-pane diff-pane-right"><div class="diff-header">Changed</div>';
+    html += '<div class="diff-lines">';
+    
+    diff.forEach(item => {
+      if (item.type === 'added') {
+        added++;
+        html += `<div class="diff-line diff-line-added" data-line="${item.changedLine}"><span class="line-number">${item.changedLine}</span><span class="line-content">${escapeHtml(item.changed)}</span></div>`;
+      } else if (item.type === 'unchanged') {
+        html += `<div class="diff-line" data-line="${item.changedLine}"><span class="line-number">${item.changedLine}</span><span class="line-content">${escapeHtml(item.changed)}</span></div>`;
+      } else {
+        html += `<div class="diff-line diff-line-empty"><span class="line-number"></span><span class="line-content"></span></div>`;
+      }
+    });
+    
+    html += '</div></div></div>';
+    html += `<div class="diff-summary"><strong>Summary:</strong> ${added} lines added, ${deleted} lines deleted</div>`;
+    
+    return html;
+  }
+
+  function renderUnified(diff) {
+    let added = 0;
+    let deleted = 0;
+    
+    let html = '<div class="diff-unified">';
+    html += '<div class="diff-header">Unified Diff</div>';
+    html += '<div class="diff-lines">';
+    
+    diff.forEach(item => {
+      if (item.type === 'deleted') {
+        deleted++;
+        html += `<div class="diff-line diff-line-deleted"><span class="line-marker">-</span><span class="line-number">${item.originalLine}</span><span class="line-content">${escapeHtml(item.original)}</span></div>`;
+      } else if (item.type === 'added') {
+        added++;
+        html += `<div class="diff-line diff-line-added"><span class="line-marker">+</span><span class="line-number">${item.changedLine}</span><span class="line-content">${escapeHtml(item.changed)}</span></div>`;
+      } else {
+        html += `<div class="diff-line"><span class="line-marker"> </span><span class="line-number">${item.originalLine}</span><span class="line-content">${escapeHtml(item.original)}</span></div>`;
+      }
+    });
+    
+    html += '</div>';
+    html += `<div class="diff-summary"><strong>Summary:</strong> ${added} lines added, ${deleted} lines deleted</div>`;
+    html += '</div>';
+    
+    return html;
+  }
+
+  function performCompare() {
+    const original = originalTextarea.value;
+    const changed = changedTextarea.value;
+    
+    if (!original && !changed) {
+      showStatus('Please enter text in both fields to compare', 'error');
+      diffOutput.innerHTML = '';
+      return;
+    }
+    
+    clearStatus();
+    
+    try {
+      const diff = computeDiff(original, changed);
+      const viewMode = viewModeSelect.value;
+      
+      if (viewMode === 'side-by-side') {
+        diffOutput.innerHTML = renderSideBySide(diff);
+      } else {
+        diffOutput.innerHTML = renderUnified(diff);
+      }
+      
+      showStatus('Comparison complete', 'success');
+    } catch (error) {
+      showStatus('An error occurred while comparing texts', 'error');
+      diffOutput.innerHTML = '';
+    }
+  }
+
+  function performSwap() {
+    const temp = originalTextarea.value;
+    originalTextarea.value = changedTextarea.value;
+    changedTextarea.value = temp;
+    
+    if (diffOutput.innerHTML) {
+      performCompare();
+    }
+    
+    showStatus('Texts swapped', 'success');
+  }
+
+  function performClear() {
+    originalTextarea.value = '';
+    changedTextarea.value = '';
+    diffOutput.innerHTML = '';
+    clearStatus();
+    showStatus('All text cleared', 'success');
+  }
+
+  compareBtn.addEventListener('click', performCompare);
+  swapBtn.addEventListener('click', performSwap);
+  clearBtn.addEventListener('click', performClear);
+  viewModeSelect.addEventListener('change', () => {
+    if (diffOutput.innerHTML) {
+      performCompare();
+    }
+  });
+})();
+</script>
+
+<style>
+.tool-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-4);
+}
+
+.tool-header h2 {
+  font-family: var(--font-body);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.tool-controls {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.control-group label {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.button-group {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+select {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+select:hover {
+  border-color: var(--color-accent);
+}
+
+select:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+button {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: var(--space-2) var(--space-4);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+#compare-btn {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-color: var(--color

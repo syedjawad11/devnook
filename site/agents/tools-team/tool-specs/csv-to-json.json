@@ -1,0 +1,33 @@
+{
+  "slug": "csv-to-json",
+  "name": "CSV ↔ JSON Converter",
+  "description": "Convert CSV data to JSON and JSON arrays back to CSV instantly in your browser. Supports custom delimiters, headers, and pretty output.",
+  "tier": "client-side",
+  "batch": 1,
+  "category": "data",
+  "icon": "table",
+  "tags": ["csv", "json", "converter", "data", "spreadsheet"],
+  "seo_keywords": ["csv to json converter", "convert csv to json online", "json to csv converter", "csv json tool", "csv parser online"],
+  "primary_keyword": "csv to json converter",
+  "related_tools": ["json-formatter", "markdown-to-html"],
+  "related_content": ["csv-vs-json", "parsing-csv-javascript"],
+  "input_label": "Paste CSV or JSON data here",
+  "output_label": "Converted output",
+  "features": [
+    "CSV to JSON conversion",
+    "JSON array to CSV conversion",
+    "Auto-detect delimiter (comma, tab, semicolon)",
+    "Custom delimiter support",
+    "First row as headers",
+    "Minified or pretty-printed output",
+    "Copy to clipboard"
+  ],
+  "controls": [
+    {"type": "select", "label": "Direction", "options": ["CSV → JSON", "JSON → CSV"], "default": "CSV → JSON"},
+    {"type": "select", "label": "Delimiter", "options": ["Auto-detect", "Comma (,)", "Tab (\\t)", "Semicolon (;)", "Pipe (|)"], "default": "Auto-detect"},
+    {"type": "checkbox", "label": "First row is header", "default": true},
+    {"type": "button", "label": "Convert", "action": "convert"},
+    {"type": "button", "label": "Copy Result", "action": "copy"}
+  ],
+  "template_id": "tool-exp-v1"
+}

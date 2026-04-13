@@ -1,0 +1,443 @@
+---
+// SQL Formatter Component — Client-side SQL beautifier
+---
+<div class="tool-container" id="tool-sql-formatter">
+  <div class="tool-header">
+    <h2>SQL Formatter</h2>
+    <p class="tool-desc">Format and beautify SQL queries with proper indentation and keyword capitalization.</p>
+  </div>
+  
+  <div class="tool-controls">
+    <div class="control-group">
+      <label for="sql-dialect">Dialect</label>
+      <select id="sql-dialect" aria-label="Select SQL dialect">
+        <option value="generic">Generic</option>
+        <option value="mysql">MySQL</option>
+        <option value="postgresql">PostgreSQL</option>
+        <option value="sqlite">SQLite</option>
+      </select>
+    </div>
+    
+    <div class="control-group">
+      <label for="sql-indent">Indent</label>
+      <select id="sql-indent" aria-label="Select indentation style">
+        <option value="2">2 spaces</option>
+        <option value="4">4 spaces</option>
+        <option value="tab">tabs</option>
+      </select>
+    </div>
+    
+    <div class="control-group checkbox-group">
+      <input type="checkbox" id="sql-uppercase" checked aria-label="Uppercase SQL keywords">
+      <label for="sql-uppercase">Uppercase keywords</label>
+    </div>
+    
+    <button id="format-btn" class="btn-primary" aria-label="Format SQL query">Format</button>
+    <button id="clear-btn" class="btn-secondary" aria-label="Clear all fields">Clear</button>
+  </div>
+
+  <div class="tool-body">
+    <div class="input-section">
+      <label for="sql-input">Paste SQL query here</label>
+      <textarea 
+        id="sql-input" 
+        placeholder="SELECT * FROM users WHERE id = 1;"
+        aria-label="SQL input textarea"
+        spellcheck="false"
+      ></textarea>
+    </div>
+
+    <div class="output-section">
+      <div class="output-header">
+        <label for="sql-output">Formatted SQL</label>
+        <button id="copy-btn" class="btn-copy" aria-label="Copy formatted SQL to clipboard" disabled>
+          Copy
+        </button>
+      </div>
+      <textarea 
+        id="sql-output" 
+        readonly 
+        aria-label="Formatted SQL output"
+        spellcheck="false"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="tool-status" aria-live="polite" aria-atomic="true"></div>
+</div>
+
+<script>
+(function() {
+  const inputTextarea = document.getElementById('sql-input');
+  const outputTextarea = document.getElementById('sql-output');
+  const formatBtn = document.getElementById('format-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const copyBtn = document.getElementById('copy-btn');
+  const dialectSelect = document.getElementById('sql-dialect');
+  const indentSelect = document.getElementById('sql-indent');
+  const uppercaseCheck = document.getElementById('sql-uppercase');
+  const statusDiv = document.querySelector('.tool-status');
+
+  const SQL_KEYWORDS = [
+    'SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER', 'LEFT', 'RIGHT', 'OUTER', 'FULL',
+    'ON', 'AS', 'AND', 'OR', 'NOT', 'IN', 'LIKE', 'BETWEEN', 'IS', 'NULL',
+    'ORDER', 'BY', 'GROUP', 'HAVING', 'LIMIT', 'OFFSET', 'UNION', 'ALL',
+    'INSERT', 'INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE', 'CREATE', 'TABLE',
+    'DROP', 'ALTER', 'ADD', 'COLUMN', 'PRIMARY', 'KEY', 'FOREIGN', 'REFERENCES',
+    'CONSTRAINT', 'INDEX', 'UNIQUE', 'DEFAULT', 'CHECK', 'CASCADE',
+    'DISTINCT', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'EXISTS',
+    'WITH', 'RECURSIVE', 'OVER', 'PARTITION', 'ROWS', 'RANGE'
+  ];
+
+  const CLAUSE_KEYWORDS = [
+    'SELECT', 'FROM', 'WHERE', 'JOIN', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN',
+    'FULL JOIN', 'OUTER JOIN', 'ORDER BY', 'GROUP BY', 'HAVING', 'LIMIT',
+    'UNION', 'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM',
+    'CREATE TABLE', 'DROP TABLE', 'ALTER TABLE'
+  ];
+
+  function showStatus(message, isError = false) {
+    statusDiv.textContent = message;
+    statusDiv.className = 'tool-status ' + (isError ? 'error' : 'success');
+    setTimeout(() => {
+      statusDiv.textContent = '';
+      statusDiv.className = 'tool-status';
+    }, 3000);
+  }
+
+  function getIndentString() {
+    const indentValue = indentSelect.value;
+    if (indentValue === 'tab') return '\t';
+    return ' '.repeat(parseInt(indentValue, 10));
+  }
+
+  function formatSQL(sql) {
+    if (!sql || !sql.trim()) {
+      throw new Error('Please enter a SQL query to format');
+    }
+
+    const uppercase = uppercaseCheck.checked;
+    const indent = getIndentString();
+    
+    // Remove extra whitespace and normalize
+    let formatted = sql.replace(/\s+/g, ' ').trim();
+    
+    // Capitalize keywords if enabled
+    if (uppercase) {
+      SQL_KEYWORDS.forEach(keyword => {
+        const regex = new RegExp('\\b' + keyword + '\\b', 'gi');
+        formatted = formatted.replace(regex, keyword.toUpperCase());
+      });
+    }
+
+    // Add newlines before major clauses
+    const clausePattern = CLAUSE_KEYWORDS
+      .map(k => uppercase ? k.toUpperCase() : k)
+      .sort((a, b) => b.length - a.length) // Longest first to avoid partial matches
+      .map(k => k.replace(/\s+/g, '\\s+'))
+      .join('|');
+    
+    const clauseRegex = new RegExp(`\\b(${clausePattern})\\b`, 'gi');
+    formatted = formatted.replace(clauseRegex, '\n$1');
+
+    // Handle parentheses (subqueries)
+    let lines = formatted.split('\n');
+    let indentLevel = 0;
+    let result = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      let line = lines[i].trim();
+      if (!line) continue;
+
+      // Count opening and closing parens
+      const openParens = (line.match(/\(/g) || []).length;
+      const closeParens = (line.match(/\)/g) || []).length;
+
+      // Decrease indent for closing parens at start
+      if (line.startsWith(')')) {
+        indentLevel = Math.max(0, indentLevel - 1);
+      }
+
+      // Add indented line
+      if (line) {
+        result.push(indent.repeat(indentLevel) + line);
+      }
+
+      // Increase indent for opening parens
+      indentLevel += openParens;
+      indentLevel -= closeParens;
+      indentLevel = Math.max(0, indentLevel);
+    }
+
+    // Handle commas in SELECT lists
+    formatted = result.join('\n');
+    const selectPattern = uppercase ? 'SELECT' : 'select';
+    const fromPattern = uppercase ? 'FROM' : 'from';
+    
+    formatted = formatted.replace(
+      new RegExp(`(${selectPattern}[^${fromPattern}]*)(,)`, 'gi'),
+      (match, before, comma) => {
+        return before.replace(/,\s*/g, ',\n' + indent);
+      }
+    );
+
+    // Clean up any double newlines
+    formatted = formatted.replace(/\n\s*\n/g, '\n');
+    
+    return formatted.trim();
+  }
+
+  function handleFormat() {
+    const input = inputTextarea.value;
+    
+    try {
+      const formatted = formatSQL(input);
+      outputTextarea.value = formatted;
+      copyBtn.disabled = false;
+      showStatus('SQL formatted successfully');
+    } catch (error) {
+      showStatus(error.message || 'Failed to format SQL', true);
+      outputTextarea.value = '';
+      copyBtn.disabled = true;
+    }
+  }
+
+  function handleClear() {
+    inputTextarea.value = '';
+    outputTextarea.value = '';
+    copyBtn.disabled = true;
+    statusDiv.textContent = '';
+    statusDiv.className = 'tool-status';
+    inputTextarea.focus();
+  }
+
+  async function handleCopy() {
+    const output = outputTextarea.value;
+    
+    if (!output) {
+      showStatus('Nothing to copy', true);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(output);
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      copyBtn.classList.add('copied');
+      
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+        copyBtn.classList.remove('copied');
+      }, 2000);
+      
+      showStatus('Copied to clipboard');
+    } catch (error) {
+      showStatus('Failed to copy to clipboard', true);
+    }
+  }
+
+  formatBtn.addEventListener('click', handleFormat);
+  clearBtn.addEventListener('click', handleClear);
+  copyBtn.addEventListener('click', handleCopy);
+
+  // Format on Enter (Ctrl/Cmd + Enter)
+  inputTextarea.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handleFormat();
+    }
+  });
+
+  // Auto-enable copy button when output has content
+  outputTextarea.addEventListener('input', () => {
+    copyBtn.disabled = !outputTextarea.value;
+  });
+})();
+</script>
+
+<style>
+.tool-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-4);
+}
+
+.tool-header h2 {
+  font-family: var(--font-body);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  color: var(--color-text-muted);
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.tool-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: flex-end;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.control-group label {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.control-group select {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.control-group select:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.checkbox-group {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-accent);
+}
+
+.checkbox-group label {
+  margin: 0;
+  cursor: pointer;
+}
+
+button {
+  padding: var(--space-2) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.btn-primary:hover {
+  background: #5dd4a3;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  border-color: var(--color-text-muted);
+}
+
+.tool-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.input-section,
+.output-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.input-section label,
+.output-section label {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-copy {
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  font-size: 0.85rem;
+}
+
+.btn-copy:hover:not(:disabled) {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.btn-copy:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-copy.copied {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-color: var(--color-accent);
+}
+
+textarea {
+  width: 100%;
+  min-height: 400px;
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+textarea:focus {
+  outline: 2px solid var(--color-accent);

@@ -1,0 +1,115 @@
+---
+interface Props {
+  language: string;
+  displayName: string;
+  postCount: number;
+  featuredTopics: string[];
+}
+
+const { language, displayName, postCount, featuredTopics } = Astro.props;
+const href = `/languages/${language}`;
+const displayTopics = featuredTopics.slice(0, 4);
+---
+
+<article class="language-card">
+  <a href={href} class="card-link">
+    <div class="card-header">
+      <h3 class="language-name">{displayName}</h3>
+      <span class="post-count">{postCount} {postCount === 1 ? 'post' : 'posts'}</span>
+    </div>
+    
+    {displayTopics.length > 0 && (
+      <div class="featured-topics">
+        {displayTopics.map((topic) => (
+          <span class="topic-badge">{topic}</span>
+        ))}
+      </div>
+    )}
+  </a>
+</article>
+
+<style>
+  .language-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .language-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+  }
+
+  .card-link {
+    display: block;
+    padding: var(--space-5);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .language-name {
+    font-family: var(--font-body);
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    transition: color 0.2s ease;
+  }
+
+  .language-card:hover .language-name {
+    color: var(--color-accent);
+  }
+
+  .post-count {
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .featured-topics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .topic-badge {
+    display: inline-block;
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .language-card:hover .topic-badge {
+    color: var(--color-text);
+    border-color: var(--color-accent);
+  }
+
+  @media (min-width: 768px) {
+    .language-name {
+      font-size: 1.75rem;
+    }
+
+    .post-count {
+      font-size: 0.9375rem;
+    }
+
+    .topic-badge {
+      font-size: 0.8125rem;
+    }
+  }
+</style>

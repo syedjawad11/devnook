@@ -1,0 +1,36 @@
+{
+  "slug": "meta-tag-generator",
+  "name": "Meta Tag Generator",
+  "description": "Generate HTML meta tags for SEO, Open Graph, and Twitter Cards instantly. Copy the code and paste it into your site's <head>.",
+  "tier": "client-side",
+  "batch": 3,
+  "category": "generator",
+  "icon": "tags",
+  "tags": ["meta tags", "seo", "open graph", "twitter card", "html", "head tags"],
+  "seo_keywords": ["meta tag generator online", "html meta tags generator", "og tags generator", "twitter card generator", "seo meta tags"],
+  "primary_keyword": "meta tag generator online",
+  "related_tools": ["sitemap-generator", "html-formatter"],
+  "related_content": ["seo-meta-tags-guide", "open-graph-explained"],
+  "input_label": "Site details",
+  "output_label": "Generated meta tags",
+  "features": [
+    "Standard SEO meta tags (title, description, robots, canonical)",
+    "Open Graph tags (og:title, og:description, og:image, og:url, og:type)",
+    "Twitter Card tags (twitter:card, twitter:title, twitter:description, twitter:image)",
+    "Character count validation for title (≤60) and description (≤160)",
+    "Copy full <head> snippet to clipboard",
+    "Preview how result looks in Google search and social share"
+  ],
+  "controls": [
+    {"type": "text-input", "label": "Page title", "placeholder": "My Page Title"},
+    {"type": "textarea", "label": "Meta description", "placeholder": "A concise description (150-160 chars)"},
+    {"type": "text-input", "label": "Canonical URL", "placeholder": "https://example.com/page"},
+    {"type": "text-input", "label": "OG image URL", "placeholder": "https://example.com/og-image.png"},
+    {"type": "select", "label": "OG type", "options": ["website", "article", "product"], "default": "website"},
+    {"type": "select", "label": "Twitter card", "options": ["summary", "summary_large_image"], "default": "summary_large_image"},
+    {"type": "select", "label": "Robots", "options": ["index, follow", "noindex, nofollow", "noindex, follow"], "default": "index, follow"},
+    {"type": "button", "label": "Generate Tags", "action": "generate"},
+    {"type": "button", "label": "Copy HTML", "action": "copy"}
+  ],
+  "template_id": "tool-exp-v2"
+}

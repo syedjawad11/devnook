@@ -1,0 +1,32 @@
+{
+  "slug": "sql-formatter",
+  "name": "SQL Formatter",
+  "description": "Format and beautify SQL queries with proper indentation and keyword capitalization. Supports MySQL, PostgreSQL, and SQLite.",
+  "tier": "client-side",
+  "batch": 1,
+  "category": "formatter",
+  "icon": "database",
+  "tags": ["sql", "formatter", "beautify", "mysql", "postgresql", "query"],
+  "seo_keywords": ["sql formatter online", "sql beautifier", "format sql query", "sql pretty printer", "sql code formatter"],
+  "primary_keyword": "sql formatter online",
+  "related_tools": ["json-formatter", "html-formatter"],
+  "related_content": ["sql-style-guide", "sql-best-practices"],
+  "input_label": "Paste SQL query here",
+  "output_label": "Formatted SQL",
+  "features": [
+    "Format SQL with proper indentation",
+    "Capitalize SQL keywords (SELECT, FROM, WHERE)",
+    "Supports SELECT, INSERT, UPDATE, DELETE, CREATE",
+    "Subquery indentation",
+    "Copy to clipboard",
+    "Dialect selection (MySQL, PostgreSQL, SQLite)"
+  ],
+  "controls": [
+    {"type": "button", "label": "Format", "action": "format"},
+    {"type": "select", "label": "Dialect", "options": ["MySQL", "PostgreSQL", "SQLite", "Generic"], "default": "Generic"},
+    {"type": "select", "label": "Indent", "options": ["2 spaces", "4 spaces", "tabs"], "default": "2 spaces"},
+    {"type": "checkbox", "label": "Uppercase keywords", "default": true},
+    {"type": "button", "label": "Clear", "action": "clear"}
+  ],
+  "template_id": "tool-exp-v1"
+}

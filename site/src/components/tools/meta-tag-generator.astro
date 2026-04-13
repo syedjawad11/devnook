@@ -1,0 +1,430 @@
+---
+// No server-side props needed — all tools are client-side
+---
+<div class="tool-container" id="tool-meta-tag-generator">
+  <div class="tool-header">
+    <h2>Meta Tag Generator</h2>
+    <p class="tool-desc">Generate HTML meta tags for SEO, Open Graph, and Twitter Cards instantly.</p>
+  </div>
+  <div class="tool-body">
+    <div class="tool-inputs">
+      <div class="input-group">
+        <label for="page-title">Page title <span class="char-count" id="title-count">0/60</span></label>
+        <input 
+          type="text" 
+          id="page-title" 
+          placeholder="My Page Title"
+          aria-label="Page title"
+          maxlength="60"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="meta-description">Meta description <span class="char-count" id="desc-count">0/160</span></label>
+        <textarea 
+          id="meta-description" 
+          rows="3"
+          placeholder="A concise description (150-160 chars)"
+          aria-label="Meta description"
+          maxlength="160"
+        ></textarea>
+      </div>
+
+      <div class="input-group">
+        <label for="canonical-url">Canonical URL</label>
+        <input 
+          type="text" 
+          id="canonical-url" 
+          placeholder="https://example.com/page"
+          aria-label="Canonical URL"
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="og-image">OG image URL</label>
+        <input 
+          type="text" 
+          id="og-image" 
+          placeholder="https://example.com/og-image.png"
+          aria-label="Open Graph image URL"
+        />
+      </div>
+
+      <div class="input-row">
+        <div class="input-group">
+          <label for="og-type">OG type</label>
+          <select id="og-type" aria-label="Open Graph type">
+            <option value="website">website</option>
+            <option value="article">article</option>
+            <option value="product">product</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="twitter-card">Twitter card</label>
+          <select id="twitter-card" aria-label="Twitter card type">
+            <option value="summary_large_image">summary_large_image</option>
+            <option value="summary">summary</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label for="robots">Robots</label>
+        <select id="robots" aria-label="Robots meta tag">
+          <option value="index, follow">index, follow</option>
+          <option value="noindex, nofollow">noindex, nofollow</option>
+          <option value="noindex, follow">noindex, follow</option>
+        </select>
+      </div>
+
+      <div class="tool-controls">
+        <button id="generate-btn" aria-label="Generate meta tags">Generate Tags</button>
+        <button id="clear-btn" class="secondary" aria-label="Clear all inputs">Clear</button>
+      </div>
+    </div>
+
+    <div class="tool-outputs">
+      <div class="preview-section">
+        <h3>Google Search Preview</h3>
+        <div class="google-preview">
+          <div class="preview-url" id="preview-url">https://example.com</div>
+          <div class="preview-title" id="preview-title">Page Title</div>
+          <div class="preview-description" id="preview-description">Meta description will appear here</div>
+        </div>
+      </div>
+
+      <div class="output-section">
+        <div class="output-header">
+          <h3>Generated HTML</h3>
+          <button id="copy-btn" aria-label="Copy generated HTML to clipboard">Copy HTML</button>
+        </div>
+        <textarea 
+          id="output" 
+          readonly 
+          rows="20"
+          aria-label="Generated meta tag HTML output"
+          placeholder="Click 'Generate Tags' to create your meta tags"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="tool-status" aria-live="polite" id="status"></div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const titleInput = document.getElementById('page-title') as HTMLInputElement;
+    const descInput = document.getElementById('meta-description') as HTMLTextAreaElement;
+    const canonicalInput = document.getElementById('canonical-url') as HTMLInputElement;
+    const ogImageInput = document.getElementById('og-image') as HTMLInputElement;
+    const ogTypeSelect = document.getElementById('og-type') as HTMLSelectElement;
+    const twitterCardSelect = document.getElementById('twitter-card') as HTMLSelectElement;
+    const robotsSelect = document.getElementById('robots') as HTMLSelectElement;
+    
+    const generateBtn = document.getElementById('generate-btn') as HTMLButtonElement;
+    const clearBtn = document.getElementById('clear-btn') as HTMLButtonElement;
+    const copyBtn = document.getElementById('copy-btn') as HTMLButtonElement;
+    
+    const output = document.getElementById('output') as HTMLTextAreaElement;
+    const status = document.getElementById('status') as HTMLDivElement;
+    
+    const titleCount = document.getElementById('title-count') as HTMLSpanElement;
+    const descCount = document.getElementById('desc-count') as HTMLSpanElement;
+    
+    const previewUrl = document.getElementById('preview-url') as HTMLDivElement;
+    const previewTitle = document.getElementById('preview-title') as HTMLDivElement;
+    const previewDescription = document.getElementById('preview-description') as HTMLDivElement;
+
+    function updateCharCount(input: HTMLInputElement | HTMLTextAreaElement, countEl: HTMLElement, max: number) {
+      const length = input.value.length;
+      countEl.textContent = `${length}/${max}`;
+      countEl.style.color = length > max * 0.9 ? 'var(--color-accent-2)' : 'var(--color-text-muted)';
+    }
+
+    function updatePreview() {
+      const title = titleInput.value || 'Page Title';
+      const desc = descInput.value || 'Meta description will appear here';
+      const url = canonicalInput.value || 'https://example.com';
+
+      previewTitle.textContent = title.length > 60 ? title.substring(0, 57) + '...' : title;
+      previewDescription.textContent = desc.length > 160 ? desc.substring(0, 157) + '...' : desc;
+      
+      try {
+        const urlObj = new URL(url);
+        previewUrl.textContent = urlObj.origin;
+      } catch {
+        previewUrl.textContent = url || 'https://example.com';
+      }
+    }
+
+    titleInput.addEventListener('input', () => {
+      updateCharCount(titleInput, titleCount, 60);
+      updatePreview();
+    });
+
+    descInput.addEventListener('input', () => {
+      updateCharCount(descInput, descCount, 160);
+      updatePreview();
+    });
+
+    canonicalInput.addEventListener('input', updatePreview);
+
+    function showStatus(message: string, isError = false) {
+      status.textContent = message;
+      status.className = `tool-status ${isError ? 'error' : 'success'}`;
+      status.style.display = 'block';
+      
+      if (!isError) {
+        setTimeout(() => {
+          status.style.display = 'none';
+        }, 3000);
+      }
+    }
+
+    function escapeHtml(text: string): string {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function generateMetaTags() {
+      const title = titleInput.value.trim();
+      const description = descInput.value.trim();
+      const canonical = canonicalInput.value.trim();
+      const ogImage = ogImageInput.value.trim();
+      const ogType = ogTypeSelect.value;
+      const twitterCard = twitterCardSelect.value;
+      const robots = robotsSelect.value;
+
+      if (!title) {
+        showStatus('Please enter a page title', true);
+        titleInput.focus();
+        return;
+      }
+
+      if (!description) {
+        showStatus('Please enter a meta description', true);
+        descInput.focus();
+        return;
+      }
+
+      if (title.length > 60) {
+        showStatus('Title should be 60 characters or less', true);
+        titleInput.focus();
+        return;
+      }
+
+      if (description.length > 160) {
+        showStatus('Description should be 160 characters or less', true);
+        descInput.focus();
+        return;
+      }
+
+      if (canonical && !isValidUrl(canonical)) {
+        showStatus('Please enter a valid canonical URL', true);
+        canonicalInput.focus();
+        return;
+      }
+
+      if (ogImage && !isValidUrl(ogImage)) {
+        showStatus('Please enter a valid OG image URL', true);
+        ogImageInput.focus();
+        return;
+      }
+
+      const escapedTitle = escapeHtml(title);
+      const escapedDesc = escapeHtml(description);
+
+      let html = '<!-- Standard SEO -->\n';
+      html += `<title>${escapedTitle}</title>\n`;
+      html += `<meta name="description" content="${escapedDesc}">\n`;
+      html += `<meta name="robots" content="${robots}">\n`;
+      
+      if (canonical) {
+        html += `<link rel="canonical" href="${escapeHtml(canonical)}">\n`;
+      }
+
+      html += '\n<!-- Open Graph -->\n';
+      html += `<meta property="og:title" content="${escapedTitle}">\n`;
+      html += `<meta property="og:description" content="${escapedDesc}">\n`;
+      html += `<meta property="og:type" content="${ogType}">\n`;
+      
+      if (canonical) {
+        html += `<meta property="og:url" content="${escapeHtml(canonical)}">\n`;
+      }
+      
+      if (ogImage) {
+        html += `<meta property="og:image" content="${escapeHtml(ogImage)}">\n`;
+      }
+
+      html += '\n<!-- Twitter Card -->\n';
+      html += `<meta name="twitter:card" content="${twitterCard}">\n`;
+      html += `<meta name="twitter:title" content="${escapedTitle}">\n`;
+      html += `<meta name="twitter:description" content="${escapedDesc}">\n`;
+      
+      if (ogImage) {
+        html += `<meta name="twitter:image" content="${escapeHtml(ogImage)}">\n`;
+      }
+
+      output.value = html;
+      showStatus('Meta tags generated successfully!');
+    }
+
+    function isValidUrl(string: string): boolean {
+      try {
+        new URL(string);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function clearAll() {
+      titleInput.value = '';
+      descInput.value = '';
+      canonicalInput.value = '';
+      ogImageInput.value = '';
+      ogTypeSelect.value = 'website';
+      twitterCardSelect.value = 'summary_large_image';
+      robotsSelect.value = 'index, follow';
+      output.value = '';
+      status.style.display = 'none';
+      
+      titleCount.textContent = '0/60';
+      descCount.textContent = '0/160';
+      titleCount.style.color = 'var(--color-text-muted)';
+      descCount.style.color = 'var(--color-text-muted)';
+      
+      previewTitle.textContent = 'Page Title';
+      previewDescription.textContent = 'Meta description will appear here';
+      previewUrl.textContent = 'https://example.com';
+      
+      showStatus('All fields cleared');
+    }
+
+    async function copyToClipboard() {
+      if (!output.value) {
+        showStatus('Nothing to copy. Generate tags first.', true);
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(output.value);
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = 'Copied!';
+        copyBtn.disabled = true;
+        
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+          copyBtn.disabled = false;
+        }, 2000);
+        
+        showStatus('HTML copied to clipboard!');
+      } catch (err) {
+        showStatus('Failed to copy to clipboard', true);
+      }
+    }
+
+    generateBtn.addEventListener('click', generateMetaTags);
+    clearBtn.addEventListener('click', clearAll);
+    copyBtn.addEventListener('click', copyToClipboard);
+
+    titleInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') generateMetaTags();
+    });
+  });
+</script>
+
+<style>
+  .tool-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--space-4);
+  }
+
+  .tool-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .tool-header h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 var(--space-2) 0;
+  }
+
+  .tool-desc {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .tool-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 768px) {
+    .tool-body {
+      grid-template-columns: 400px 1fr;
+    }
+  }
+
+  .tool-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+
+  label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .char-count {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  input[type="text"],
+  textarea,
+  select {
+    width: 100%;
+    padding: var(--space-3);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    transition: border-color 0.2s;
+  }
+
+  input[type="text"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+  

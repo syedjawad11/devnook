@@ -1,0 +1,29 @@
+{
+  "slug": "base64-encoder",
+  "name": "Base64 Encoder/Decoder",
+  "description": "Encode and decode Base64 strings instantly in your browser. Supports text and URL-safe Base64.",
+  "tier": "client-side",
+  "batch": 2,
+  "category": "encoder",
+  "icon": "binary",
+  "tags": ["base64", "encode", "decode", "binary", "encoding"],
+  "seo_keywords": ["base64 encoder online", "base64 decoder", "encode base64", "decode base64 string", "base64 converter"],
+  "primary_keyword": "base64 encoder online",
+  "related_tools": ["url-encoder", "hash-generator"],
+  "related_content": ["what-is-base64", "base64-use-cases"],
+  "input_label": "Text or Base64 string",
+  "output_label": "Result",
+  "features": [
+    "Encode text to Base64",
+    "Decode Base64 to text",
+    "URL-safe Base64 mode",
+    "Copy to clipboard",
+    "Clear button"
+  ],
+  "controls": [
+    {"type": "button", "label": "Encode", "action": "encode"},
+    {"type": "button", "label": "Decode", "action": "decode"},
+    {"type": "checkbox", "label": "URL-safe mode", "default": false}
+  ],
+  "template_id": "tool-exp-v1"
+}

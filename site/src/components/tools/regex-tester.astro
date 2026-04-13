@@ -1,0 +1,474 @@
+---
+// Regex Tester — Client-side only
+---
+<div class="tool-container" id="tool-regex-tester">
+  <div class="tool-header">
+    <h2>Regex Tester</h2>
+    <p class="tool-desc">Test regular expressions with real-time match highlighting and capture group display</p>
+  </div>
+
+  <div class="tool-body">
+    <div class="regex-controls">
+      <div class="control-group">
+        <label for="regex-pattern">Regex pattern</label>
+        <input
+          type="text"
+          id="regex-pattern"
+          class="regex-input"
+          placeholder="e.g. \b\w+@\w+\.\w+\b"
+          aria-label="Regular expression pattern"
+          spellcheck="false"
+        />
+      </div>
+      
+      <div class="flags-group">
+        <label class="flag-label">
+          <input type="checkbox" id="flag-g" checked aria-label="Global flag">
+          <span>g (global)</span>
+        </label>
+        <label class="flag-label">
+          <input type="checkbox" id="flag-i" aria-label="Case insensitive flag">
+          <span>i (case insensitive)</span>
+        </label>
+        <label class="flag-label">
+          <input type="checkbox" id="flag-m" aria-label="Multiline flag">
+          <span>m (multiline)</span>
+        </label>
+        <label class="flag-label">
+          <input type="checkbox" id="flag-s" aria-label="Dotall flag">
+          <span>s (dotall)</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="input-section">
+      <label for="test-string">Test string</label>
+      <textarea
+        id="test-string"
+        class="test-input"
+        rows="8"
+        placeholder="Enter text to test your regex against..."
+        aria-label="Test string input"
+        spellcheck="false"
+      ></textarea>
+    </div>
+
+    <div class="button-row">
+      <button id="test-btn" class="btn-primary" aria-label="Test regular expression">
+        Test Regex
+      </button>
+      <button id="clear-btn" class="btn-secondary" aria-label="Clear all fields">
+        Clear
+      </button>
+    </div>
+
+    <div class="tool-error" id="error-message" role="alert" aria-live="assertive"></div>
+    <div class="tool-status" id="status-message" aria-live="polite"></div>
+
+    <div class="results-section" id="results-section" style="display: none;">
+      <div class="results-header">
+        <h3>Results</h3>
+        <span class="match-count" id="match-count">0 matches</span>
+      </div>
+      
+      <div class="highlighted-output" id="highlighted-output"></div>
+
+      <div class="matches-list" id="matches-list"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const patternInput = document.getElementById('regex-pattern');
+  const testInput = document.getElementById('test-string');
+  const flagG = document.getElementById('flag-g');
+  const flagI = document.getElementById('flag-i');
+  const flagM = document.getElementById('flag-m');
+  const flagS = document.getElementById('flag-s');
+  const testBtn = document.getElementById('test-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const errorDiv = document.getElementById('error-message');
+  const statusDiv = document.getElementById('status-message');
+  const resultsSection = document.getElementById('results-section');
+  const matchCountSpan = document.getElementById('match-count');
+  const highlightedOutput = document.getElementById('highlighted-output');
+  const matchesList = document.getElementById('matches-list');
+
+  function clearError() {
+    errorDiv.textContent = '';
+    errorDiv.style.display = 'none';
+  }
+
+  function showError(message) {
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+    statusDiv.textContent = '';
+  }
+
+  function showStatus(message) {
+    statusDiv.textContent = message;
+    clearError();
+  }
+
+  function clearStatus() {
+    statusDiv.textContent = '';
+  }
+
+  function getFlags() {
+    let flags = '';
+    if (flagG.checked) flags += 'g';
+    if (flagI.checked) flags += 'i';
+    if (flagM.checked) flags += 'm';
+    if (flagS.checked) flags += 's';
+    return flags;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function testRegex() {
+    clearError();
+    clearStatus();
+    resultsSection.style.display = 'none';
+
+    const pattern = patternInput.value.trim();
+    const testString = testInput.value;
+
+    if (!pattern) {
+      showError('Please enter a regex pattern');
+      return;
+    }
+
+    if (!testString) {
+      showError('Please enter a test string');
+      return;
+    }
+
+    let regex;
+    try {
+      const flags = getFlags();
+      regex = new RegExp(pattern, flags);
+    } catch (e) {
+      showError(`Invalid regex: ${e.message}`);
+      return;
+    }
+
+    const matches = [];
+    let match;
+    const isGlobal = flagG.checked;
+
+    if (isGlobal) {
+      while ((match = regex.exec(testString)) !== null) {
+        matches.push({
+          full: match[0],
+          groups: match.slice(1),
+          index: match.index,
+          namedGroups: match.groups || {}
+        });
+        if (match.index === regex.lastIndex) {
+          regex.lastIndex++;
+        }
+      }
+    } else {
+      match = regex.exec(testString);
+      if (match) {
+        matches.push({
+          full: match[0],
+          groups: match.slice(1),
+          index: match.index,
+          namedGroups: match.groups || {}
+        });
+      }
+    }
+
+    if (matches.length === 0) {
+      showStatus('No matches found');
+      return;
+    }
+
+    matchCountSpan.textContent = `${matches.length} match${matches.length === 1 ? '' : 'es'}`;
+    resultsSection.style.display = 'block';
+
+    renderHighlightedOutput(testString, matches);
+    renderMatchesList(matches);
+    showStatus(`Found ${matches.length} match${matches.length === 1 ? '' : 'es'}`);
+  }
+
+  function renderHighlightedOutput(text, matches) {
+    let html = '';
+    let lastIndex = 0;
+    const sortedMatches = [...matches].sort((a, b) => a.index - b.index);
+
+    sortedMatches.forEach((match, idx) => {
+      html += escapeHtml(text.substring(lastIndex, match.index));
+      html += `<mark class="highlight" data-match="${idx}">${escapeHtml(match.full)}</mark>`;
+      lastIndex = match.index + match.full.length;
+    });
+    html += escapeHtml(text.substring(lastIndex));
+
+    highlightedOutput.innerHTML = html;
+  }
+
+  function renderMatchesList(matches) {
+    let html = '';
+    
+    matches.forEach((match, idx) => {
+      html += `<div class="match-item">`;
+      html += `<div class="match-header">`;
+      html += `<strong>Match ${idx + 1}</strong>`;
+      html += `<button class="btn-copy" data-text="${escapeHtml(match.full)}" aria-label="Copy match ${idx + 1}">Copy</button>`;
+      html += `</div>`;
+      html += `<div class="match-content">`;
+      html += `<code>${escapeHtml(match.full)}</code>`;
+      html += `<span class="match-index">at index ${match.index}</span>`;
+      html += `</div>`;
+
+      if (match.groups.length > 0 && match.groups.some(g => g !== undefined)) {
+        html += `<div class="groups-section">`;
+        html += `<strong>Capture groups:</strong>`;
+        html += `<ul class="groups-list">`;
+        match.groups.forEach((group, gIdx) => {
+          if (group !== undefined) {
+            html += `<li><span class="group-label">Group ${gIdx + 1}:</span> <code>${escapeHtml(group)}</code></li>`;
+          }
+        });
+        html += `</ul>`;
+        html += `</div>`;
+      }
+
+      if (Object.keys(match.namedGroups).length > 0) {
+        html += `<div class="groups-section">`;
+        html += `<strong>Named groups:</strong>`;
+        html += `<ul class="groups-list">`;
+        Object.entries(match.namedGroups).forEach(([name, value]) => {
+          html += `<li><span class="group-label">${escapeHtml(name)}:</span> <code>${escapeHtml(value)}</code></li>`;
+        });
+        html += `</ul>`;
+        html += `</div>`;
+      }
+
+      html += `</div>`;
+    });
+
+    matchesList.innerHTML = html;
+
+    document.querySelectorAll('.btn-copy').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const text = this.getAttribute('data-text');
+        copyToClipboard(text, this);
+      });
+    });
+  }
+
+  function copyToClipboard(text, button) {
+    navigator.clipboard.writeText(text).then(() => {
+      const originalText = button.textContent;
+      button.textContent = 'Copied!';
+      button.disabled = true;
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.disabled = false;
+      }, 2000);
+    }).catch(() => {
+      showError('Failed to copy to clipboard');
+    });
+  }
+
+  function clearAll() {
+    patternInput.value = '';
+    testInput.value = '';
+    flagG.checked = true;
+    flagI.checked = false;
+    flagM.checked = false;
+    flagS.checked = false;
+    clearError();
+    clearStatus();
+    resultsSection.style.display = 'none';
+    matchesList.innerHTML = '';
+    highlightedOutput.innerHTML = '';
+  }
+
+  testBtn.addEventListener('click', testRegex);
+  clearBtn.addEventListener('click', clearAll);
+
+  patternInput.addEventListener('input', () => {
+    if (resultsSection.style.display === 'block') {
+      clearStatus();
+    }
+  });
+
+  testInput.addEventListener('input', () => {
+    if (resultsSection.style.display === 'block') {
+      clearStatus();
+    }
+  });
+
+  [flagG, flagI, flagM, flagS].forEach(flag => {
+    flag.addEventListener('change', () => {
+      if (resultsSection.style.display === 'block') {
+        clearStatus();
+      }
+    });
+  });
+
+  patternInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      testRegex();
+    }
+  });
+
+  testInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
+      testRegex();
+    }
+  });
+})();
+</script>
+
+<style>
+.tool-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-5);
+  text-align: center;
+}
+
+.tool-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.tool-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.regex-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.control-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.regex-input {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 1rem;
+}
+
+.regex-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.flags-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.flag-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--color-text);
+}
+
+.flag-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-accent);
+}
+
+.input-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.input-section label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.test-input {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.test-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.button-row {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: var(--space-3) var(--space-5);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--color-

@@ -1,0 +1,477 @@
+---
+// No server-side props needed — all tools are client-side
+---
+<div class="tool-container" id="tool-sitemap-generator">
+  <div class="tool-header">
+    <h2>XML Sitemap Generator</h2>
+    <p class="tool-desc">Generate a valid XML sitemap from a list of URLs instantly in your browser.</p>
+  </div>
+  <div class="tool-body">
+    <div class="tool-input">
+      <label for="url-input">URLs (one per line)</label>
+      <textarea 
+        id="url-input" 
+        rows="10" 
+        placeholder="https://example.com/&#10;https://example.com/about&#10;https://example.com/blog"
+        aria-label="Enter URLs to include in sitemap, one per line"
+      ></textarea>
+    </div>
+    <div class="tool-controls">
+      <div class="control-group">
+        <label for="changefreq-select">Change frequency</label>
+        <select id="changefreq-select" aria-label="Select default change frequency for URLs">
+          <option value="daily">Daily</option>
+          <option value="weekly" selected>Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+          <option value="always">Always</option>
+          <option value="hourly">Hourly</option>
+          <option value="never">Never</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label for="priority-select">Priority</label>
+        <select id="priority-select" aria-label="Select default priority for URLs">
+          <option value="1.0">1.0</option>
+          <option value="0.9">0.9</option>
+          <option value="0.8" selected>0.8</option>
+          <option value="0.7">0.7</option>
+          <option value="0.5">0.5</option>
+          <option value="0.3">0.3</option>
+          <option value="0.1">0.1</option>
+        </select>
+      </div>
+      <div class="control-group checkbox-group">
+        <input type="checkbox" id="lastmod-checkbox" checked aria-label="Set last modified date to today">
+        <label for="lastmod-checkbox">Set lastmod to today</label>
+      </div>
+      <button id="generate-btn" aria-label="Generate XML sitemap from entered URLs">Generate Sitemap</button>
+      <button id="clear-btn" aria-label="Clear all input and output">Clear</button>
+    </div>
+    <div class="tool-output">
+      <div class="output-header">
+        <label for="xml-output">sitemap.xml</label>
+        <div class="output-actions">
+          <button id="download-btn" disabled aria-label="Download sitemap as XML file">Download sitemap.xml</button>
+          <button id="copy-btn" disabled aria-label="Copy XML to clipboard">Copy XML</button>
+        </div>
+      </div>
+      <textarea 
+        id="xml-output" 
+        rows="15" 
+        readonly 
+        placeholder="Generated XML sitemap will appear here..."
+        aria-label="Generated XML sitemap output"
+      ></textarea>
+    </div>
+  </div>
+  <div class="tool-status" aria-live="polite"></div>
+</div>
+
+<script>
+(function() {
+  const urlInput = document.getElementById('url-input');
+  const changefreqSelect = document.getElementById('changefreq-select');
+  const prioritySelect = document.getElementById('priority-select');
+  const lastmodCheckbox = document.getElementById('lastmod-checkbox');
+  const generateBtn = document.getElementById('generate-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const downloadBtn = document.getElementById('download-btn');
+  const copyBtn = document.getElementById('copy-btn');
+  const xmlOutput = document.getElementById('xml-output');
+  const statusDiv = document.querySelector('.tool-status');
+
+  function showStatus(message, isError = false) {
+    statusDiv.textContent = message;
+    statusDiv.className = 'tool-status' + (isError ? ' error' : ' success');
+    statusDiv.style.display = 'block';
+    setTimeout(() => {
+      statusDiv.style.display = 'none';
+    }, isError ? 5000 : 3000);
+  }
+
+  function isValidUrl(url) {
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch {
+      return false;
+    }
+  }
+
+  function escapeXml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+  }
+
+  function getTodayISO() {
+    const now = new Date();
+    return now.toISOString().split('T')[0];
+  }
+
+  function generateSitemap() {
+    const input = urlInput.value.trim();
+    if (!input) {
+      showStatus('Please enter at least one URL', true);
+      return;
+    }
+
+    const lines = input.split('\n').map(line => line.trim()).filter(line => line);
+    const urls = [];
+    const errors = [];
+
+    lines.forEach((line, index) => {
+      if (!isValidUrl(line)) {
+        errors.push(`Line ${index + 1}: Invalid URL "${line}"`);
+      } else {
+        urls.push(line);
+      }
+    });
+
+    if (errors.length > 0) {
+      showStatus(errors.join('; '), true);
+      return;
+    }
+
+    if (urls.length === 0) {
+      showStatus('No valid URLs found', true);
+      return;
+    }
+
+    const changefreq = changefreqSelect.value;
+    const priority = prioritySelect.value;
+    const useLastmod = lastmodCheckbox.checked;
+    const lastmod = useLastmod ? getTodayISO() : null;
+
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
+
+    urls.forEach(url => {
+      xml += '  <url>\n';
+      xml += `    <loc>${escapeXml(url)}</loc>\n`;
+      if (lastmod) {
+        xml += `    <lastmod>${lastmod}</lastmod>\n`;
+      }
+      xml += `    <changefreq>${changefreq}</changefreq>\n`;
+      xml += `    <priority>${priority}</priority>\n`;
+      xml += '  </url>\n';
+    });
+
+    xml += '</urlset>';
+
+    xmlOutput.value = xml;
+    downloadBtn.disabled = false;
+    copyBtn.disabled = false;
+    showStatus(`Sitemap generated with ${urls.length} URL${urls.length !== 1 ? 's' : ''}`);
+  }
+
+  function downloadSitemap() {
+    const xml = xmlOutput.value;
+    if (!xml) return;
+
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sitemap.xml';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showStatus('sitemap.xml downloaded');
+  }
+
+  function copySitemap() {
+    const xml = xmlOutput.value;
+    if (!xml) return;
+
+    navigator.clipboard.writeText(xml).then(() => {
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 2000);
+    }).catch(() => {
+      showStatus('Failed to copy to clipboard', true);
+    });
+  }
+
+  function clearAll() {
+    urlInput.value = '';
+    xmlOutput.value = '';
+    downloadBtn.disabled = true;
+    copyBtn.disabled = true;
+    statusDiv.style.display = 'none';
+  }
+
+  generateBtn.addEventListener('click', generateSitemap);
+  downloadBtn.addEventListener('click', downloadSitemap);
+  copyBtn.addEventListener('click', copySitemap);
+  clearBtn.addEventListener('click', clearAll);
+
+  urlInput.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      generateSitemap();
+    }
+  });
+})();
+</script>
+
+<style>
+.tool-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-5);
+}
+
+.tool-header h2 {
+  font-family: var(--font-body);
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.tool-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tool-input,
+.tool-output {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+label {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+textarea {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.tool-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 140px;
+}
+
+.checkbox-group {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: var(--color-accent);
+}
+
+.checkbox-group label {
+  cursor: pointer;
+  user-select: none;
+}
+
+select {
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+button {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+
+button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#generate-btn {
+  flex: 1;
+  min-width: 160px;
+}
+
+#clear-btn {
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+}
+
+#clear-btn:hover {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.output-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.output-actions button {
+  padding: var(--space-2) var(--space-3);
+  font-size: 0.85rem;
+}
+
+#download-btn {
+  background: var(--color-accent-2);
+}
+
+#copy-btn {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+#copy-btn:hover:not(:disabled) {
+  background: var(--color-surface);
+}
+
+.tool-status {
+  display: none;
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-family: var(--font-body);
+}
+
+.tool-status.success {
+  background: rgba(110, 231, 183, 0.1);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.tool-status.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+@media (max-width: 768px) {
+  .tool-container {
+    padding: var(--space-3);
+  }
+
+  .tool-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .tool-controls {
+    padding: var(--space-3);
+  }
+
+  .control-group {
+    min-width: 100%;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .output-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .output-actions {
+    flex-direction: column;
+  }
+
+  .output-actions button {
+    width: 100%;
+  }
+}
+</style>

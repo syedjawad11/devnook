@@ -1,0 +1,406 @@
+---
+// No server-side props needed — all tools are client-side
+---
+<div class="tool-container" id="tool-cron-parser">
+  <div class="tool-header">
+    <h2>Cron Expression Builder</h2>
+    <p class="tool-desc">Build, parse, and understand cron expressions in plain English. See the next 5 run times.</p>
+  </div>
+  
+  <div class="tool-body">
+    <div class="input-section">
+      <label for="cron-input">Cron expression</label>
+      <input 
+        type="text" 
+        id="cron-input" 
+        class="cron-input"
+        placeholder="0 9 * * 1-5"
+        aria-label="Enter cron expression"
+      />
+      
+      <div class="controls-row">
+        <div class="control-group">
+          <label for="timezone-select">Timezone</label>
+          <select id="timezone-select" aria-label="Select timezone">
+            <option value="UTC" selected>UTC</option>
+            <option value="Local">Local</option>
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <label for="preset-select">Presets</label>
+          <select id="preset-select" aria-label="Select preset cron expression">
+            <option value="">-- Select preset --</option>
+            <option value="* * * * *">Every minute</option>
+            <option value="0 * * * *">Every hour</option>
+            <option value="0 0 * * *">Daily at midnight</option>
+            <option value="0 0 * * 1">Weekly Monday</option>
+            <option value="0 0 1 * *">Monthly 1st</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="button-row">
+        <button id="parse-btn" class="btn-primary" aria-label="Parse cron expression">Parse</button>
+        <button id="clear-btn" class="btn-secondary" aria-label="Clear input">Clear</button>
+      </div>
+    </div>
+
+    <div class="output-section">
+      <div class="output-header">
+        <label>Explanation & next runs</label>
+        <button id="copy-btn" class="btn-copy" aria-label="Copy next run times to clipboard" style="display: none;">
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      
+      <div id="explanation-output" class="explanation-box" aria-live="polite"></div>
+      <div id="schedule-output" class="schedule-box" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <div id="tool-status" class="tool-status" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const cronInput = document.getElementById('cron-input');
+  const timezoneSelect = document.getElementById('timezone-select');
+  const presetSelect = document.getElementById('preset-select');
+  const parseBtn = document.getElementById('parse-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const copyBtn = document.getElementById('copy-btn');
+  const explanationOutput = document.getElementById('explanation-output');
+  const scheduleOutput = document.getElementById('schedule-output');
+  const statusDiv = document.getElementById('tool-status');
+
+  // Cron parser logic
+  function parseCronExpression(cron) {
+    const parts = cron.trim().split(/\s+/);
+    
+    if (parts.length !== 5 && parts.length !== 6) {
+      throw new Error('Invalid cron expression. Must have 5 or 6 fields.');
+    }
+
+    const hasSeconds = parts.length === 6;
+    const [seconds, minute, hour, dayOfMonth, month, dayOfWeek] = hasSeconds 
+      ? parts 
+      : ['0', ...parts];
+
+    return {
+      seconds,
+      minute,
+      hour,
+      dayOfMonth,
+      month,
+      dayOfWeek,
+      hasSeconds
+    };
+  }
+
+  function explainCronField(value, fieldName, valueMap = {}) {
+    if (value === '*') return `every ${fieldName}`;
+    if (value.includes('/')) {
+      const [range, step] = value.split('/');
+      if (range === '*') return `every ${step} ${fieldName}${step > 1 ? 's' : ''}`;
+      return `every ${step} ${fieldName}${step > 1 ? 's' : ''} starting from ${range}`;
+    }
+    if (value.includes('-')) {
+      const [start, end] = value.split('-');
+      const startName = valueMap[start] || start;
+      const endName = valueMap[end] || end;
+      return `${startName} through ${endName}`;
+    }
+    if (value.includes(',')) {
+      const values = value.split(',').map(v => valueMap[v] || v);
+      return values.join(', ');
+    }
+    return valueMap[value] || value;
+  }
+
+  function generateExplanation(parsed) {
+    const months = {
+      '1': 'January', '2': 'February', '3': 'March', '4': 'April',
+      '5': 'May', '6': 'June', '7': 'July', '8': 'August',
+      '9': 'September', '10': 'October', '11': 'November', '12': 'December'
+    };
+    
+    const days = {
+      '0': 'Sunday', '1': 'Monday', '2': 'Tuesday', '3': 'Wednesday',
+      '4': 'Thursday', '5': 'Friday', '6': 'Saturday', '7': 'Sunday'
+    };
+
+    let explanation = 'Runs ';
+
+    // Time of day
+    if (parsed.minute === '*' && parsed.hour === '*') {
+      explanation += 'every minute';
+    } else if (parsed.minute !== '*' && parsed.hour === '*') {
+      explanation += `at minute ${explainCronField(parsed.minute, 'minute')} of every hour`;
+    } else if (parsed.minute === '0' && parsed.hour !== '*') {
+      explanation += `at ${explainCronField(parsed.hour, 'hour', {})}:00`;
+    } else {
+      const hourExplain = explainCronField(parsed.hour, 'hour', {});
+      const minuteExplain = explainCronField(parsed.minute, 'minute', {});
+      explanation += `at ${hourExplain}:${minuteExplain}`;
+    }
+
+    // Day constraints
+    const hasDayOfMonth = parsed.dayOfMonth !== '*';
+    const hasDayOfWeek = parsed.dayOfWeek !== '*';
+    
+    if (hasDayOfWeek) {
+      explanation += ` on ${explainCronField(parsed.dayOfWeek, 'day', days)}`;
+    }
+    
+    if (hasDayOfMonth && !hasDayOfWeek) {
+      explanation += ` on day ${explainCronField(parsed.dayOfMonth, 'day of month')} of the month`;
+    } else if (hasDayOfMonth && hasDayOfWeek) {
+      explanation += ` (day ${explainCronField(parsed.dayOfMonth, 'day of month')})`;
+    }
+
+    // Month constraint
+    if (parsed.month !== '*') {
+      explanation += ` in ${explainCronField(parsed.month, 'month', months)}`;
+    }
+
+    return explanation + '.';
+  }
+
+  function getNextRuns(cron, timezone, count = 5) {
+    const parsed = parseCronExpression(cron);
+    const runs = [];
+    let current = new Date();
+    
+    if (timezone === 'UTC') {
+      current = new Date(current.toISOString());
+    }
+
+    const maxIterations = 10000;
+    let iterations = 0;
+
+    while (runs.length < count && iterations < maxIterations) {
+      current = new Date(current.getTime() + 60000); // Add 1 minute
+      iterations++;
+
+      const minute = current.getMinutes();
+      const hour = current.getHours();
+      const dayOfMonth = current.getDate();
+      const month = current.getMonth() + 1;
+      const dayOfWeek = current.getDay();
+
+      if (!matchesCronField(minute, parsed.minute)) continue;
+      if (!matchesCronField(hour, parsed.hour)) continue;
+      if (!matchesCronField(dayOfMonth, parsed.dayOfMonth)) continue;
+      if (!matchesCronField(month, parsed.month)) continue;
+      if (!matchesCronField(dayOfWeek, parsed.dayOfWeek)) continue;
+
+      runs.push(new Date(current));
+    }
+
+    return runs;
+  }
+
+  function matchesCronField(value, pattern) {
+    if (pattern === '*') return true;
+    
+    if (pattern.includes(',')) {
+      return pattern.split(',').some(p => matchesCronField(value, p.trim()));
+    }
+    
+    if (pattern.includes('/')) {
+      const [range, step] = pattern.split('/');
+      const stepNum = parseInt(step);
+      if (range === '*') {
+        return value % stepNum === 0;
+      }
+      const rangeStart = parseInt(range);
+      return value >= rangeStart && (value - rangeStart) % stepNum === 0;
+    }
+    
+    if (pattern.includes('-')) {
+      const [start, end] = pattern.split('-').map(Number);
+      return value >= start && value <= end;
+    }
+    
+    return value === parseInt(pattern);
+  }
+
+  function formatRunTime(date, timezone) {
+    if (timezone === 'UTC') {
+      return date.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+    }
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }) + ' Local';
+  }
+
+  function showStatus(message, isError = false) {
+    statusDiv.textContent = message;
+    statusDiv.className = `tool-status ${isError ? 'error' : 'success'}`;
+    statusDiv.style.display = 'block';
+    
+    if (!isError) {
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 3000);
+    }
+  }
+
+  function parseCron() {
+    const cron = cronInput.value.trim();
+    const timezone = timezoneSelect.value;
+
+    if (!cron) {
+      showStatus('Please enter a cron expression', true);
+      explanationOutput.textContent = '';
+      scheduleOutput.textContent = '';
+      copyBtn.style.display = 'none';
+      return;
+    }
+
+    try {
+      const parsed = parseCronExpression(cron);
+      const explanation = generateExplanation(parsed);
+      const nextRuns = getNextRuns(cron, timezone, 5);
+
+      explanationOutput.innerHTML = `<strong>Explanation:</strong><br>${explanation}`;
+      
+      const runsList = nextRuns.map((run, idx) => 
+        `<div class="run-item"><span class="run-number">${idx + 1}.</span> ${formatRunTime(run, timezone)}</div>`
+      ).join('');
+      
+      scheduleOutput.innerHTML = `<strong>Next 5 runs:</strong><div class="runs-list">${runsList}</div>`;
+      
+      copyBtn.style.display = 'inline-block';
+      statusDiv.style.display = 'none';
+    } catch (error) {
+      showStatus(error.message, true);
+      explanationOutput.textContent = '';
+      scheduleOutput.textContent = '';
+      copyBtn.style.display = 'none';
+    }
+  }
+
+  parseBtn.addEventListener('click', parseCron);
+  
+  cronInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      parseCron();
+    }
+  });
+
+  presetSelect.addEventListener('change', (e) => {
+    if (e.target.value) {
+      cronInput.value = e.target.value;
+      parseCron();
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    cronInput.value = '';
+    explanationOutput.textContent = '';
+    scheduleOutput.textContent = '';
+    copyBtn.style.display = 'none';
+    statusDiv.style.display = 'none';
+    presetSelect.value = '';
+  });
+
+  copyBtn.addEventListener('click', async () => {
+    const scheduleText = scheduleOutput.textContent;
+    
+    try {
+      await navigator.clipboard.writeText(scheduleText);
+      const originalText = copyBtn.querySelector('.copy-text').textContent;
+      copyBtn.querySelector('.copy-text').textContent = 'Copied!';
+      
+      setTimeout(() => {
+        copyBtn.querySelector('.copy-text').textContent = originalText;
+      }, 2000);
+    } catch (error) {
+      showStatus('Failed to copy to clipboard', true);
+    }
+  });
+});
+</script>
+
+<style>
+.tool-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-5);
+}
+
+.tool-header h2 {
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  color: var(--color-text-muted);
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+.tool-body {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.input-section,
+.output-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+label {
+  display: block;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: var(--space-2);
+}
+
+.cron-input {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+  box-sizing: border-box;
+}
+
+.cron-input:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.cron-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.controls-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4

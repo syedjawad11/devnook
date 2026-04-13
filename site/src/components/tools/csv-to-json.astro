@@ -1,0 +1,481 @@
+---
+// CSV ↔ JSON Converter — Client-side tool component
+---
+<div class="tool-container" id="tool-csv-to-json">
+  <div class="tool-header">
+    <h2>CSV ↔ JSON Converter</h2>
+    <p class="tool-desc">Convert CSV data to JSON and JSON arrays back to CSV instantly in your browser.</p>
+  </div>
+
+  <div class="tool-controls">
+    <div class="control-group">
+      <label for="direction-select">Direction</label>
+      <select id="direction-select" aria-label="Conversion direction">
+        <option value="csv-to-json">CSV → JSON</option>
+        <option value="json-to-csv">JSON → CSV</option>
+      </select>
+    </div>
+
+    <div class="control-group">
+      <label for="delimiter-select">Delimiter</label>
+      <select id="delimiter-select" aria-label="CSV delimiter">
+        <option value="auto">Auto-detect</option>
+        <option value=",">Comma (,)</option>
+        <option value="\t">Tab (\t)</option>
+        <option value=";">Semicolon (;)</option>
+        <option value="|">Pipe (|)</option>
+      </select>
+    </div>
+
+    <div class="control-group checkbox-group">
+      <label>
+        <input type="checkbox" id="header-checkbox" checked aria-label="First row is header">
+        <span>First row is header</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="tool-body">
+    <div class="io-group">
+      <label for="input-area">Paste CSV or JSON data here</label>
+      <textarea 
+        id="input-area" 
+        rows="12" 
+        placeholder="name,age,city&#10;Alice,30,NYC&#10;Bob,25,LA"
+        aria-label="Input data"
+      ></textarea>
+    </div>
+
+    <div class="io-group">
+      <label for="output-area">Converted output</label>
+      <textarea 
+        id="output-area" 
+        rows="12" 
+        readonly 
+        placeholder="Converted result will appear here..."
+        aria-label="Output data"
+      ></textarea>
+    </div>
+  </div>
+
+  <div class="tool-actions">
+    <button id="convert-btn" class="btn-primary" aria-label="Convert data">Convert</button>
+    <button id="copy-btn" class="btn-secondary" aria-label="Copy result to clipboard">Copy Result</button>
+    <button id="clear-btn" class="btn-secondary" aria-label="Clear all fields">Clear</button>
+  </div>
+
+  <div class="tool-status" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+(function() {
+  const inputArea = document.getElementById('input-area');
+  const outputArea = document.getElementById('output-area');
+  const directionSelect = document.getElementById('direction-select');
+  const delimiterSelect = document.getElementById('delimiter-select');
+  const headerCheckbox = document.getElementById('header-checkbox');
+  const convertBtn = document.getElementById('convert-btn');
+  const copyBtn = document.getElementById('copy-btn');
+  const clearBtn = document.getElementById('clear-btn');
+  const statusDiv = document.querySelector('.tool-status');
+
+  function showStatus(message, isError = false) {
+    statusDiv.textContent = message;
+    statusDiv.className = 'tool-status' + (isError ? ' error' : ' success');
+    statusDiv.style.display = 'block';
+  }
+
+  function hideStatus() {
+    statusDiv.style.display = 'none';
+  }
+
+  function detectDelimiter(line) {
+    const delimiters = [',', '\t', ';', '|'];
+    let maxCount = 0;
+    let detectedDelimiter = ',';
+
+    for (const delim of delimiters) {
+      const count = line.split(delim).length - 1;
+      if (count > maxCount) {
+        maxCount = count;
+        detectedDelimiter = delim;
+      }
+    }
+
+    return detectedDelimiter;
+  }
+
+  function parseCSV(csvText, delimiter, hasHeader) {
+    const lines = csvText.trim().split('\n').filter(line => line.trim());
+    if (lines.length === 0) {
+      throw new Error('CSV input is empty');
+    }
+
+    const actualDelimiter = delimiter === 'auto' ? detectDelimiter(lines[0]) : delimiter;
+    
+    const parseLine = (line) => {
+      const values = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === actualDelimiter && !inQuotes) {
+          values.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      values.push(current.trim());
+      return values;
+    };
+
+    const rows = lines.map(parseLine);
+    const headers = hasHeader ? rows[0] : rows[0].map((_, i) => `column_${i + 1}`);
+    const dataRows = hasHeader ? rows.slice(1) : rows;
+
+    return dataRows.map(row => {
+      const obj = {};
+      headers.forEach((header, i) => {
+        obj[header] = row[i] || '';
+      });
+      return obj;
+    });
+  }
+
+  function convertCSVToJSON() {
+    const csvText = inputArea.value.trim();
+    if (!csvText) {
+      throw new Error('Please enter CSV data');
+    }
+
+    const delimiter = delimiterSelect.value;
+    const hasHeader = headerCheckbox.checked;
+
+    const jsonArray = parseCSV(csvText, delimiter, hasHeader);
+    return JSON.stringify(jsonArray, null, 2);
+  }
+
+  function convertJSONToCSV() {
+    const jsonText = inputArea.value.trim();
+    if (!jsonText) {
+      throw new Error('Please enter JSON data');
+    }
+
+    let data;
+    try {
+      data = JSON.parse(jsonText);
+    } catch (e) {
+      throw new Error('Invalid JSON format');
+    }
+
+    if (!Array.isArray(data)) {
+      throw new Error('JSON must be an array of objects');
+    }
+
+    if (data.length === 0) {
+      throw new Error('JSON array is empty');
+    }
+
+    const hasHeader = headerCheckbox.checked;
+    const delimiter = delimiterSelect.value === 'auto' ? ',' : delimiterSelect.value;
+
+    const headers = Object.keys(data[0]);
+    
+    const escapeCsvValue = (value) => {
+      const str = String(value ?? '');
+      if (str.includes(delimiter) || str.includes('"') || str.includes('\n')) {
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+      return str;
+    };
+
+    let csv = '';
+    if (hasHeader) {
+      csv = headers.map(escapeCsvValue).join(delimiter) + '\n';
+    }
+
+    csv += data.map(row => 
+      headers.map(header => escapeCsvValue(row[header])).join(delimiter)
+    ).join('\n');
+
+    return csv;
+  }
+
+  function convert() {
+    hideStatus();
+    
+    try {
+      const direction = directionSelect.value;
+      let result;
+
+      if (direction === 'csv-to-json') {
+        result = convertCSVToJSON();
+      } else {
+        result = convertJSONToCSV();
+      }
+
+      outputArea.value = result;
+      showStatus('Conversion successful!');
+    } catch (error) {
+      showStatus(error.message, true);
+      outputArea.value = '';
+    }
+  }
+
+  async function copyToClipboard() {
+    const text = outputArea.value.trim();
+    if (!text) {
+      showStatus('Nothing to copy', true);
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(text);
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = 'Copied!';
+      showStatus('Copied to clipboard!');
+      
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 2000);
+    } catch (error) {
+      showStatus('Failed to copy to clipboard', true);
+    }
+  }
+
+  function clearAll() {
+    inputArea.value = '';
+    outputArea.value = '';
+    hideStatus();
+    directionSelect.value = 'csv-to-json';
+    delimiterSelect.value = 'auto';
+    headerCheckbox.checked = true;
+  }
+
+  function updateDelimiterVisibility() {
+    const direction = directionSelect.value;
+    delimiterSelect.disabled = false;
+  }
+
+  convertBtn.addEventListener('click', convert);
+  copyBtn.addEventListener('click', copyToClipboard);
+  clearBtn.addEventListener('click', clearAll);
+  directionSelect.addEventListener('change', updateDelimiterVisibility);
+
+  inputArea.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      convert();
+    }
+  });
+})();
+</script>
+
+<style>
+.tool-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.tool-header {
+  margin-bottom: var(--space-5);
+}
+
+.tool-header h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.tool-desc {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.tool-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 150px;
+}
+
+.control-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.control-group select {
+  padding: var(--space-2);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+}
+
+.control-group select:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.checkbox-group {
+  justify-content: center;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  flex-direction: row;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--color-accent);
+}
+
+.tool-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+@media (max-width: 768px) {
+  .tool-body {
+    grid-template-columns: 1fr;
+  }
+}
+
+.io-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.io-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.io-group textarea {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.io-group textarea:focus {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.io-group textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.io-group textarea[readonly] {
+  background: var(--color-bg);
+  cursor: default;
+}
+
+.tool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.btn-primary,
+.btn-secondary {
+  padding: var(--space-3) var(--space-5);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: var(--color-bg);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+.btn-secondary:hover {
+  background: var(--color-border);
+}
+
+.btn-primary:active,
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+.tool-status {
+  display: none;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.tool-status.success {
+  background: rgba(110, 231, 183, 0.1);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.tool-status.error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+</style>

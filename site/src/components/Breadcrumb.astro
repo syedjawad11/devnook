@@ -1,0 +1,84 @@
+---
+interface Crumb {
+  label: string;
+  href: string | null;
+}
+
+interface Props {
+  crumbs: Crumb[];
+}
+
+const { crumbs } = Astro.props;
+
+// Generate schema.org BreadcrumbList
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((crumb, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    name: crumb.label,
+    ...(crumb.href && { item: `https://devnook.dev${crumb.href}` })
+  }))
+};
+---
+
+<nav aria-label="Breadcrumb">
+  <ol class="breadcrumb">
+    {crumbs.map((crumb, index) => (
+      <li class="breadcrumb-item">
+        {crumb.href ? (
+          <a href={crumb.href}>{crumb.label}</a>
+        ) : (
+          <span aria-current="page">{crumb.label}</span>
+        )}
+        {index < crumbs.length - 1 && <span class="separator">/</span>}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+
+<style>
+  nav {
+    margin-bottom: var(--space-4);
+  }
+
+  .breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .breadcrumb-item a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .breadcrumb-item a:hover {
+    color: var(--color-accent);
+  }
+
+  .breadcrumb-item span[aria-current] {
+    color: var(--color-text);
+  }
+
+  .separator {
+    color: var(--color-border);
+    user-select: none;
+  }
+</style>

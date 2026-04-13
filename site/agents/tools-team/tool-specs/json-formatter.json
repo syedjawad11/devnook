@@ -1,0 +1,30 @@
+{
+  "slug": "json-formatter",
+  "name": "JSON Formatter & Validator",
+  "description": "Format, validate, and minify JSON instantly in your browser. No data sent to servers.",
+  "tier": "client-side",
+  "batch": 1,
+  "category": "data",
+  "icon": "braces",
+  "tags": ["json", "formatter", "validator", "minify", "beautify"],
+  "seo_keywords": ["json formatter online", "json validator free", "format json online", "json beautifier", "json minifier"],
+  "primary_keyword": "json formatter online",
+  "related_tools": ["csv-to-json", "hash-generator"],
+  "related_content": ["what-is-json", "json-vs-xml"],
+  "input_label": "Paste JSON here",
+  "output_label": "Formatted JSON",
+  "features": [
+    "Format with 2 or 4 space indent",
+    "Minify (remove whitespace)",
+    "Validate with line-specific error messages",
+    "Copy to clipboard",
+    "Clear button"
+  ],
+  "controls": [
+    {"type": "button", "label": "Format", "action": "format"},
+    {"type": "button", "label": "Minify", "action": "minify"},
+    {"type": "button", "label": "Validate", "action": "validate"},
+    {"type": "select", "label": "Indent", "options": ["2 spaces", "4 spaces", "tabs"], "default": "2 spaces"}
+  ],
+  "template_id": "tool-exp-v1"
+}
