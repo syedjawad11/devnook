@@ -1,13 +1,7 @@
 import { defineConfig } from 'astro/config';
-import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://devnook.dev',
-  output: 'hybrid',
-  adapter: cloudflare({
-    platformProxy: {
-      enabled: true
-    }
-  }),
+  output: 'static',
   integrations: [],
   image: {
     service: {
@@ -18,11 +12,6 @@ export default defineConfig({
     shikiConfig: {
       theme: 'github-dark',
       wrap: true
-    }
-  },
-  vite: {
-    ssr: {
-      external: ['node:async_hooks', '@resvg/resvg-js', 'sharp']
     }
   }
 });
