@@ -11,9 +11,15 @@ import sys
 import json
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Force UTF-8 stdout on Windows to handle Unicode characters in print statements
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
+
+# Load .env from project root so ANTHROPIC_API_KEY is available
+_PROJECT_ROOT_FOR_ENV = Path(__file__).resolve().parents[2]
+load_dotenv(_PROJECT_ROOT_FOR_ENV / ".env")
 
 # Allow imports from agents/utils/
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -57,12 +63,21 @@ def generate_file(filename: str, description: str, context: str = "") -> str:
 
 
 def write_file(path: str, content: str):
-    """Write content to file, creating parent directories as needed."""
+    """Write content to file, creating parent directories as needed.
+
+    Idempotent: skips any file that already exists, so re-running the
+    scaffold only produces files that are genuinely missing. Note that
+    the caller still pays for the LLM call even when we skip — use this
+    to recover from partial scaffolds, not to cheaply re-run from scratch.
+    """
+    full_path = PROJECT_ROOT / path
+    if full_path.exists():
+        print(f"  · skip (exists) {path}")
+        return
     import re
     # Strip markdown code fences that the LLM sometimes adds despite instructions
     content = re.sub(r"^```[a-z]*\n", "", content)
     content = re.sub(r"\n```\s*$", "", content)
-    full_path = PROJECT_ROOT / path
     full_path.parent.mkdir(parents=True, exist_ok=True)
     full_path.write_text(content, encoding="utf-8")
     print(f"  ✓ {path}")

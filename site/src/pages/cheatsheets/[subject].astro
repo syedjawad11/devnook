@@ -1,0 +1,29 @@
+---
+import { getCollection } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const cheatsheets = await getCollection('cheatsheets');
+  
+  return cheatsheets.map((cheatsheet) => ({
+    params: { subject: cheatsheet.slug },
+    props: { cheatsheet },
+  }));
+}
+
+const { cheatsheet } = Astro.props;
+const { Content } = await cheatsheet.render();
+
+const breadcrumb = [
+  { label: 'Home', href: '/' },
+  { label: 'Cheatsheets', href: '/cheatsheets/' },
+  { label: cheatsheet.data.title, href: '' },
+];
+
+const relatedPosts = cheatsheet.data.related_posts || [];
+const relatedTools = cheatsheet.data.related_tools || [];
+---
+
+<PostLayout frontmatter={cheatsheet.data}>
+  <Content />
+</PostLayout>

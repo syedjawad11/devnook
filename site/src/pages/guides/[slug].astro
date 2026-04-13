@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides');
+  return guides.map((guide) => ({
+    params: { slug: guide.slug },
+    props: { guide },
+  }));
+}
+
+interface Props {
+  guide: {
+    slug: string;
+    data: {
+      title: string;
+      description: string;
+      category: string;
+      template_id: string;
+      tags: string[];
+      related_posts: string[];
+      related_tools: string[];
+      published_date: string;
+      og_image: string;
+      word_count_target: number;
+    };
+    render: () => Promise<{
+      Content: any;
+      headings: Array<{ depth: number; text: string; slug: string }>;
+    }>;
+  };
+}
+
+const { guide } = Astro.props;
+const { Content, headings } = await guide.render();
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Guides', href: '/guides/' },
+  { label: guide.data.title, href: '' },
+];
+
+const pageTitle = guide.data.title;
+const pageDescription = guide.data.description;
+const ogImage = guide.data.og_image || `/og/guides/${guide.slug}.png`;
+const publishedDate = new Date(guide.data.published_date);
+---
+
+<PostLayout frontmatter={guide.data}>
+  <Content />
+</PostLayout>

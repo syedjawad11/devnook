@@ -1,0 +1,414 @@
+---
+import { getCollection } from 'astro:content';
+import ToolLayout from '../../layouts/ToolLayout.astro';
+
+const toolModules = import.meta.glob<{ default: any }>(
+  '../../components/tools/*.astro',
+  { eager: true }
+);
+const toolComponents: Record<string, any> = {};
+for (const [path, mod] of Object.entries(toolModules)) {
+  const slug = path.split('/').pop()!.replace('.astro', '');
+  toolComponents[slug] = mod.default;
+}
+
+export async function getStaticPaths() {
+  const tools = await getCollection('tools');
+  const availableSlugs = new Set(
+    Object.keys(
+      import.meta.glob('../../components/tools/*.astro', { eager: true })
+    ).map((p) => p.split('/').pop()!.replace('.astro', ''))
+  );
+  return tools
+    .filter((tool) => availableSlugs.has(tool.data.tool_slug ?? tool.slug))
+    .map((tool) => ({
+      params: { slug: tool.data.tool_slug ?? tool.slug },
+      props: { tool },
+    }));
+}
+
+const { tool } = Astro.props;
+const { Content } = await tool.render();
+
+const ToolComponent = toolComponents[tool.data.tool_slug ?? tool.slug];
+
+const breadcrumbs = [
+  { label: 'Home', href: '/' },
+  { label: 'Tools', href: '/tools/' },
+  { label: tool.data.title, href: `/tools/${tool.slug}` },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: tool.data.title,
+  description: tool.data.description,
+  applicationCategory: 'WebApplication',
+  operatingSystem: 'Any',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  aggregateRating:
+    tool.data.tier === 'tier-1'
+      ? {
+          '@type': 'AggregateRating',
+          ratingValue: '4.8',
+          ratingCount: '150',
+        }
+      : undefined,
+};
+---
+
+<ToolLayout
+  title={tool.data.title}
+  description={tool.data.description}
+  breadcrumbs={breadcrumbs}
+  tool={tool.data}
+  jsonLd={jsonLd}
+>
+  <div class="tool-page">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        {
+          breadcrumbs.map((crumb, i) => (
+            <li>
+              {i < breadcrumbs.length - 1 ? (
+                <>
+                  <a href={crumb.href}>{crumb.label}</a>
+                  <span class="separator">/</span>
+                </>
+              ) : (
+                <span aria-current="page">{crumb.label}</span>
+              )}
+            </li>
+          ))
+        }
+      </ol>
+    </nav>
+
+    <header class="tool-header">
+      <h1>{tool.data.title}</h1>
+      <p class="tool-description">{tool.data.description}</p>
+    </header>
+
+    <div class="tool-container">
+      <ToolComponent />
+    </div>
+
+    <article class="tool-content">
+      <Content />
+    </article>
+
+    {
+      tool.data.related_tools && tool.data.related_tools.length > 0 && (
+        <aside class="related-tools">
+          <h2>Related Tools</h2>
+          <ul class="related-list">
+            {tool.data.related_tools.map((relatedPath: string) => {
+              const slug = relatedPath.split('/').pop();
+              return (
+                <li>
+                  <a href={relatedPath} class="related-link">
+                    {slug?.replace(/-/g, ' ')}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </aside>
+      )
+    }
+
+    {
+      tool.data.related_content && tool.data.related_content.length > 0 && (
+        <aside class="related-content">
+          <h2>Related Content</h2>
+          <ul class="related-list">
+            {tool.data.related_content.map((contentPath: string) => {
+              const parts = contentPath.split('/');
+              const title = parts[parts.length - 1].replace(/-/g, ' ');
+              return (
+                <li>
+                  <a href={contentPath} class="related-link">
+                    {title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </aside>
+      )
+    }
+  </div>
+</ToolLayout>
+
+<style>
+  .tool-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-6) var(--space-4);
+  }
+
+  .breadcrumb {
+    margin-bottom: var(--space-4);
+  }
+
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+  }
+
+  .breadcrumb li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .breadcrumb a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-accent);
+  }
+
+  .breadcrumb .separator {
+    color: var(--color-border);
+  }
+
+  .breadcrumb [aria-current='page'] {
+    color: var(--color-text);
+  }
+
+  .tool-header {
+    margin-bottom: var(--space-6);
+  }
+
+  .tool-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-3) 0;
+    line-height: 1.2;
+  }
+
+  .tool-description {
+    font-size: 1.125rem;
+    color: var(--color-text-muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .tool-container {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    margin-bottom: var(--space-7);
+  }
+
+  .tool-content {
+    max-width: 800px;
+    margin: 0 auto var(--space-7);
+  }
+
+  .tool-content :global(h2) {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: var(--space-6) 0 var(--space-4) 0;
+    line-height: 1.3;
+  }
+
+  .tool-content :global(h3) {
+    font-size: 1.375rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: var(--space-5) 0 var(--space-3) 0;
+    line-height: 1.4;
+  }
+
+  .tool-content :global(h4) {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: var(--space-4) 0 var(--space-3) 0;
+    line-height: 1.4;
+  }
+
+  .tool-content :global(p) {
+    font-size: 1rem;
+    color: var(--color-text);
+    line-height: 1.7;
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .tool-content :global(ul),
+  .tool-content :global(ol) {
+    margin: 0 0 var(--space-4) 0;
+    padding-left: var(--space-5);
+  }
+
+  .tool-content :global(li) {
+    font-size: 1rem;
+    color: var(--color-text);
+    line-height: 1.7;
+    margin-bottom: var(--space-2);
+  }
+
+  .tool-content :global(code) {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    background: var(--color-surface);
+    padding: 0.125em 0.375em;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+  }
+
+  .tool-content :global(pre) {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    overflow-x: auto;
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .tool-content :global(pre code) {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.875rem;
+  }
+
+  .tool-content :global(a) {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .tool-content :global(a:hover) {
+    color: var(--color-accent-2);
+    text-decoration: underline;
+  }
+
+  .tool-content :global(blockquote) {
+    border-left: 3px solid var(--color-accent);
+    padding-left: var(--space-4);
+    margin: var(--space-4) 0;
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+
+  .tool-content :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: var(--space-4) 0;
+    font-size: 0.9375rem;
+  }
+
+  .tool-content :global(th),
+  .tool-content :global(td) {
+    padding: var(--space-3);
+    border: 1px solid var(--color-border);
+    text-align: left;
+  }
+
+  .tool-content :global(th) {
+    background: var(--color-surface);
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .tool-content :global(td) {
+    color: var(--color-text);
+  }
+
+  .related-tools,
+  .related-content {
+    max-width: 800px;
+    margin: 0 auto var(--space-6);
+    padding: var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+  }
+
+  .related-tools h2,
+  .related-content h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0 0 var(--space-4) 0;
+  }
+
+  .related-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .related-link {
+    display: block;
+    padding: var(--space-3);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    text-decoration: none;
+    text-transform: capitalize;
+    transition: all 0.2s ease;
+  }
+
+  .related-link:hover {
+    border-color: var(--color-accent);
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 768px) {
+    .tool-page {
+      padding: var(--space-4) var(--space-3);
+    }
+
+    .tool-header h1 {
+      font-size: 2rem;
+    }
+
+    .tool-description {
+      font-size: 1rem;
+    }
+
+    .tool-container {
+      padding: var(--space-4);
+    }
+
+    .tool-content :global(h2) {
+      font-size: 1.5rem;
+    }
+
+    .tool-content :global(h3) {
+      font-size: 1.25rem;
+    }
+
+    .tool-content :global(table) {
+      font-size: 0.875rem;
+    }
+
+    .tool-content :global(th),
+    .tool-content :global(td) {
+      padding: var(--space-2);
+    }
+  }
+</style>
