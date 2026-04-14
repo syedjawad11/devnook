@@ -40,7 +40,13 @@ const pageDescription = 'Browser-based developer tools for JSON formatting, base
 
         <div class="tools-grid">
           {tools.map(tool => (
-            <ToolCard tool={tool} />
+            <ToolCard
+              slug={tool.data.tool_slug ?? tool.slug}
+              name={tool.data.title}
+              description={tool.data.description}
+              tier="client-side"
+              icon="{ }"
+            />
           ))}
         </div>
       </>
@@ -128,11 +134,11 @@ const pageDescription = 'Browser-based developer tools for JSON formatting, base
   .filter-btn:hover {
     color: var(--color-text);
     border-color: var(--color-accent);
-    background: rgba(110, 231, 183, 0.05);
+    background: var(--color-accent-light);
   }
 
   .filter-btn[aria-pressed="true"] {
-    color: var(--color-bg);
+    color: var(--color-text-inv);
     background: var(--color-accent);
     border-color: var(--color-accent);
   }

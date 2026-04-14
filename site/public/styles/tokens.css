@@ -1,38 +1,50 @@
-/* DevNook Design Tokens */
-
-/* ============================================
-   FONTS
-   ============================================ */
-
-@font-face {
-  font-family: 'Outfit';
-  font-style: normal;
-  font-weight: 300 900;
-  font-display: swap;
-  src: url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-}
-
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400 700;
-  font-display: swap;
-  src: url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
-}
+/* DevNook Design Tokens — Light Theme */
 
 :root {
   /* ============================================
-     COLORS
+     SURFACES
      ============================================ */
-  --color-bg: #0d0d0d;
-  --color-surface: #161616;
-  --color-border: #2a2a2a;
-  --color-text: #e8e8e8;
-  --color-text-muted: #8a8a8a;
-  --color-accent: #6ee7b7;
-  --color-accent-2: #7c3aed;
-  --color-error: #f87171;
-  --color-success: #34d399;
+  --color-bg: #fafaf8;
+  --color-surface: #ffffff;
+  --color-elevated: #f3f3f0;
+
+  /* ============================================
+     TEXT
+     ============================================ */
+  --color-text: #1a1a19;
+  --color-text-muted: #5a5a56;
+  --color-text-faint: #8a8a84;
+  --color-text-inv: #fafaf8;
+
+  /* ============================================
+     BORDERS
+     ============================================ */
+  --color-border: #e5e5e0;
+  --color-border-strong: #d4d4cf;
+
+  /* ============================================
+     ACCENTS (extended palette)
+     ============================================ */
+  --color-accent: #2563eb;
+  --color-accent-light: #dbeafe;
+  --color-accent-dark: #1d4ed8;
+
+  --color-purple: #7c3aed;
+  --color-purple-light: #ede9fe;
+
+  --color-green: #16a34a;
+  --color-green-light: #dcfce7;
+
+  --color-amber: #d97706;
+  --color-amber-light: #fef3c7;
+
+  --color-coral: #e85d30;
+  --color-coral-light: #fed7c7;
+
+  /* Back-compat aliases */
+  --color-accent-2: var(--color-purple);
+  --color-error: var(--color-coral);
+  --color-success: var(--color-green);
 
   /* ============================================
      TYPOGRAPHY
@@ -55,15 +67,16 @@
   /* ============================================
      BORDER RADIUS
      ============================================ */
-  --radius-sm: 4px;
-  --radius-md: 8px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
   --radius-lg: 16px;
+  --radius-xl: 20px;
 
   /* ============================================
      SHADOWS
      ============================================ */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.04), 0 12px 32px rgba(0, 0, 0, 0.06);
 
   /* ============================================
      TRANSITIONS
@@ -116,7 +129,7 @@ a {
 }
 
 a:hover {
-  color: var(--color-text);
+  color: var(--color-accent-dark);
 }
 
 img {

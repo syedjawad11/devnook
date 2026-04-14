@@ -16,16 +16,16 @@ const Tag = href ? 'a' : 'span';
   .tag-badge {
     display: inline-flex;
     align-items: center;
-    padding: var(--space-1) var(--space-3);
+    padding: 3px 10px;
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 500;
-    color: var(--color-text);
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-accent);
+    color: var(--color-text-muted);
+    background-color: var(--color-elevated);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     text-decoration: none;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    transition: all var(--transition-fast);
     white-space: nowrap;
   }
 
@@ -34,8 +34,9 @@ const Tag = href ? 'a' : 'span';
   }
 
   a.tag-badge:hover {
-    background-color: var(--color-accent);
-    color: var(--color-bg);
+    background-color: var(--color-accent-light);
+    color: var(--color-accent-dark);
+    border-color: var(--color-accent-light);
   }
 
   span.tag-badge {

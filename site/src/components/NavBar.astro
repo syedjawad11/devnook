@@ -2,10 +2,11 @@
 const currentPath = Astro.url.pathname;
 
 const navItems = [
-  { label: 'Tools', href: '/tools/' },
+  { label: 'Home', href: '/' },
   { label: 'Languages', href: '/languages/' },
   { label: 'Guides', href: '/guides/' },
   { label: 'Cheatsheets', href: '/cheatsheets/' },
+  { label: 'Tools', href: '/tools/' },
   { label: 'Blog', href: '/blog/' },
 ];
 
@@ -17,9 +18,12 @@ function isActive(href: string, path: string): boolean {
 ---
 
 <nav class="navbar">
-  <div class="container">
-    <a href="/" class="logo">DevNook</a>
-    
+  <div class="inner">
+    <a href="/" class="logo">
+      <span class="logo-mark">D</span>
+      <span class="logo-text">DevNook</span>
+    </a>
+
     <button class="mobile-toggle" aria-label="Toggle navigation" aria-expanded="false">
       <span class="hamburger"></span>
     </button>
@@ -28,7 +32,7 @@ function isActive(href: string, path: string): boolean {
       <ul class="nav-links">
         {navItems.map((item) => (
           <li>
-            <a 
+            <a
               href={item.href}
               class:list={['nav-link', { active: isActive(item.href, currentPath) }]}
             >
@@ -37,44 +41,52 @@ function isActive(href: string, path: string): boolean {
           </li>
         ))}
       </ul>
-
-      <button class="search-button" aria-label="Open search">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
     </div>
   </div>
 </nav>
 
 <style>
   .navbar {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
     position: sticky;
     top: 0;
-    z-index: 100;
-    background-color: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
-    backdrop-filter: blur(8px);
+    z-index: 90;
   }
 
-  .container {
-    max-width: 1280px;
+  .inner {
+    max-width: var(--max-w-site);
     margin: 0 auto;
-    padding: 0 var(--space-4);
+    padding: 0 var(--space-5);
     display: flex;
     align-items: center;
-    justify-content: space-between;
     height: 64px;
+    gap: var(--space-5);
   }
 
   .logo {
-    font-family: var(--font-body);
-    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
     color: var(--color-text);
     text-decoration: none;
-    letter-spacing: -0.02em;
-    transition: color 0.2s ease;
+  }
+
+  .logo-mark {
+    width: 28px;
+    height: 28px;
+    background: var(--color-accent);
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
   }
 
   .logo:hover {
@@ -88,6 +100,7 @@ function isActive(href: string, path: string): boolean {
     padding: var(--space-2);
     cursor: pointer;
     color: var(--color-text);
+    margin-left: auto;
   }
 
   .hamburger {
@@ -110,100 +123,62 @@ function isActive(href: string, path: string): boolean {
     transition: transform 0.2s ease;
   }
 
-  .hamburger::before {
-    top: -8px;
-  }
+  .hamburger::before { top: -8px; }
+  .hamburger::after { bottom: -8px; }
 
-  .hamburger::after {
-    bottom: -8px;
-  }
-
-  .mobile-toggle[aria-expanded="true"] .hamburger {
-    background-color: transparent;
-  }
-
-  .mobile-toggle[aria-expanded="true"] .hamburger::before {
-    transform: translateY(8px) rotate(45deg);
-  }
-
-  .mobile-toggle[aria-expanded="true"] .hamburger::after {
-    transform: translateY(-8px) rotate(-45deg);
-  }
+  .mobile-toggle[aria-expanded="true"] .hamburger { background-color: transparent; }
+  .mobile-toggle[aria-expanded="true"] .hamburger::before { transform: translateY(8px) rotate(45deg); }
+  .mobile-toggle[aria-expanded="true"] .hamburger::after { transform: translateY(-8px) rotate(-45deg); }
 
   .nav-menu {
+    margin-left: var(--space-4);
     display: flex;
     align-items: center;
-    gap: var(--space-6);
   }
 
   .nav-links {
     display: flex;
     align-items: center;
-    gap: var(--space-6);
+    gap: 0;
     list-style: none;
     margin: 0;
     padding: 0;
   }
 
   .nav-link {
-    font-family: var(--font-body);
-    font-size: 0.9375rem;
+    padding: 20px 16px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--color-text-muted);
+    display: block;
+    border-bottom: 2px solid transparent;
+    transition: color var(--transition-fast), border-color var(--transition-fast);
     text-decoration: none;
-    transition: color 0.2s ease;
-    position: relative;
   }
 
   .nav-link:hover {
     color: var(--color-text);
+    border-bottom-color: var(--color-border-strong);
   }
 
   .nav-link.active {
-    color: var(--color-accent);
-  }
-
-  .nav-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: -20px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background-color: var(--color-accent);
-  }
-
-  .search-button {
-    background: none;
-    border: none;
-    padding: var(--space-2);
-    cursor: pointer;
-    color: var(--color-text-muted);
-    transition: color 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .search-button:hover {
-    color: var(--color-accent);
+    color: var(--color-text);
+    border-bottom-color: var(--color-accent);
   }
 
   @media (max-width: 768px) {
-    .mobile-toggle {
-      display: block;
-    }
+    .mobile-toggle { display: block; }
 
     .nav-menu {
       position: fixed;
       top: 64px;
       left: 0;
       right: 0;
-      background-color: var(--color-surface);
+      background: var(--color-surface);
       border-bottom: 1px solid var(--color-border);
       flex-direction: column;
-      gap: 0;
       padding: var(--space-4) 0;
+      margin-left: 0;
       transform: translateY(-100%);
       opacity: 0;
       visibility: hidden;
@@ -218,7 +193,6 @@ function isActive(href: string, path: string): boolean {
 
     .nav-links {
       flex-direction: column;
-      gap: 0;
       width: 100%;
     }
 
@@ -227,31 +201,26 @@ function isActive(href: string, path: string): boolean {
       border-bottom: 1px solid var(--color-border);
     }
 
-    .nav-links li:last-child {
+    .nav-links li:last-child { border-bottom: none; }
+
+    .nav-link {
+      padding: var(--space-4);
+      width: 100%;
       border-bottom: none;
     }
 
-    .nav-link {
-      display: block;
-      padding: var(--space-4);
-      width: 100%;
-    }
-
-    .nav-link.active::after {
-      display: none;
-    }
-
-    .search-button {
-      margin-top: var(--space-4);
+    .nav-link.active {
+      border-bottom: none;
+      background: var(--color-accent-light);
     }
   }
 </style>
 
 <script>
   function initNavBar() {
-    const toggle = document.querySelector('.mobile-toggle');
-    const menu = document.querySelector('.nav-menu');
-    
+    const toggle = document.querySelector<HTMLButtonElement>('.mobile-toggle');
+    const menu = document.querySelector<HTMLElement>('.nav-menu');
+
     if (!toggle || !menu) return;
 
     toggle.addEventListener('click', () => {
@@ -260,7 +229,6 @@ function isActive(href: string, path: string): boolean {
       menu.classList.toggle('open');
     });
 
-    // Close menu on escape key
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && menu.classList.contains('open')) {
         toggle.setAttribute('aria-expanded', 'false');
@@ -268,7 +236,6 @@ function isActive(href: string, path: string): boolean {
       }
     });
 
-    // Close menu when clicking outside
     document.addEventListener('click', (e) => {
       const target = e.target as HTMLElement;
       if (!toggle.contains(target) && !menu.contains(target) && menu.classList.contains('open')) {
@@ -277,9 +244,8 @@ function isActive(href: string, path: string): boolean {
       }
     });
 
-    // Close menu on navigation
     const links = menu.querySelectorAll('.nav-link');
-    links.forEach(link => {
+    links.forEach((link) => {
       link.addEventListener('click', () => {
         toggle.setAttribute('aria-expanded', 'false');
         menu.classList.remove('open');
@@ -287,9 +253,6 @@ function isActive(href: string, path: string): boolean {
     });
   }
 
-  // Initialize on page load
   initNavBar();
-
-  // Re-initialize after view transitions
   document.addEventListener('astro:page-load', initNavBar);
 </script>
