@@ -144,7 +144,7 @@ languages.forEach(lang => {
       <div class="posts-grid">
         {recentPosts.map(post => {
           const baseUrl = post.collection === 'languages'
-            ? `/languages/${post.data.language}/${post.slug.split('/').pop()}`
+            ? `/languages/${post.data.language}/${post.data.concept}`
             : `/${post.collection}/${post.slug}`;
           
           return (
