@@ -127,9 +127,8 @@ languages.forEach(lang => {
       <div class="languages-grid">
         {languages.map(lang => (
           <LanguageCard
-            slug={lang.slug}
-            name={lang.name}
-            logo={lang.logo}
+            language={lang.slug}
+            displayName={lang.name}
             postCount={lang.postCount}
             featuredTopics={[]}
           />

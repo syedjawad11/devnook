@@ -65,9 +65,8 @@ const languageData = languages.map(lang => ({
     <div class="languages-grid">
       {languageData.map(lang => (
         <LanguageCard
-          slug={lang.slug}
-          name={lang.name}
-          color={lang.color}
+          language={lang.slug}
+          displayName={lang.name}
           postCount={lang.postCount}
           featuredTopics={lang.featuredTopics}
         />
