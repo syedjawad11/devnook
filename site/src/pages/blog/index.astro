@@ -10,6 +10,17 @@ const sortedPosts = blogPosts.sort((a, b) => {
   return dateB.getTime() - dateA.getTime();
 });
 
+const [featured, ...rest] = sortedPosts;
+
+const FILTERS = ['All', 'Comparisons', 'AI & Productivity', 'Tutorials', 'How-tos'];
+
+function formatMonth(dateStr?: string) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 const pageTitle = 'Blog — DevNook';
 const pageDescription = 'In-depth comparisons, tutorials, and insights on programming languages, frameworks, and developer tools.';
 ---
@@ -24,17 +35,48 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
         </p>
       </header>
 
-      <div class="posts-grid">
-        {sortedPosts.map((post) => (
-          <PostCard
-            title={post.data.title}
-            description={post.data.description}
-            href={`/blog/${post.slug}`}
-            tags={post.data.tags}
-            date={post.data.published_date}
-          />
-        ))}
-      </div>
+      {sortedPosts.length > 0 && (
+        <>
+          {/* Decorative filter chips — non-functional in v1, kept for visual parity with design */}
+          <div class="filters" role="group" aria-label="Filter posts (visual only)">
+            {FILTERS.map((f, i) => (
+              <button type="button" class={`chip ${i === 0 ? 'active' : ''}`} disabled>{f}</button>
+            ))}
+          </div>
+
+          {featured && (
+            <a class="featured" href={`/blog/${featured.slug}/`}>
+              <div class="featured-thumb" aria-hidden="true">
+                <span class="thumb-mark">{(featured.data.title ?? '').charAt(0)}</span>
+              </div>
+              <div class="featured-body">
+                <div class="featured-meta">
+                  <span class="pill">Featured</span>
+                  <span class="featured-date">{formatMonth(featured.data.published_date)}</span>
+                </div>
+                <h2>{featured.data.title}</h2>
+                <p>{featured.data.description}</p>
+                <span class="read-more">Read article &rarr;</span>
+              </div>
+            </a>
+          )}
+
+          {rest.length > 0 && (
+            <div class="posts-grid">
+              {rest.map((post) => (
+                <PostCard
+                  title={post.data.title}
+                  description={post.data.description}
+                  href={`/blog/${post.slug}/`}
+                  tags={post.data.tags}
+                  date={post.data.published_date}
+                  category="blog"
+                />
+              ))}
+            </div>
+          )}
+        </>
+      )}
 
       {sortedPosts.length === 0 && (
         <div class="empty-state">
@@ -52,42 +94,153 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
   }
 
   .container {
-    max-width: 1200px;
+    max-width: var(--max-w-site);
     margin: 0 auto;
-    padding: 0 var(--space-4);
+    padding: 0 var(--space-5);
   }
 
   .page-header {
-    margin-bottom: var(--space-7);
+    margin-bottom: var(--space-6);
     text-align: center;
   }
 
   .page-header h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(2rem, 5vw, 2.75rem);
     font-weight: 700;
     color: var(--color-text);
-    margin: 0 0 var(--space-3) 0;
+    margin: 0 0 var(--space-3);
     letter-spacing: -0.02em;
   }
 
   .page-description {
-    font-size: 1.125rem;
+    font-size: 1.05rem;
     color: var(--color-text-muted);
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .filters {
+    display: flex;
+    gap: var(--space-2);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+  }
+
+  .chip {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--font-body);
+    cursor: default;
+  }
+
+  .chip.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: var(--color-text-inv);
+  }
+
+  .featured {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    text-decoration: none;
+    margin-bottom: var(--space-6);
+    transition: all var(--transition-fast);
+  }
+
+  .featured:hover {
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+  }
+
+  .featured-thumb {
+    background: linear-gradient(135deg, var(--color-accent), var(--color-purple));
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+  }
+
+  .thumb-mark {
+    font-size: 4rem;
+    font-weight: 700;
+    color: var(--color-text-inv);
+    font-family: var(--font-mono);
+    opacity: 0.9;
+  }
+
+  .featured-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-1);
+  }
+
+  .pill {
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 12px;
+    background: var(--color-accent-light);
+    color: var(--color-accent-dark);
+  }
+
+  .featured-date {
+    font-size: 12px;
+    color: var(--color-text-faint);
+    font-family: var(--font-mono);
+  }
+
+  .featured-body h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin: 0;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+
+  .featured-body p {
+    font-size: 14px;
+    color: var(--color-text-muted);
+    margin: 0;
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  .read-more {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    margin-top: var(--space-2);
   }
 
   .posts-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-5);
-  }
-
-  @media (min-width: 768px) {
-    .posts-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-4);
   }
 
   .empty-state {
@@ -98,5 +251,20 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
 
   .empty-state p {
     font-size: 1.125rem;
+  }
+
+  @media (max-width: 768px) {
+    .featured {
+      grid-template-columns: 1fr;
+      gap: var(--space-4);
+    }
+
+    .featured-thumb {
+      min-height: 140px;
+    }
+
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

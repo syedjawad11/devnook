@@ -1,135 +1,370 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import PostCard from '../../../components/PostCard.astro';
+import { LANGUAGE_NAMES, langColor } from '../../../lib/language-colors';
 
 export async function getStaticPaths() {
-  const LANGUAGE_NAME_MAP: Record<string, string> = {
-    python: 'Python',
-    javascript: 'JavaScript',
-    typescript: 'TypeScript',
-    go: 'Go',
-    rust: 'Rust',
-    java: 'Java',
-    csharp: 'C#',
-    php: 'PHP',
-    ruby: 'Ruby',
-    swift: 'Swift',
-    kotlin: 'Kotlin',
-    cpp: 'C++'
-  };
-  const formatLanguageName = (slug: string): string =>
-    LANGUAGE_NAME_MAP[slug] || slug.charAt(0).toUpperCase() + slug.slice(1);
-
   const allLanguagePosts = await getCollection('languages');
+  const allCheatsheets = await getCollection('cheatsheets');
+  const allTools = await getCollection('tools');
 
-  const languageMap = new Map<string, { displayName: string; posts: any[] }>();
-
+  const languageMap = new Map<string, any[]>();
   allLanguagePosts.forEach(post => {
     const lang = post.data.language;
-    if (!languageMap.has(lang)) {
-      languageMap.set(lang, {
-        displayName: formatLanguageName(lang),
-        posts: []
-      });
-    }
-    languageMap.get(lang)!.posts.push(post);
+    if (!languageMap.has(lang)) languageMap.set(lang, []);
+    languageMap.get(lang)!.push(post);
   });
 
-  return Array.from(languageMap.entries()).map(([lang, data]) => ({
-    params: { lang },
-    props: {
-      language: lang,
-      displayName: data.displayName,
-      posts: data.posts.sort((a, b) =>
-        new Date(b.data.published_date).getTime() - new Date(a.data.published_date).getTime()
-      )
-    }
-  }));
+  // Ensure every known language has a page, even with zero posts
+  Object.keys(LANGUAGE_NAMES).forEach(lang => {
+    if (!languageMap.has(lang)) languageMap.set(lang, []);
+  });
+
+  return Array.from(languageMap.entries()).map(([lang, posts]) => {
+    const sorted = [...posts].sort((a, b) =>
+      (a.data.concept ?? '').localeCompare(b.data.concept ?? '')
+    );
+    const csCount = allCheatsheets.filter(
+      cs => (cs.data as any).language === lang
+    ).length;
+    return {
+      params: { lang },
+      props: {
+        language: lang,
+        displayName: LANGUAGE_NAMES[lang] ?? lang,
+        posts: sorted,
+        cheatsheetCount: csCount,
+        toolCount: allTools.length,
+      },
+    };
+  });
 }
 
-const { language, displayName, posts } = Astro.props;
+const { language, displayName, posts, cheatsheetCount, toolCount } = Astro.props;
 
 const breadcrumbs = [
   { label: 'Home', href: '/' },
   { label: 'Languages', href: '/languages/' },
-  { label: displayName, href: `/languages/${language}` }
+  { label: displayName, href: `/languages/${language}/` },
 ];
 
-const pageTitle = `${displayName} Tutorials & Concepts`;
-const pageDescription = `Learn ${displayName} with ${posts.length} tutorials covering core concepts, syntax, and best practices. Clear examples and explanations for developers.`;
+const pageTitle = `${displayName} Tutorials & Concepts — DevNook`;
+const pageDescription = `Learn ${displayName} with ${posts.length} tutorials covering core concepts, syntax, and best practices.`;
+
+const dotColor = langColor(language);
+
+const FEATURED_TOOL_SLUGS = ['json-formatter', 'regex-tester', 'base64-encoder'];
+const allTools = await getCollection('tools');
+const featuredTools = FEATURED_TOOL_SLUGS
+  .map(slug => allTools.find(t => (t.data.tool_slug ?? t.slug) === slug))
+  .filter(Boolean) as typeof allTools;
 ---
 
-<BaseLayout 
+<BaseLayout
   title={pageTitle}
   description={pageDescription}
   breadcrumbs={breadcrumbs}
 >
-  <div class="language-hub">
+  <div class="hub">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="/">Home</a>
+      <span class="sep">/</span>
+      <a href="/languages/">Languages</a>
+      <span class="sep">/</span>
+      <span class="current">{displayName}</span>
+    </nav>
+
     <header class="hub-header">
-      <h1>{displayName}</h1>
-      <p class="post-count">{posts.length} {posts.length === 1 ? 'post' : 'posts'}</p>
+      <div class="title-row">
+        <span class="lang-dot" style={`background:${dotColor}`}></span>
+        <h1>{displayName}</h1>
+      </div>
+      <p class="lead">Complete {displayName} tutorials, concepts, and reference material for working developers.</p>
+
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-num">{posts.length}</span>
+          <span class="stat-label">Tutorials</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">{cheatsheetCount}</span>
+          <span class="stat-label">Cheat sheets</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">{featuredTools.length}</span>
+          <span class="stat-label">Related tools</span>
+        </div>
+      </div>
     </header>
 
-    <div class="posts-grid">
-      {posts.map(post => (
-        <PostCard
-          title={post.data.title}
-          description={post.data.description}
-          href={`/languages/${language}/${post.data.concept}`}
-          tags={post.data.tags}
-          date={post.data.published_date}
-        />
-      ))}
-    </div>
+    {posts.length > 0 ? (
+      <section class="section">
+        <div class="section-head">
+          <h2>Core concepts</h2>
+        </div>
+        <div class="concept-grid">
+          {posts.map((post, i) => (
+            <a class="concept-card" href={`/languages/${language}/${post.data.concept}/`}>
+              <span class="num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="concept-title">{post.data.title}</span>
+              <span class="arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ) : (
+      <section class="section empty">
+        <p>No tutorials published for {displayName} yet. Check back soon.</p>
+      </section>
+    )}
+
+    {featuredTools.length > 0 && (
+      <section class="section">
+        <div class="section-head">
+          <h2>Related tools</h2>
+          <a href="/tools/" class="section-link">All tools &rarr;</a>
+        </div>
+        <div class="tools-row">
+          {featuredTools.map(tool => (
+            <a class="tool-pill" href={`/tools/${tool.data.tool_slug ?? tool.slug}/`}>
+              <span class="tool-pill-name">{tool.data.title}</span>
+              <span class="tool-pill-desc">{tool.data.description}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    )}
   </div>
 </BaseLayout>
 
 <style>
-  .language-hub {
-    max-width: 1200px;
+  .hub {
+    max-width: var(--max-w-site);
     margin: 0 auto;
-    padding: var(--space-6) var(--space-4);
+    padding: var(--space-6) var(--space-5);
+  }
+
+  .crumbs {
+    display: flex;
+    gap: var(--space-2);
+    font-size: 13px;
+    color: var(--color-text-faint);
+    margin-bottom: var(--space-5);
+    align-items: center;
+  }
+
+  .crumbs a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .crumbs a:hover {
+    color: var(--color-accent);
+  }
+
+  .crumbs .sep {
+    opacity: 0.5;
+  }
+
+  .crumbs .current {
+    color: var(--color-text);
   }
 
   .hub-header {
     margin-bottom: var(--space-7);
-    text-align: center;
+  }
+
+  .title-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+
+  .lang-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
   }
 
   .hub-header h1 {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw, 2.75rem);
     font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--color-text);
-    margin: 0 0 var(--space-3) 0;
-    font-family: var(--font-body);
-  }
-
-  .post-count {
-    font-size: 1.125rem;
-    color: var(--color-text-muted);
     margin: 0;
-    font-family: var(--font-body);
   }
 
-  .posts-grid {
-    display: grid;
-    grid-template-columns: 1fr;
+  .lead {
+    font-size: 1.05rem;
+    color: var(--color-text-muted);
+    max-width: 640px;
+    margin: 0 0 var(--space-5);
+    font-weight: 300;
+  }
+
+  .stats {
+    display: flex;
     gap: var(--space-5);
+    padding: var(--space-4) var(--space-5);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    flex-wrap: wrap;
   }
 
-  @media (min-width: 768px) {
-    .language-hub {
-      padding: var(--space-7) var(--space-5);
-    }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
 
-    .hub-header h1 {
-      font-size: 3rem;
-    }
+  .stat-num {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text);
+    font-family: var(--font-mono);
+  }
 
-    .posts-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-6);
-    }
+  .stat-label {
+    font-size: 12px;
+    color: var(--color-text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .section {
+    margin-bottom: var(--space-7);
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .section-head h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .section-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .section-link:hover {
+    color: var(--color-accent-dark);
+  }
+
+  .concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .concept-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+  }
+
+  .concept-card:hover {
+    border-color: var(--color-accent);
+    background: var(--color-accent-light);
+    transform: translateY(-1px);
+  }
+
+  .concept-card .num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-faint);
+    min-width: 22px;
+  }
+
+  .concept-card:hover .num {
+    color: var(--color-accent);
+  }
+
+  .concept-title {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    line-height: 1.4;
+  }
+
+  .arrow {
+    color: var(--color-text-faint);
+    font-size: 14px;
+    transition: transform var(--transition-fast);
+  }
+
+  .concept-card:hover .arrow {
+    color: var(--color-accent);
+    transform: translateX(3px);
+  }
+
+  .tools-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .tool-pill {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: border-color var(--transition-fast);
+  }
+
+  .tool-pill:hover {
+    border-color: var(--color-accent);
+  }
+
+  .tool-pill-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .tool-pill-desc {
+    font-size: 12px;
+    color: var(--color-text-faint);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .empty {
+    padding: var(--space-6);
+    text-align: center;
+    background: var(--color-surface);
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-muted);
   }
 </style>
