@@ -59,15 +59,18 @@ const jsonLd = {
         }
       : undefined,
 };
+
+const cheatsheetLink = tool.data.related_content?.find((c: string) =>
+  c.startsWith('/cheatsheets/')
+);
 ---
 
 <ToolLayout
   title={tool.data.title}
   description={tool.data.description}
-  breadcrumbs={breadcrumbs}
-  tool={tool.data}
-  jsonLd={jsonLd}
 >
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
   <div class="tool-page">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <ol>
@@ -93,54 +96,56 @@ const jsonLd = {
       <p class="tool-description">{tool.data.description}</p>
     </header>
 
-    <div class="tool-container">
-      <ToolComponent />
+    <div class="tool-workspace">
+      <main class="tool-main">
+        <div class="tool-widget-card">
+          <ToolComponent />
+        </div>
+
+        <article class="prose">
+          <Content />
+        </article>
+      </main>
+
+      <aside class="tool-sidebar">
+        <div class="sidebar-card info-box">
+          <h2>About this tool</h2>
+          {tool.data.tier && (
+            <span class={`tier-badge tier-${tool.data.tier}`}>
+              {tool.data.tier === 'tier-1' ? 'Popular' : tool.data.tier === 'tier-2' ? 'Standard' : 'Utility'}
+            </span>
+          )}
+          <p>{tool.data.description}</p>
+        </div>
+
+        {tool.data.related_tools && tool.data.related_tools.length > 0 && (
+          <div class="sidebar-card">
+            <h2>Related tools</h2>
+            <ul class="related-list">
+              {tool.data.related_tools.map((relatedPath: string) => {
+                const slug = relatedPath.split('/').pop();
+                return (
+                  <li>
+                    <a href={relatedPath} class="related-link">
+                      {slug?.replace(/-/g, ' ')}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        )}
+
+        {cheatsheetLink && (
+          <div class="sidebar-card cheatsheet-card">
+            <h2>Cheat sheet</h2>
+            <a href={cheatsheetLink} class="cheatsheet-link">
+              View reference cheat sheet →
+            </a>
+          </div>
+        )}
+      </aside>
     </div>
-
-    <article class="tool-content">
-      <Content />
-    </article>
-
-    {
-      tool.data.related_tools && tool.data.related_tools.length > 0 && (
-        <aside class="related-tools">
-          <h2>Related Tools</h2>
-          <ul class="related-list">
-            {tool.data.related_tools.map((relatedPath: string) => {
-              const slug = relatedPath.split('/').pop();
-              return (
-                <li>
-                  <a href={relatedPath} class="related-link">
-                    {slug?.replace(/-/g, ' ')}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </aside>
-      )
-    }
-
-    {
-      tool.data.related_content && tool.data.related_content.length > 0 && (
-        <aside class="related-content">
-          <h2>Related Content</h2>
-          <ul class="related-list">
-            {tool.data.related_content.map((contentPath: string) => {
-              const parts = contentPath.split('/');
-              const title = parts[parts.length - 1].replace(/-/g, ' ');
-              return (
-                <li>
-                  <a href={contentPath} class="related-link">
-                    {title}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </aside>
-      )
-    }
   </div>
 </ToolLayout>
 
@@ -151,6 +156,7 @@ const jsonLd = {
     padding: var(--space-6) var(--space-4);
   }
 
+  /* Breadcrumb */
   .breadcrumb {
     margin-bottom: var(--space-4);
   }
@@ -190,6 +196,7 @@ const jsonLd = {
     color: var(--color-text);
   }
 
+  /* Header */
   .tool-header {
     margin-bottom: var(--space-6);
   }
@@ -209,20 +216,29 @@ const jsonLd = {
     line-height: 1.6;
   }
 
-  .tool-container {
+  /* Workspace 2-col grid */
+  .tool-workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  /* Main column */
+  .tool-widget-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-lg);
     padding: var(--space-6);
-    margin-bottom: var(--space-7);
+    margin-bottom: var(--space-6);
   }
 
-  .tool-content {
-    max-width: 800px;
-    margin: 0 auto var(--space-7);
+  /* Prose content */
+  .prose {
+    color: var(--color-text);
   }
 
-  .tool-content :global(h2) {
+  .prose :global(h2) {
     font-size: 1.75rem;
     font-weight: 700;
     color: var(--color-text);
@@ -230,7 +246,7 @@ const jsonLd = {
     line-height: 1.3;
   }
 
-  .tool-content :global(h3) {
+  .prose :global(h3) {
     font-size: 1.375rem;
     font-weight: 600;
     color: var(--color-text);
@@ -238,7 +254,7 @@ const jsonLd = {
     line-height: 1.4;
   }
 
-  .tool-content :global(h4) {
+  .prose :global(h4) {
     font-size: 1.125rem;
     font-weight: 600;
     color: var(--color-text);
@@ -246,27 +262,27 @@ const jsonLd = {
     line-height: 1.4;
   }
 
-  .tool-content :global(p) {
+  .prose :global(p) {
     font-size: 1rem;
     color: var(--color-text);
     line-height: 1.7;
     margin: 0 0 var(--space-4) 0;
   }
 
-  .tool-content :global(ul),
-  .tool-content :global(ol) {
+  .prose :global(ul),
+  .prose :global(ol) {
     margin: 0 0 var(--space-4) 0;
     padding-left: var(--space-5);
   }
 
-  .tool-content :global(li) {
+  .prose :global(li) {
     font-size: 1rem;
     color: var(--color-text);
     line-height: 1.7;
     margin-bottom: var(--space-2);
   }
 
-  .tool-content :global(code) {
+  .prose :global(code) {
     font-family: var(--font-mono);
     font-size: 0.875em;
     background: var(--color-surface);
@@ -275,7 +291,7 @@ const jsonLd = {
     border: 1px solid var(--color-border);
   }
 
-  .tool-content :global(pre) {
+  .prose :global(pre) {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -284,25 +300,25 @@ const jsonLd = {
     margin: 0 0 var(--space-4) 0;
   }
 
-  .tool-content :global(pre code) {
+  .prose :global(pre code) {
     background: none;
     border: none;
     padding: 0;
     font-size: 0.875rem;
   }
 
-  .tool-content :global(a) {
+  .prose :global(a) {
     color: var(--color-accent);
     text-decoration: none;
     transition: color 0.2s ease;
   }
 
-  .tool-content :global(a:hover) {
-    color: var(--color-accent-2);
+  .prose :global(a:hover) {
+    color: var(--color-accent);
     text-decoration: underline;
   }
 
-  .tool-content :global(blockquote) {
+  .prose :global(blockquote) {
     border-left: 3px solid var(--color-accent);
     padding-left: var(--space-4);
     margin: var(--space-4) 0;
@@ -310,71 +326,133 @@ const jsonLd = {
     font-style: italic;
   }
 
-  .tool-content :global(table) {
+  .prose :global(table) {
     width: 100%;
     border-collapse: collapse;
     margin: var(--space-4) 0;
     font-size: 0.9375rem;
   }
 
-  .tool-content :global(th),
-  .tool-content :global(td) {
+  .prose :global(th),
+  .prose :global(td) {
     padding: var(--space-3);
     border: 1px solid var(--color-border);
     text-align: left;
   }
 
-  .tool-content :global(th) {
+  .prose :global(th) {
     background: var(--color-surface);
     font-weight: 600;
     color: var(--color-text);
   }
 
-  .tool-content :global(td) {
-    color: var(--color-text);
+  /* Sidebar */
+  .tool-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    position: sticky;
+    top: var(--space-6);
   }
 
-  .related-tools,
-  .related-content {
-    max-width: 800px;
-    margin: 0 auto var(--space-6);
-    padding: var(--space-5);
+  .sidebar-card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
+    padding: var(--space-5);
   }
 
-  .related-tools h2,
-  .related-content h2 {
-    font-size: 1.25rem;
+  .sidebar-card h2 {
+    font-size: 0.875rem;
     font-weight: 600;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 var(--space-3) 0;
+  }
+
+  .sidebar-card p {
+    font-size: 0.9375rem;
     color: var(--color-text);
-    margin: 0 0 var(--space-4) 0;
+    line-height: 1.6;
+    margin: var(--space-2) 0 0 0;
+  }
+
+  .tier-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25em 0.625em;
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--space-2);
+  }
+
+  .tier-tier-1 {
+    background: var(--color-green-light);
+    color: var(--color-green);
+  }
+
+  .tier-tier-2 {
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+  }
+
+  .tier-tier-3 {
+    background: var(--color-surface);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
   }
 
   .related-list {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: var(--space-2);
   }
 
   .related-link {
     display: block;
-    padding: var(--space-3);
+    padding: var(--space-2) var(--space-3);
     background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     color: var(--color-text);
     text-decoration: none;
     text-transform: capitalize;
+    font-size: 0.9375rem;
     transition: all 0.2s ease;
   }
 
   .related-link:hover {
     border-color: var(--color-accent);
-    transform: translateX(4px);
+    color: var(--color-accent);
+  }
+
+  .cheatsheet-link {
+    display: block;
+    color: var(--color-accent);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .cheatsheet-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive — collapse to 1-col at 900px */
+  @media (max-width: 900px) {
+    .tool-workspace {
+      grid-template-columns: 1fr;
+    }
+
+    .tool-sidebar {
+      position: static;
+    }
   }
 
   @media (max-width: 768px) {
@@ -390,25 +468,16 @@ const jsonLd = {
       font-size: 1rem;
     }
 
-    .tool-container {
+    .tool-widget-card {
       padding: var(--space-4);
     }
 
-    .tool-content :global(h2) {
+    .prose :global(h2) {
       font-size: 1.5rem;
     }
 
-    .tool-content :global(h3) {
+    .prose :global(h3) {
       font-size: 1.25rem;
-    }
-
-    .tool-content :global(table) {
-      font-size: 0.875rem;
-    }
-
-    .tool-content :global(th),
-    .tool-content :global(td) {
-      padding: var(--space-2);
     }
   }
 </style>

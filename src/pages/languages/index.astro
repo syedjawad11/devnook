@@ -2,55 +2,18 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import LanguageCard from '../../components/LanguageCard.astro';
 import { getCollection } from 'astro:content';
+import { LANGUAGE_NAMES } from '../../lib/language-colors';
 
 const allLanguagePosts = await getCollection('languages');
 
-const languages = [
-  { slug: 'python', name: 'Python', color: '#3776ab' },
-  { slug: 'javascript', name: 'JavaScript', color: '#f7df1e' },
-  { slug: 'typescript', name: 'TypeScript', color: '#3178c6' },
-  { slug: 'go', name: 'Go', color: '#00add8' },
-  { slug: 'rust', name: 'Rust', color: '#ce422b' },
-  { slug: 'java', name: 'Java', color: '#007396' },
-  { slug: 'csharp', name: 'C#', color: '#239120' },
-  { slug: 'php', name: 'PHP', color: '#777bb4' },
-  { slug: 'ruby', name: 'Ruby', color: '#cc342d' },
-  { slug: 'swift', name: 'Swift', color: '#f05138' },
-  { slug: 'kotlin', name: 'Kotlin', color: '#7f52ff' },
-  { slug: 'cpp', name: 'C++', color: '#00599c' }
-];
-
-const postCountsByLanguage = allLanguagePosts.reduce((acc, post) => {
-  const lang = post.data.language;
-  acc[lang] = (acc[lang] || 0) + 1;
-  return acc;
-}, {} as Record<string, number>);
-
-const languagesByPostCount = allLanguagePosts.reduce((acc, post) => {
-  const lang = post.data.language;
-  if (!acc[lang]) {
-    acc[lang] = [];
-  }
-  acc[lang].push(post);
-  return acc;
-}, {} as Record<string, typeof allLanguagePosts>);
-
-const getFeaturedTopics = (langSlug: string) => {
-  const posts = languagesByPostCount[langSlug] || [];
-  return posts
-    .sort((a, b) => new Date(b.data.published_date).getTime() - new Date(a.data.published_date).getTime())
-    .slice(0, 3)
-    .map(p => p.data.concept);
-};
-
-const languageData = languages.map(lang => ({
-  ...lang,
-  postCount: postCountsByLanguage[lang.slug] || 0,
-  featuredTopics: getFeaturedTopics(lang.slug)
+const languages = Object.keys(LANGUAGE_NAMES).map(slug => ({
+  slug,
+  name: LANGUAGE_NAMES[slug],
+  postCount: allLanguagePosts.filter(p => p.data.language === slug).length,
 }));
 ---
 
-<BaseLayout 
+<BaseLayout
   title="Programming Languages — DevNook"
   description="Learn programming concepts across 12 popular languages: Python, JavaScript, TypeScript, Go, Rust, Java, C#, PHP, Ruby, Swift, Kotlin, and C++."
 >
@@ -63,12 +26,11 @@ const languageData = languages.map(lang => ({
     </header>
 
     <div class="languages-grid">
-      {languageData.map(lang => (
+      {languages.map(lang => (
         <LanguageCard
           language={lang.slug}
           displayName={lang.name}
           postCount={lang.postCount}
-          featuredTopics={lang.featuredTopics}
         />
       ))}
     </div>
@@ -77,9 +39,9 @@ const languageData = languages.map(lang => ({
 
 <style>
   .languages-index {
-    max-width: 1200px;
+    max-width: var(--max-w-site);
     margin: 0 auto;
-    padding: var(--space-6) var(--space-4);
+    padding: var(--space-6) var(--space-5);
   }
 
   .page-header {
@@ -88,41 +50,31 @@ const languageData = languages.map(lang => ({
   }
 
   .page-header h1 {
-    font-size: 2.5rem;
+    font-size: clamp(2rem, 4vw, 2.75rem);
     font-weight: 700;
+    letter-spacing: -0.02em;
     color: var(--color-text);
-    margin-bottom: var(--space-3);
-    font-family: var(--font-body);
+    margin: 0 0 var(--space-3);
   }
 
   .subtitle {
-    font-size: 1.125rem;
+    font-size: 1.05rem;
     color: var(--color-text-muted);
     max-width: 600px;
     margin: 0 auto;
     line-height: 1.6;
+    font-weight: 300;
   }
 
   .languages-grid {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-3);
   }
 
-  @media (min-width: 768px) {
-    .page-header h1 {
-      font-size: 3rem;
-    }
-
+  @media (max-width: 520px) {
     .languages-grid {
       grid-template-columns: repeat(2, 1fr);
-      gap: var(--space-5);
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .languages-grid {
-      grid-template-columns: repeat(3, 1fr);
     }
   }
 </style>
