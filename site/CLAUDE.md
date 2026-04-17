@@ -26,44 +26,36 @@
 | 5 — Content Pipeline Write | ✅ Complete | 2026-04-12 |
 | 6 — Publishing | ✅ Complete | 2026-04-13 |
 | 7 — Launch | ✅ Live — light-theme reskin complete | 2026-04-15 |
-| 8 — Subagent Architecture | 🚧 Phase 1 complete (session 12) | 2026-04-17 |
+| 8 — Subagent Architecture | 🚧 Phase 2 complete (session 13) | 2026-04-17 |
 
 ---
 
 ## Last Session Summary
 
-**Session Date:** 2026-04-17 (session 12)
-**Session Goal:** Execute Phase 1 of the subagent architecture plan designed in session 11.
+**Session Date:** 2026-04-17 (session 13)
+**Session Goal:** Execute Phase 2 — full pipeline dry run with all subagents.
 
-### Status: ✅ PHASE 1 COMPLETE
+### Status: ✅ PHASE 2 COMPLETE
 
 ### What was completed
 
-1. **Schema migration** — Added `content_type` and `source` columns to `registry.db` posts table.
-   - 17 existing posts → `content_type='editorial'`, `source='claude_code'`
-   - 14 existing posts → `content_type='programmatic'`, `source='claude_code'`
-   - Table now has 25 columns (was 23)
+1. **Writer subagent** — 3 editorial guides written from queued registry posts, all QA passed (1,600–1,740 words each), saved to `agents/content-team/drafts/`, registry updated to `status=drafted, qa_status=passed`.
 
-2. **Subagent prompt files** — Created `agents/subagent-prompts/` with 5 prompt templates:
-   - `planner.md` (Haiku) — keyword discovery + queuing
-   - `writer.md` (Sonnet) — article writing + SEO + QA
-   - `ingest.md` (Haiku) — Antigravity file ingestion + mapping contract
-   - `builder.md` (Sonnet) — Astro site dev + 5 gotchas embedded
-   - `publisher.md` (Haiku) — drafts → staging → src/content
+2. **Ingest subagent** — 10 Antigravity files ingested from `../web_content/output/`. Copied to drafts, inserted into registry (`source=antigravity`, `content_type=programmatic`, `status=drafted`), originals archived to `_ingested/`.
 
-3. **CLAUDE.md trimmed** — Sessions 4–10 moved to `session-history.md`. File reduced from 588 to ~150 lines.
+3. **Publisher subagent** — 3 editorial guides staged then published to `src/content/guides/`. Registry updated to `status=published`.
 
-4. **Planner smoke test** — [TBD — complete after Step 3 confirm]
+4. **Build verified** — `npm run build` passed cleanly: 52 pages (up from 43+).
 
-### Commits pushed
-- None yet — pending user approval at end of session
+### Registry state after session
+- published: 23 | drafted: 10 (Antigravity) | queued: 2 | rejected: 10 | staged: 1
 
-### Next session priorities (session 13 — Phase 2)
+### Next session priorities (session 14)
 
-1. **Writer subagent test** — Write 3 test editorial articles, validate quality vs old pipeline
-2. **Ingest subagent test** — Ingest Antigravity output files from `../web_content/output/`
-3. **Publisher subagent test** — Stage + publish test content
-4. **Full pipeline dry run** — Planner → Writer → Publisher end-to-end
+1. **Scale Writer** — run Writer on remaining 2 queued editorial posts + queue more via Planner
+2. **Antigravity QA gate** — decide: auto-approve `source=antigravity` drafts or run QA pass before publish
+3. **GitHub Actions drip publish** — automate 2–3 posts/day from staged content
+4. **AdSense + GSC setup** — submit sitemap, enable AdSense
 
 ### Deferred (unchanged)
 - AdSense, GSC, gsc_ping.py
