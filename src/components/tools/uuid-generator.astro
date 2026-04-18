@@ -74,6 +74,7 @@
 <script>
 (function() {
   const countInput = document.getElementById('uuid-count');
+  if (!countInput) return;
   const uppercaseCheckbox = document.getElementById('uuid-uppercase');
   const generateBtn = document.getElementById('generate-btn');
   const copyAllBtn = document.getElementById('copy-all-btn');

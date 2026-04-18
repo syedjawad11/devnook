@@ -51,6 +51,7 @@
 <script>
 (function() {
   const originalTextarea = document.getElementById('original-text');
+  if (!originalTextarea) return;
   const changedTextarea = document.getElementById('changed-text');
   const compareBtn = document.getElementById('compare-btn');
   const swapBtn = document.getElementById('swap-btn');

@@ -70,11 +70,12 @@
 
 <script>
 (function() {
+  const generateBtn = document.getElementById('generate-btn');
+  if (!generateBtn) return;
   const urlInput = document.getElementById('url-input');
   const changefreqSelect = document.getElementById('changefreq-select');
   const prioritySelect = document.getElementById('priority-select');
   const lastmodCheckbox = document.getElementById('lastmod-checkbox');
-  const generateBtn = document.getElementById('generate-btn');
   const clearBtn = document.getElementById('clear-btn');
   const downloadBtn = document.getElementById('download-btn');
   const copyBtn = document.getElementById('copy-btn');

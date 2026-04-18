@@ -69,6 +69,7 @@
 <script>
 (function() {
   const inputTextarea = document.getElementById('sql-input');
+  if (!inputTextarea) return;
   const outputTextarea = document.getElementById('sql-output');
   const formatBtn = document.getElementById('format-btn');
   const clearBtn = document.getElementById('clear-btn');

@@ -66,13 +66,56 @@
   <div class="tool-error" id="toolError" role="alert"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
-
 <script>
 (function() {
   'use strict';
-  
+
   const markdownInput = document.getElementById('markdownInput');
+  if (!markdownInput) return;
+
+  // Minimal inline Markdown→HTML parser (no CDN needed)
+  function parseMarkdown(md) {
+    let html = md
+      // Fenced code blocks
+      .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, code) =>
+        `<pre><code${lang ? ` class="language-${lang}"` : ''}>${escMd(code.trimEnd())}</code></pre>`)
+      // Headings
+      .replace(/^(#{1,6})\s+(.+)$/gm, (_, h, t) => `<h${h.length}>${t}</h${h.length}>`)
+      // Blockquotes
+      .replace(/^>\s?(.+)$/gm, '<blockquote>$1</blockquote>')
+      // Unordered lists (simplistic — single level)
+      .replace(/^[-*+]\s+(.+)$/gm, '<li>$1</li>')
+      // Ordered lists
+      .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+      // Horizontal rule
+      .replace(/^---+$/gm, '<hr>')
+      // Bold
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      // Italic
+      .replace(/\*(.+?)\*/g, '<em>$1</em>')
+      // Inline code
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      // Links
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>')
+      // Images
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img alt="$1" src="$2">')
+      // Wrap consecutive <li> in <ul>
+      .replace(/(<li>.*<\/li>\n?)+/g, m => `<ul>${m}</ul>`)
+      // Paragraphs: blank-line-separated blocks not already tagged
+      .split(/\n{2,}/)
+      .map(block => {
+        const trimmed = block.trim();
+        if (!trimmed) return '';
+        if (/^<(h[1-6]|ul|ol|li|pre|blockquote|hr)/.test(trimmed)) return trimmed;
+        return `<p>${trimmed.replace(/\n/g, '<br>')}</p>`;
+      })
+      .join('\n');
+    return html;
+  }
+
+  function escMd(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
   const htmlOutput = document.getElementById('htmlOutput');
   const previewOutput = document.getElementById('previewOutput');
   const convertBtn = document.getElementById('convertBtn');
@@ -84,16 +127,6 @@
   const previewPane = document.getElementById('previewPane');
   const htmlPane = document.getElementById('htmlPane');
   const outputSection = document.getElementById('outputSection');
-
-  // Configure marked for GitHub Flavored Markdown
-  if (typeof marked !== 'undefined') {
-    marked.setOptions({
-      gfm: true,
-      breaks: true,
-      headerIds: true,
-      mangle: false
-    });
-  }
 
   function showStatus(message) {
     toolStatus.textContent = message;
@@ -145,13 +178,8 @@
       return;
     }
 
-    if (typeof marked === 'undefined') {
-      showError('Markdown parser library failed to load. Please refresh the page.');
-      return;
-    }
-
     try {
-      const html = marked.parse(markdown);
+      const html = parseMarkdown(markdown);
       htmlOutput.value = html;
       previewOutput.innerHTML = html;
       showStatus('Markdown converted successfully!');

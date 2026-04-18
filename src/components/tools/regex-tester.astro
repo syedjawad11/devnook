@@ -81,6 +81,7 @@
 <script>
 (function() {
   const patternInput = document.getElementById('regex-pattern');
+  if (!patternInput) return;
   const testInput = document.getElementById('test-string');
   const flagG = document.getElementById('flag-g');
   const flagI = document.getElementById('flag-i');

@@ -71,6 +71,7 @@
 <script>
 (function() {
   const inputEl = document.getElementById('json-input');
+  if (!inputEl) return;
   const outputEl = document.getElementById('json-output');
   const statusEl = document.getElementById('status-message');
   const indentSelect = document.getElementById('indent-select');

@@ -85,6 +85,7 @@
 <script>
 (function() {
   const inputArea = document.getElementById('html-input');
+  if (!inputArea) return;
   const outputArea = document.getElementById('html-output');
   const formatBtn = document.getElementById('format-btn');
   const minifyBtn = document.getElementById('minify-btn');

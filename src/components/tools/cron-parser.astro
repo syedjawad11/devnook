@@ -63,8 +63,9 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+(function() {
   const cronInput = document.getElementById('cron-input');
+  if (!cronInput) return;
   const timezoneSelect = document.getElementById('timezone-select');
   const presetSelect = document.getElementById('preset-select');
   const parseBtn = document.getElementById('parse-btn');
@@ -327,7 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showStatus('Failed to copy to clipboard', true);
     }
   });
-});
+})();
 </script>
 
 <style>

@@ -90,8 +90,9 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  (function() {
     const projectName = document.getElementById('project-name') as HTMLInputElement;
+    if (!projectName) return;
     const projectDescription = document.getElementById('project-description') as HTMLTextAreaElement;
     const projectType = document.getElementById('project-type') as HTMLSelectElement;
     const license = document.getElementById('license') as HTMLSelectElement;
@@ -266,7 +267,7 @@
     projectName.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') generateReadme();
     });
-  });
+  })();
 </script>
 
 <style>

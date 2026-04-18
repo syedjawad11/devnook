@@ -75,9 +75,10 @@
 
 <script>
 (function() {
+  const encodeUrlBtn = document.getElementById('encode-url-btn');
+  if (!encodeUrlBtn) return;
   const inputEl = document.getElementById('url-input');
   const outputEl = document.getElementById('url-output');
-  const encodeUrlBtn = document.getElementById('encode-url-btn');
   const encodeComponentBtn = document.getElementById('encode-component-btn');
   const decodeBtn = document.getElementById('decode-btn');
   const clearBtn = document.getElementById('clear-btn');
