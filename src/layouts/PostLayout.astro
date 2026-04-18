@@ -1,4 +1,5 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import RelatedPosts from '../components/RelatedPosts.astro';
@@ -19,6 +20,29 @@ interface Props {
 }
 
 const { frontmatter } = Astro.props;
+
+type RelatedItem = { title: string; slug: string; category: string };
+const [allGuides, allBlog, allCheatsheets, allLanguages, allTools] = await Promise.all([
+  getCollection('guides'),
+  getCollection('blog'),
+  getCollection('cheatsheets'),
+  getCollection('languages'),
+  getCollection('tools'),
+]);
+const pathMap = new Map<string, RelatedItem>();
+for (const e of allGuides)
+  pathMap.set(`/guides/${e.slug}`, { title: e.data.title, slug: `/guides/${e.slug}`, category: 'Guide' });
+for (const e of allBlog)
+  pathMap.set(`/blog/${e.slug}`, { title: e.data.title, slug: `/blog/${e.slug}`, category: 'Blog' });
+for (const e of allCheatsheets)
+  pathMap.set(`/cheatsheets/${e.slug}`, { title: e.data.title, slug: `/cheatsheets/${e.slug}`, category: 'Cheatsheet' });
+for (const e of allLanguages)
+  pathMap.set(`/languages/${e.slug}`, { title: e.data.title, slug: `/languages/${e.slug}`, category: e.data.language });
+for (const e of allTools)
+  pathMap.set(`/tools/${e.data.tool_slug ?? e.slug}`, { title: e.data.title, slug: `/tools/${e.data.tool_slug ?? e.slug}`, category: 'Tool' });
+const resolvedRelatedPosts: RelatedItem[] = (frontmatter.related_posts ?? [])
+  .map((path: string) => pathMap.get(path))
+  .filter((item: RelatedItem | undefined): item is RelatedItem => item !== undefined);
 
 const formattedDate = new Date(frontmatter.published_date).toLocaleDateString('en-US', {
   year: 'numeric',
@@ -78,9 +102,9 @@ breadcrumbItems.push({ label: frontmatter.title, href: null });
         </aside>
       </div>
 
-      {frontmatter.related_posts && frontmatter.related_posts.length > 0 && (
+      {resolvedRelatedPosts.length > 0 && (
         <div class="related-section">
-          <RelatedPosts posts={frontmatter.related_posts} />
+          <RelatedPosts posts={resolvedRelatedPosts} />
         </div>
       )}
     </div>

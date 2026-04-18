@@ -28,6 +28,13 @@ export async function getStaticPaths() {
 }
 
 const { tool } = Astro.props;
+const allToolEntries = await getCollection('tools');
+const validToolPaths = new Set(
+  allToolEntries.map((t) => `/tools/${t.data.tool_slug ?? t.slug}`)
+);
+const filteredRelatedTools = (tool.data.related_tools ?? []).filter(
+  (path: string) => validToolPaths.has(path)
+);
 const { Content } = await tool.render();
 
 const ToolComponent = toolComponents[tool.data.tool_slug ?? tool.slug];
@@ -118,11 +125,11 @@ const cheatsheetLink = tool.data.related_content?.find((c: string) =>
           <p>{tool.data.description}</p>
         </div>
 
-        {tool.data.related_tools && tool.data.related_tools.length > 0 && (
+        {filteredRelatedTools.length > 0 && (
           <div class="sidebar-card">
             <h2>Related tools</h2>
             <ul class="related-list">
-              {tool.data.related_tools.map((relatedPath: string) => {
+              {filteredRelatedTools.map((relatedPath: string) => {
                 const slug = relatedPath.split('/').pop();
                 return (
                   <li>
