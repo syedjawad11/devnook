@@ -32,34 +32,42 @@
 
 ## Last Session Summary
 
-**Session Date:** 2026-04-17 (session 13)
-**Session Goal:** Execute Phase 2 — full pipeline dry run with all subagents.
+**Session Date:** 2026-04-18 (session 18)
+**Session Goal:** Add `robots.txt` + verify sitemap setup is complete for Google Search Console.
 
-### Status: ✅ PHASE 2 COMPLETE
+### Status: ✅ Complete — pushed to main, Cloudflare Pages auto-deploying
 
-### What was completed
+### What was done
 
-1. **Writer subagent** — 3 editorial guides written from queued registry posts, all QA passed (1,600–1,740 words each), saved to `agents/content-team/drafts/`, registry updated to `status=drafted, qa_status=passed`.
+1. **Created `public/robots.txt`** — allow-all rules + `Sitemap: https://devnook.dev/sitemap-index.xml` directive. Committed and pushed (`feat(seo): add robots.txt referencing sitemap-index.xml`).
 
-2. **Ingest subagent** — 10 Antigravity files ingested from `../web_content/output/`. Copied to drafts, inserted into registry (`source=antigravity`, `content_type=programmatic`, `status=drafted`), originals archived to `_ingested/`.
+2. **Verified sitemap build** — `npm run build` confirmed `dist/robots.txt` and `dist/sitemap-index.xml` both generated correctly. 60 pages built.
 
-3. **Publisher subagent** — 3 editorial guides staged then published to `src/content/guides/`. Registry updated to `status=published`.
+3. **No changes needed** to `astro.config.mjs` or `BaseLayout.astro` — both were already correct.
 
-4. **Build verified** — `npm run build` passed cleanly: 52 pages (up from 43+).
+### Pending user actions (one-time, manual)
+1. **Google Search Console** — verify `https://devnook.dev` (DNS TXT record via Cloudflare), then submit `https://devnook.dev/sitemap-index.xml` → Sitemaps tab
+2. Post-deploy spot check: `https://devnook.dev/robots.txt` (200 text/plain) and `https://devnook.dev/sitemap-index.xml` (200 application/xml)
 
-### Registry state after session
-- published: 23 | drafted: 10 (Antigravity) | queued: 2 | rejected: 10 | staged: 1
+### Next session priorities (session 19)
 
-### Next session priorities (session 14)
+1. **Fix 2–3 minor website UI issues** (user noticed during review)
+2. **Fix broken links** — audit and fix broken links on the site
+3. **Remaining 7 Antigravity articles** — QA → Publisher pipeline:
+   - how-to-implement-singleton-design-pattern-in-javascript
+   - how-to-parse-json-in-javascript
+   - how-to-send-http-request-in-cpp
+   - how-to-set-environment-variables-in-java
+   - how-to-set-environment-variables-in-php
+   - how-to-use-data-class-in-kotlin
+   - how-to-write-closure-in-swift
+4. **Scale Writer** — run Writer on 2 queued editorial posts (CSS minification, HTML minification)
+5. **Verify GSC** — confirm sitemap submission + indexing working (if user completed GSC setup)
 
-1. **Scale Writer** — run Writer on remaining 2 queued editorial posts + queue more via Planner
-2. **Antigravity QA gate** — decide: auto-approve `source=antigravity` drafts or run QA pass before publish
-3. **GitHub Actions drip publish** — automate 2–3 posts/day from staged content
-4. **AdSense + GSC setup** — submit sitemap, enable AdSense
+### Deferred (do NOT do until traffic hits 50k visitors/month)
+- **AdSense integration** — explicitly deferred by user; revisit only at 50k visitors/month threshold
 
 ### Deferred (unchanged)
-- AdSense, GSC, gsc_ping.py
-- GitHub Actions drip-publish automation
 - Blog filter chips functional wiring (decorative only)
 - Search bar wiring (SearchBar.astro parked on disk)
 - Orphan `sitemap-generator-from-url.md` cleanup
@@ -71,12 +79,12 @@ Historical session summaries (sessions 4–10) moved to [session-history.md](ses
 ## Key File Locations
 
 **Architecture plan** — `development_stages/subagent-architecture-plan.md`  
-**Subagent prompts** — `agents/subagent-prompts/{planner,writer,ingest,builder,publisher}.md`  
+**Subagent prompts** — `agents/subagent-prompts/{planner,writer,ingest,antigravity-qa,builder,publisher}.md`  
 **Agent skills** — `agents/skills/{astro-conventions,content-schema,devnook-brand-voice,qa-rejection-criteria,seo-writing-rules,tool-build-patterns}.md`  
 **Registry** — `agents/content-team/registry.db` (25 columns, includes content_type + source)  
 **Drafts** — `agents/content-team/drafts/`  
 **Antigravity ingest source** — `../web_content/output/`  
-**Astro site** — `src/` (building cleanly, 43+ pages)  
+**Astro site** — `src/` (building cleanly, 58 pages, 17 tools)  
 **GitHub repo** — `https://github.com/syedjawad11/DevNook-.git` (main branch, Cloudflare Pages auto-deploy)
 
 ---
@@ -97,10 +105,12 @@ ORCHESTRATOR (Opus/Sonnet main session)
 Orchestrator: spawns subagents, reviews JSON reports (~200 tokens each),
               commits + pushes only on user approval.
 Python scripts: retained as non-LLM utilities (DB ops, file moves, HTTP scraping).
+  └── Antigravity QA (Sonnet) — fixes + approves antigravity drafts before publish
 ```
 
 **Workflow patterns:**
 - Pattern A (weekly content run): Planner → Ingest (parallel) → Writer (batch=5) → Publisher
+- Pattern A2 (Antigravity publish): Ingest → Antigravity QA (batch=10) → Publisher
 - Pattern B (new tool): Orchestrator checks spec → Builder → review + commit
 - Pattern C (bug fix): Orchestrator describes → Builder → review + commit
 - Pattern D (status check): inline sqlite3 query — no subagent needed
@@ -126,6 +136,8 @@ Python scripts: retained as non-LLM utilities (DB ops, file moves, HTTP scraping
 | Nuclear reset beats debugging poisoned Pages state | Sessions 6–7 couldn't clear Functions-mode flags via commits or cache | Delete + recreate Pages project; preserve repo + DNS |
 | Subagent architecture replaces Python LLM pipeline | Monolithic Opus session burned context and token budget | 5 subagents (Haiku/Sonnet) in isolated contexts; Opus as orchestrator only |
 | Languages category owned by Antigravity | Clean firewall; DevNook editorial only (guides/blog/cheatsheets/tools) | Planner + Writer must never queue languages posts |
+| Antigravity QA never rejects | Gemini Pro 3.1 content trusted; QA fixes structural/SEO issues only | antigravity-qa subagent always sets qa_status='passed'; word range 1500–2500 |
+| Use `@astrojs/sitemap` not custom sitemap | Custom `sitemap-index.xml.ts` was broken (missing child sitemaps) | `@astrojs/sitemap@3.2.1` — v3.7+ incompatible with Astro 4.x |
 
 ---
 
@@ -134,7 +146,7 @@ Python scripts: retained as non-LLM utilities (DB ops, file moves, HTTP scraping
 ```bash
 ANTHROPIC_API_KEY=sk-ant-...       # writer, qa agents + tools-team
 GEMINI_API_KEY=AIza...             # legacy — not used in subagent architecture
-GOOGLE_SERVICE_ACCOUNT_JSON=...    # GSC pinging (future)
+GOOGLE_SERVICE_ACCOUNT_JSON=...    # GSC Indexing API — add as GitHub secret for drip-publish
 ```
 
 ---
