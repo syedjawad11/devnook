@@ -32,35 +32,41 @@
 
 ## Last Session Summary
 
-**Session Date:** 2026-04-18 (session 19)
-**Session Goal:** Fix broken related links (75/89 returning 404) — build-time existence filter (Option A).
+**Session Date:** 2026-04-18 (session 20)
+**Session Goal:** Stage and schedule 7 QA-passed antigravity articles for Apr 19–20 drip publish.
 
-### Status: ✅ Complete — build passing, 60 pages, 0 errors
+### Status: ✅ Complete — 7 articles staged, schedule committed and pushed
 
 ### What was done
 
-1. **Fixed `src/layouts/PostLayout.astro`** — added `getCollection` import + build-time pathMap that resolves `related_posts` string paths into `{title, slug, category}` objects, filtering out any path not matching a real page. Also fixed a pre-existing bug where raw `string[]` was passed to `RelatedPosts` (which expects objects), causing blank titles on every page.
+1. **Verified QA** — all 7 antigravity drafts already had `qa_status='passed'` in registry; spot-checked content looks clean.
 
-2. **Fixed `src/pages/tools/[slug].astro`** — added `filteredRelatedTools` computed from a `Set` of valid tool paths; "Related tools" sidebar card now only renders when ≥1 linked tool actually exists.
+2. **Staged 7 articles** — moved from `agents/content-team/drafts/` to `content-staging/languages/{lang}/` via Python; registry updated to `status='staged'`.
+   - how-to-implement-singleton-design-pattern-in-javascript (javascript)
+   - how-to-parse-json-in-javascript (javascript)
+   - how-to-send-http-request-in-cpp (cpp)
+   - how-to-set-environment-variables-in-java (java)
+   - how-to-set-environment-variables-in-php (php)
+   - how-to-use-data-class-in-kotlin (kotlin)
+   - how-to-write-closure-in-swift (swift)
 
-3. **Root causes addressed:**
-   - Aspirational links to unpublished pages (majority): silently dropped at build time
-   - Slug mismatch in languages content: pathMap uses `e.slug` which matches actual Astro routes
-   - Fix is self-healing — links automatically appear as new content is published
+3. **Updated `.github/workflows/drip-publish.yml`**:
+   - Added `workflow_dispatch` count input (default: 3) for flexible manual triggering
+   - Added extra cron `0 10 20 4 *` (Apr 20 at 10:00 UTC, count=1) so 4 articles publish on Apr 20
+   - Publish count logic: workflow_dispatch uses input; `0 10 20 4 *` uses count=1; all other crons use count=3
 
-### Next session priorities (session 20)
+4. **Drip schedule for the 7 new articles** (FIFO order, Apr 17 mtimes are oldest in queue):
+   - Apr 19 08:00 UTC (daily): singleton-js, parse-json-js, http-request-cpp
+   - Apr 20 08:00 UTC (daily): set-env-java, set-env-php, data-class-kotlin
+   - Apr 20 10:00 UTC (extra): write-closure-swift
+   - Apr 21 08:00 UTC (daily): lambda-java, dict-python, patterns-python (prior batch)
 
-1. **Remaining 7 Antigravity articles** — QA → Publisher pipeline:
-   - how-to-implement-singleton-design-pattern-in-javascript
-   - how-to-parse-json-in-javascript
-   - how-to-send-http-request-in-cpp
-   - how-to-set-environment-variables-in-java
-   - how-to-set-environment-variables-in-php
-   - how-to-use-data-class-in-kotlin
-   - how-to-write-closure-in-swift
-2. **Scale Writer** — run Writer on 2 queued editorial posts (CSS minification, HTML minification)
-3. **Fix 2–3 minor website UI issues** (user noticed during review — not yet specified)
-4. **Verify GSC** — confirm sitemap submission + indexing working (if user completed GSC setup)
+### Next session priorities (session 21)
+
+1. **Scale Writer** — run Writer on 2 queued editorial posts (CSS minification, HTML minification)
+2. **Fix 2–3 minor website UI issues** (user noticed during review — not yet specified)
+3. **Verify GSC** — confirm sitemap submission + indexing working (if user completed GSC setup)
+4. **Next Antigravity batch** — ingest + QA + stage more languages articles
 
 ### Deferred (do NOT do until traffic hits 50k visitors/month)
 - **AdSense integration** — explicitly deferred by user; revisit only at 50k visitors/month threshold
