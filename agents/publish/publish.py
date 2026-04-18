@@ -102,14 +102,17 @@ def publish(count: int, category_filter: str = "all"):
         url = get_category_url_prefix(meta["category"], slug, meta.get("language"))
         published_urls.append(url)
     
-    # Ping GSC for all published URLs
-    print(f"\nPinging Google Search Console ({len(published_urls)} URLs)...")
-    for url in published_urls:
-        try:
-            ping_url(url)
-            print(f"  >> GSC: {url}")
-        except Exception as e:
-            print(f"  [X] GSC failed for {url}: {e}")
+    # Ping GSC for all published URLs (skipped if GOOGLE_SERVICE_ACCOUNT_JSON not set)
+    if not os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON"):
+        print("\nSkipping GSC ping — GOOGLE_SERVICE_ACCOUNT_JSON not configured.")
+    else:
+        print(f"\nPinging Google Search Console ({len(published_urls)} URLs)...")
+        for url in published_urls:
+            try:
+                ping_url(url)
+                print(f"  >> GSC: {url}")
+            except Exception as e:
+                print(f"  [X] GSC failed for {url}: {e}")
 
 def main():
     parser = argparse.ArgumentParser()
