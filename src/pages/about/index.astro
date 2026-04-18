@@ -1,0 +1,104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const pageTitle = 'About DevNook — Developer Tools & References Built for Speed';
+const pageDescription = "DevNook is a free, ad-free library of developer tools, language guides, and cheat sheets. Learn why it exists and what it's for.";
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://devnook.dev/about/"
+>
+  <div class="about-page">
+    <div class="container">
+      <h1>About DevNook</h1>
+
+      <p>DevNook is a free, open library of developer tools, language guides, and quick-reference cheat sheets. It exists for one reason: the reference material developers use every day should be fast to load, easy to scan, and free of the noise that fills most of the modern web.</p>
+
+      <h2>Why DevNook exists</h2>
+
+      <p>Every developer has been there. You need to remember the exact syntax for a regex lookahead, or how <code>Array.prototype.reduce</code> handles an empty array, or what claims a JWT actually contains. You open a search engine, click the top result, wait for it to load, dismiss a cookie banner, close a newsletter popup, scroll past three ads and a 900-word SEO preamble — and finally find a two-line code snippet.</p>
+
+      <p>That friction adds up. DevNook is an attempt to do the opposite: get you to the answer in under ten seconds, on any device, with nothing standing in the way.</p>
+
+      <h2>What you'll find here</h2>
+
+      <ul>
+        <li><strong>Tools</strong> — browser-based utilities that run entirely on your device. JSON formatting, regex testing, JWT decoding, Base64 encoding, and more. Nothing you paste ever leaves your browser.</li>
+        <li><strong>Language guides</strong> — focused, practical explanations of the features developers reach for most, across Python, JavaScript, TypeScript, Go, Rust, and others.</li>
+        <li><strong>Cheat sheets</strong> — one-page references organised by task, not by API surface. Built for the moment you need them, not for teaching from scratch.</li>
+        <li><strong>Guides</strong> — longer-form articles for topics that genuinely need the space, written without padding.</li>
+      </ul>
+
+      <h2>The principles behind it</h2>
+
+      <ol>
+        <li><strong>Performance is a feature.</strong> Pages should be usable the moment they load. No layout shift, no blocking scripts, no third-party fonts loading for six seconds.</li>
+        <li><strong>Content respects your time.</strong> If the answer fits in three lines, the article is three lines.</li>
+        <li><strong>Privacy is the priority.</strong> Tools run client-side — anything you paste stays in your browser. We use lightweight analytics to understand what's useful, but never for advertising, remarketing, or cross-site tracking.</li>
+        <li><strong>The web should be readable.</strong> Clean typography, sensible contrast, keyboard-friendly navigation, and dark mode that actually works.</li>
+        <li><strong>Free means free.</strong> No paywalls, no "pro" tier, no email gates. If a resource is listed on DevNook, you can use it.</li>
+      </ol>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-page {
+    padding: var(--space-7) 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    margin-bottom: var(--space-5);
+    color: var(--color-text);
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  ul, ol {
+    padding-left: var(--space-5);
+    margin-bottom: var(--space-4);
+  }
+
+  li {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--color-surface);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+</style>

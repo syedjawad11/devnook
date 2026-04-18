@@ -1,0 +1,171 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const pageTitle = 'Cookie Policy — DevNook';
+const pageDescription = "DevNook's cookie policy. We don't use advertising or cross-site tracking. This page explains the cookies and storage we do use.";
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl="https://devnook.dev/cookie-policy/"
+>
+  <div class="policy-page">
+    <div class="container">
+      <h1>Cookie Policy</h1>
+
+      <p class="updated"><strong>Last updated:</strong> 18 April 2026</p>
+
+      <p>This Cookie Policy explains how DevNook ("we", "us", "devnook.dev") uses cookies and similar technologies when you visit our website. We keep this to an absolute minimum and do not use advertising or cross-site tracking cookies.</p>
+
+      <h2>What cookies are</h2>
+
+      <p>Cookies are small text files stored on your device by your web browser when you visit a website. They are widely used to make websites work, to improve user experience, and — on many sites — to track users across the web for advertising. Similar technologies include <code>localStorage</code>, <code>sessionStorage</code>, and cookie-free fingerprinting; where relevant, this policy applies to those too.</p>
+
+      <h2>Cookies we do not use</h2>
+
+      <p>DevNook does <strong>not</strong> use any of the following:</p>
+
+      <ul>
+        <li>Advertising cookies</li>
+        <li>Behavioural or retargeting cookies</li>
+        <li>Cross-site tracking cookies</li>
+        <li>Social media tracking pixels</li>
+      </ul>
+
+      <p>We also do not embed third-party scripts whose primary purpose is to profile visitors.</p>
+
+      <h2>Cookies and storage we may use</h2>
+
+      <p>DevNook may use a small number of strictly necessary cookies or browser storage entries, limited to:</p>
+
+      <ul>
+        <li><strong>Theme preference</strong> — if you toggle dark mode, your choice is stored locally in your browser (<code>localStorage</code>) so the site remembers it on your next visit. This value never leaves your device.</li>
+        <li><strong>Tool state</strong> — some browser-based tools (e.g. the JSON Formatter, Regex Tester) may store your most recent input locally so it persists if you refresh the page. This data stays in your browser and is never transmitted.</li>
+        <li><strong>Security and infrastructure cookies</strong> set by Cloudflare — our hosting provider — to protect the site from abuse and to serve content efficiently. These are standard for any site on Cloudflare and do not identify you. You can read Cloudflare's own cookie documentation at <a href="https://www.cloudflare.com/cookie-policy/" target="_blank" rel="noopener noreferrer">cloudflare.com/cookie-policy</a>.</li>
+      </ul>
+
+      <p>None of the above are used for marketing or for building a profile of you.</p>
+
+      <h2>Analytics</h2>
+
+      <p>DevNook uses <strong>Google Analytics</strong> to understand, in aggregate, which pages and tools people use most. This helps us decide what to improve and what to build next.</p>
+
+      <ul>
+        <li>The data is aggregated and statistical — we use it to see things like "the JSON Formatter is popular" or "most visitors arrive from search engines", not to identify individual users.</li>
+        <li>Google Analytics sets its own cookies (names typically starting with <code>_ga</code>) on your device. These are first-party cookies under the devnook.dev domain.</li>
+        <li>The data is processed by Google on our behalf. You can read Google's privacy policy at <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">policies.google.com/privacy</a> and learn more about how Google uses data at <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">policies.google.com/technologies/partner-sites</a>.</li>
+        <li>We do not use Google Analytics for advertising, audience remarketing, or cross-site tracking.</li>
+      </ul>
+
+      <h3>How to opt out of Google Analytics</h3>
+
+      <ul>
+        <li>Install the official <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics Opt-out Browser Add-on</a>, which works across every site that uses GA.</li>
+        <li>Enable "Do Not Track" or tracking-prevention settings in your browser.</li>
+        <li>Use a browser or extension that blocks analytics scripts (e.g. Brave, uBlock Origin, Firefox's Enhanced Tracking Protection).</li>
+      </ul>
+
+      <p>Opting out of analytics has no effect on your ability to use the site — every tool, guide, and cheat sheet will continue to work normally.</p>
+
+      <h2>Third-party content</h2>
+
+      <p>Some pages on DevNook may link out to third-party sites (for example, official language documentation or GitHub repositories). Once you click through, those sites operate under their own cookie and privacy policies, which we do not control. We recommend reviewing the policies of any third-party site you visit.</p>
+
+      <h2>How to control cookies</h2>
+
+      <p>You can control and delete cookies at any time through your browser settings. Every major browser lets you:</p>
+
+      <ul>
+        <li>View the cookies currently stored on your device</li>
+        <li>Delete individual cookies or all cookies</li>
+        <li>Block cookies from specific sites or block them globally</li>
+        <li>Use private/incognito mode, which isolates cookies to the current session</li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .policy-page {
+    padding: var(--space-7) 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  h1 {
+    font-size: clamp(2rem, 5vw, 2.75rem);
+    font-weight: 700;
+    margin-bottom: var(--space-5);
+    color: var(--color-text);
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+  }
+
+  h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  .updated {
+    font-size: 0.9rem;
+    color: var(--color-text-faint);
+    margin-bottom: var(--space-5);
+  }
+
+  ul {
+    padding-left: var(--space-5);
+    margin-bottom: var(--space-4);
+  }
+
+  li {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--color-surface);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+  }
+
+  a:hover {
+    color: var(--color-accent-hover, var(--color-accent));
+    text-decoration: underline;
+  }
+
+  strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+</style>
