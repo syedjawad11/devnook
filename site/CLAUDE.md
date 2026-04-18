@@ -32,28 +32,25 @@
 
 ## Last Session Summary
 
-**Session Date:** 2026-04-18 (session 18)
-**Session Goal:** Add `robots.txt` + verify sitemap setup is complete for Google Search Console.
+**Session Date:** 2026-04-18 (session 19)
+**Session Goal:** Fix broken related links (75/89 returning 404) — build-time existence filter (Option A).
 
-### Status: ✅ Complete — pushed to main, Cloudflare Pages auto-deploying
+### Status: ✅ Complete — build passing, 60 pages, 0 errors
 
 ### What was done
 
-1. **Created `public/robots.txt`** — allow-all rules + `Sitemap: https://devnook.dev/sitemap-index.xml` directive. Committed and pushed (`feat(seo): add robots.txt referencing sitemap-index.xml`).
+1. **Fixed `src/layouts/PostLayout.astro`** — added `getCollection` import + build-time pathMap that resolves `related_posts` string paths into `{title, slug, category}` objects, filtering out any path not matching a real page. Also fixed a pre-existing bug where raw `string[]` was passed to `RelatedPosts` (which expects objects), causing blank titles on every page.
 
-2. **Verified sitemap build** — `npm run build` confirmed `dist/robots.txt` and `dist/sitemap-index.xml` both generated correctly. 60 pages built.
+2. **Fixed `src/pages/tools/[slug].astro`** — added `filteredRelatedTools` computed from a `Set` of valid tool paths; "Related tools" sidebar card now only renders when ≥1 linked tool actually exists.
 
-3. **No changes needed** to `astro.config.mjs` or `BaseLayout.astro` — both were already correct.
+3. **Root causes addressed:**
+   - Aspirational links to unpublished pages (majority): silently dropped at build time
+   - Slug mismatch in languages content: pathMap uses `e.slug` which matches actual Astro routes
+   - Fix is self-healing — links automatically appear as new content is published
 
-### Pending user actions (one-time, manual)
-1. **Google Search Console** — verify `https://devnook.dev` (DNS TXT record via Cloudflare), then submit `https://devnook.dev/sitemap-index.xml` → Sitemaps tab
-2. Post-deploy spot check: `https://devnook.dev/robots.txt` (200 text/plain) and `https://devnook.dev/sitemap-index.xml` (200 application/xml)
+### Next session priorities (session 20)
 
-### Next session priorities (session 19)
-
-1. **Fix 2–3 minor website UI issues** (user noticed during review)
-2. **Fix broken links** — audit and fix broken links on the site
-3. **Remaining 7 Antigravity articles** — QA → Publisher pipeline:
+1. **Remaining 7 Antigravity articles** — QA → Publisher pipeline:
    - how-to-implement-singleton-design-pattern-in-javascript
    - how-to-parse-json-in-javascript
    - how-to-send-http-request-in-cpp
@@ -61,8 +58,9 @@
    - how-to-set-environment-variables-in-php
    - how-to-use-data-class-in-kotlin
    - how-to-write-closure-in-swift
-4. **Scale Writer** — run Writer on 2 queued editorial posts (CSS minification, HTML minification)
-5. **Verify GSC** — confirm sitemap submission + indexing working (if user completed GSC setup)
+2. **Scale Writer** — run Writer on 2 queued editorial posts (CSS minification, HTML minification)
+3. **Fix 2–3 minor website UI issues** (user noticed during review — not yet specified)
+4. **Verify GSC** — confirm sitemap submission + indexing working (if user completed GSC setup)
 
 ### Deferred (do NOT do until traffic hits 50k visitors/month)
 - **AdSense integration** — explicitly deferred by user; revisit only at 50k visitors/month threshold
@@ -84,7 +82,7 @@ Historical session summaries (sessions 4–10) moved to [session-history.md](ses
 **Registry** — `agents/content-team/registry.db` (25 columns, includes content_type + source)  
 **Drafts** — `agents/content-team/drafts/`  
 **Antigravity ingest source** — `../web_content/output/`  
-**Astro site** — `src/` (building cleanly, 58 pages, 17 tools)  
+**Astro site** — `src/` (building cleanly, 60 pages, 17 tools)  
 **GitHub repo** — `https://github.com/syedjawad11/DevNook-.git` (main branch, Cloudflare Pages auto-deploy)
 
 ---
