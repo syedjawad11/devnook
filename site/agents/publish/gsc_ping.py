@@ -12,13 +12,14 @@ Setup:
 
 import os
 import json
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
 
 SCOPES = ["https://www.googleapis.com/auth/indexing"]
 
 def get_service():
     """Build authenticated GSC service."""
+    from google.oauth2 import service_account
+    from googleapiclient.discovery import build
+
     sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
     if not sa_json:
         raise ValueError("GOOGLE_SERVICE_ACCOUNT_JSON env var not set")
