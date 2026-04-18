@@ -60,6 +60,7 @@
 <script>
 (function() {
   const jwtInput = document.getElementById('jwt-input');
+  if (!jwtInput) return;
   const headerOutput = document.getElementById('header-output');
   const payloadOutput = document.getElementById('payload-output');
   const expiryInfo = document.getElementById('expiry-info');

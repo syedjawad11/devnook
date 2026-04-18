@@ -113,8 +113,9 @@
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', () => {
+  (function() {
     const titleInput = document.getElementById('page-title') as HTMLInputElement;
+    if (!titleInput) return;
     const descInput = document.getElementById('meta-description') as HTMLTextAreaElement;
     const canonicalInput = document.getElementById('canonical-url') as HTMLInputElement;
     const ogImageInput = document.getElementById('og-image') as HTMLInputElement;
@@ -336,7 +337,7 @@
     titleInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') generateMetaTags();
     });
-  });
+  })();
 </script>
 
 <style>

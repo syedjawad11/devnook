@@ -74,6 +74,7 @@
 <script>
   (function() {
     const inputEl = document.getElementById('base64-input') as HTMLTextAreaElement;
+    if (!inputEl) return;
     const outputEl = document.getElementById('base64-output') as HTMLTextAreaElement;
     const encodeBtn = document.getElementById('encode-btn') as HTMLButtonElement;
     const decodeBtn = document.getElementById('decode-btn') as HTMLButtonElement;
