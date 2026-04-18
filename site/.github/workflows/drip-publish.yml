@@ -2,13 +2,20 @@ name: Drip Publish
 
 on:
   schedule:
-    - cron: '0 8 * * *'  # Daily at 08:00 UTC
-  workflow_dispatch:      # Allow manual trigger
+    - cron: '0 8 * * *'   # Daily at 08:00 UTC
+    - cron: '0 10 20 4 *' # Apr 20 at 10:00 UTC — 4th antigravity article to complete the batch
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Number of posts to publish'
+        required: false
+        default: '3'
+        type: string
 
 jobs:
   publish:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -30,11 +37,22 @@ jobs:
           git config user.name "DevNook Publisher"
           git config user.email "publisher@devnook.dev"
 
+      - name: Set publish count
+        id: set_count
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "count=${{ inputs.count || '3' }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.schedule }}" = "0 10 20 4 *" ]; then
+            echo "count=1" >> $GITHUB_OUTPUT  # publish just the 4th article
+          else
+            echo "count=3" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run drip publisher
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |
-          python agents/publish/publish.py --count 3
+          python agents/publish/publish.py --count ${{ steps.set_count.outputs.count }}
 
       - name: Check if there were any posts to publish
         id: check_changes
