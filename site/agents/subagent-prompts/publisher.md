@@ -31,7 +31,7 @@ None required — this is pure file operations.
 1. **Query approved drafts**:
    ```sql
    SELECT slug, category, file_path FROM posts
-   WHERE qa_status = 'passed' AND status = 'drafted'
+   WHERE qa_status = 'passed' AND status = 'linked'
    [AND category = CATEGORY_FILTER if provided]
    ```
 

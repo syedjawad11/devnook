@@ -1,18 +1,23 @@
 ---
-title: "How to Use Data Classes in Kotlin?"
-description: "Discover how to cleanly model object structures and state using Kotlin's Data Classes to eradicate extensive boilerplate and boilerplate property methods."
 category: languages
-language: kotlin
 concept: data-class
+description: Discover how to cleanly model object structures and state using Kotlin's
+  Data Classes to eradicate extensive boilerplate and boilerplate property methods.
 difficulty: beginner
-template_id: lang-v2
-tags: ["kotlin", "data-class", "oop", "architecture"]
+language: kotlin
+og_image: /og/languages/kotlin/data-class.png
+published_date: '2026-04-16'
 related_posts:
-  - /languages/kotlin/classes
-  - /languages/kotlin/null-safety
+- /languages/kotlin/classes
+- /languages/kotlin/null-safety
 related_tools: []
-published_date: "2026-04-16"
-og_image: "/og/languages/kotlin/data-class.png"
+tags:
+- kotlin
+- data-class
+- oop
+- architecture
+template_id: lang-v2
+title: How to Use Data Classes in Kotlin?
 word_count_target: 1500
 ---
 
@@ -20,7 +25,7 @@ word_count_target: 1500
 
 ## The Problem
 
-When building rigorous applications such as an Android App or Spring Boot microservice, developers frequently create classes whose sole purpose is strictly holding data state (POJOs in Java). If you use standard structures, you face an avalanche of required boilerplate generation just to ensure the objects behave efficiently.
+When building rigorous applications such as an Android App or Spring Boot microservice, developers frequently create classes whose sole purpose is strictly holding data state (POJOs in [Java](/languages/java)). If you use standard structures, you face an avalanche of required boilerplate generation just to ensure the objects behave efficiently.
 
 ```kotlin
 // A standard class requires massive amounts of manual method overriding

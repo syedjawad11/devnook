@@ -1,28 +1,35 @@
 ---
-title: "How to Implement Design Patterns in Python: A Modern Guide"
-description: "Learn how to implement design patterns in Python using first-class functions and modules. Covers Strategy, Observer, Singleton, and common pitfalls."
 category: languages
-language: "python"
-concept: "design-patterns"
-difficulty: "advanced"
-template_id: "lang-v1"
-tags: ["python", "design-patterns", "architecture", "oop"]
+concept: design-patterns
+description: Learn how to implement design patterns in Python using first-class functions
+  and modules. Covers Strategy, Observer, Singleton, and common pitfalls.
+difficulty: advanced
+language: python
+og_image: /og/languages/python/design-patterns.png
+published_date: '2026-04-17'
+related_cheatsheet: ''
+related_posts:
+- how-to-use-decorators-in-python
+- what-is-a-closure-in-python
 related_tools: []
-related_posts: ["how-to-use-decorators-in-python", "what-is-a-closure-in-python"]
-related_cheatsheet: ""
-published_date: "2026-04-17"
-og_image: "/og/languages/python/design-patterns.png"
+tags:
+- python
+- design-patterns
+- architecture
+- oop
+template_id: lang-v1
+title: 'How to Implement Design Patterns in Python: A Modern Guide'
 ---
 
 # How to Implement Design Patterns in Python: A Modern Guide
 
-Implementing design patterns in Python often looks fundamentally different from Java or C++, because Python's dynamic typing, first-class functions, and module system make many patterns far more concise — and some patterns unnecessary altogether.
+Implementing design patterns in [Python](/languages/python) often looks fundamentally different from Java or C++, because Python's dynamic typing, first-class functions, and module system make many patterns far more concise — and some patterns unnecessary altogether.
 
 ## What are Design Patterns in Python?
 
 Design patterns are reusable solutions to recurring software architecture problems, first formalized by the Gang of Four in their 1994 book *Design Patterns: Elements of Reusable Object-Oriented Software*. The GoF catalogued 23 patterns divided into three families: creational (how objects are made), structural (how they are composed), and behavioral (how they communicate).
 
-In Python, the implementation of these patterns diverges significantly from their canonical Java form. Java requires every behavioral abstraction to be expressed through an interface and a concrete class — two files minimum. Python can express the same abstraction with a single function, because functions are first-class objects with `__call__` semantics. A Strategy pattern that takes 50 lines in Java collapses to 5 in Python. This isn't just syntactic convenience; it reflects a deeper difference in how the languages think about behavioral abstraction.
+In Python, the implementation of these patterns diverges significantly from their canonical [Java](/languages/java) form. Java requires every behavioral abstraction to be expressed through an interface and a concrete class — two files minimum. Python can express the same abstraction with a single function, because functions are first-class objects with `__call__` semantics. A Strategy pattern that takes 50 lines in Java collapses to 5 in Python. This isn't just syntactic convenience; it reflects a deeper difference in how the languages think about behavioral abstraction.
 
 Understanding design patterns in Python means knowing both the pattern's intent (which is language-agnostic) and the idiomatic Pythonic way to express it (which often bears little resemblance to the GoF code samples written for statically typed languages).
 

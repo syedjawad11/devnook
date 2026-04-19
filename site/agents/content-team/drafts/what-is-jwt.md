@@ -178,7 +178,7 @@ The third part is the signature — a cryptographic hash that you verify against
 
 ## Security Best Practices
 
-Always use HTTPS when transmitting JWTs — an intercepted token gives an attacker full access until expiration. Set short expiration times (1 hour or less) for access tokens and implement refresh token rotation for longer sessions. Store the secret key securely in environment variables, never commit it to version control.
+Always use HTTPS when transmitting JWTs — an intercepted token gives an attacker full access until expiration. Set short expiration times (1 hour or less) for access tokens and implement refresh token rotation for longer sessions. Store the secret key securely in [environment variables](/languages/java/environment-variables), never commit it to version control.
 
 Validate every claim in the payload, not just the signature. Check `exp` to ensure the token hasn't expired, verify `iss` matches your expected issuer, and validate `aud` if you're using audience claims. For user-specific data, always verify the `sub` claim matches the requested resource.
 
