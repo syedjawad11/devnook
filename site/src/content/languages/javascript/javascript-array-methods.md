@@ -8,13 +8,10 @@ difficulty: intermediate
 language: javascript
 og_image: /og/languages/javascript/array-methods.png
 published_date: '2026-04-13'
-related_cheatsheet: /cheatsheets/javascript-array-methods
+related_cheatsheet: ''
 related_content: []
-related_posts:
-- /languages/javascript/arrow-functions
-- /languages/javascript/destructuring
-related_tools:
-- /tools/javascript-console
+related_posts: []
+related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"TechArticle\",\n  \"headline\": \"JavaScript Array Methods: map(),\
   \ filter(), reduce() and More\",\n  \"description\": \"Master the functional array\
@@ -299,10 +296,9 @@ const sumOfSquares = numbers
   .reduce((sum, square) => sum + square, 0);
 ```
 
-## Related
 
-For more on modern JavaScript syntax, see [JavaScript Arrow Functions](/languages/javascript/arrow-functions) and [JavaScript Destructuring](/languages/javascript/destructuring).
+For more on modern JavaScript syntax, see JavaScript Arrow Functions and JavaScript Destructuring.
 
-Test array methods interactively with our [JavaScript Console](/tools/javascript-console).
+Test array methods interactively with our JavaScript Console.
 
-Download the [JavaScript Array Methods Cheat Sheet](/cheatsheets/javascript-array-methods) for quick reference.
+Download the JavaScript Array Methods Cheat Sheet for quick reference.

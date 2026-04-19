@@ -8,14 +8,10 @@ difficulty: intermediate
 language: rust
 og_image: /og/languages/rust/async-await.png
 published_date: '2026-04-12'
-related_cheatsheet: /cheatsheets/rust-concurrency
+related_cheatsheet: ''
 related_content: []
-related_posts:
-- /languages/rust/lifetimes
-- /languages/rust/error-handling
-- /languages/javascript/async-await
-related_tools:
-- /tools/rust-playground
+related_posts: []
+related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"TechArticle\",\n  \"headline\": \"How Async/Await Works in Rust\
   \ — Complete Guide\",\n  \"description\": \"Learn how async/await works in Rust\
@@ -102,7 +98,7 @@ Unlike languages with built-in async runtimes, Rust lets you choose your executo
 
 ## Going Further — Real-World Patterns
 
-**Pattern 1: Concurrent [HTTP Requests](/languages/cpp/http-requests) with Error Handling**
+**Pattern 1: Concurrent HTTP Requests with Error Handling**
 
 ```rust
 use reqwest;
@@ -213,6 +209,5 @@ The `tokio::spawn` function runs an async task in the background, similar to spa
 
 Async/await in Rust solves the problem of efficient concurrent I/O without the overhead of OS threads. By transforming async functions into state machines called futures, Rust achieves zero-cost concurrency that's both memory-safe and performant. The key insight is that futures are lazy—they do nothing until an executor polls them. Using `.await` pauses execution and yields control, allowing the executor to multiplex thousands of concurrent operations on a small thread pool. The compiler enforces safety across async boundaries using the same ownership and lifetime rules as synchronous code. Master the basics with simple concurrent requests, then progress to streams, background tasks, and error handling patterns as your needs grow.
 
-## Related
 
-For memory management across async boundaries, see our guide on [Rust Lifetimes](/languages/rust/lifetimes). Learn to handle failures gracefully in [Rust Error Handling](/languages/rust/error-handling). Compare Rust's approach with [JavaScript Async/Await](/languages/javascript/async-await). Reference the [Rust Concurrency Cheat Sheet](/cheatsheets/rust-concurrency) for quick syntax lookups.
+For memory management across async boundaries, see our guide on Rust Lifetimes. Learn to handle failures gracefully in Rust Error Handling. Compare Rust's approach with JavaScript Async/Await. Reference the Rust Concurrency Cheat Sheet for quick syntax lookups.

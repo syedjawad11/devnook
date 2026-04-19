@@ -9,11 +9,8 @@ language: javascript
 og_image: /og/cheatsheets/javascript-array-cheatsheet.png
 published_date: '2026-04-13'
 related_content: []
-related_posts:
-- /languages/javascript/array-destructuring
-- /languages/javascript/map-vs-foreach
-related_tools:
-- /tools/javascript-repl
+related_posts: []
+related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"Article\",\n  \"headline\": \"JavaScript Array Methods Cheat Sheet:\
   \ Quick Reference Guide\",\n  \"description\": \"Complete JavaScript array methods\
@@ -241,6 +238,5 @@ arr.fill(9, 1, 3);                // [1, 9, 9] (from index 1 to 3)
 - ES2023 added immutable versions: `toReversed()`, `toSorted()`, `toSpliced()`, and `with()`
 - Negative indices work with `at()`, `slice()`, and `splice()` but not bracket notation before ES2022
 
-## Related
 
-For deep dives into specific [array methods](/languages/javascript/array-methods), see our guide on [JavaScript map vs forEach](/languages/javascript/map-vs-foreach) and [array destructuring patterns](/languages/javascript/array-destructuring). Test array methods interactively with our [JavaScript REPL](/tools/javascript-repl).
+For deep dives into specific [array methods](/languages/javascript/array-methods), see our guide on JavaScript map vs forEach and array destructuring patterns. Test array methods interactively with our JavaScript REPL.

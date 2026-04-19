@@ -5,11 +5,9 @@ description: Format and validate JSON instantly. Our free online JSON formatter 
   syntax errors and beautifies messy JSON in one click.
 og_image: /og/guides/json-formatter-guide.png
 published_date: '2026-04-13'
-related_cheatsheet: /cheatsheets/json-syntax
+related_cheatsheet: ''
 related_content: []
-related_posts:
-- /guides/what-is-json
-- /guides/json-vs-xml
+related_posts: []
 related_tools:
 - /tools/json-formatter
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
@@ -112,7 +110,7 @@ The formatted version reveals the structure instantly. You can see the nested `p
 
 ### Validating Syntax Errors
 
-When [JSON parsing](/languages/javascript/json-parsing) fails, formatters show exactly where the problem is:
+When JSON parsing fails, formatters show exactly where the problem is:
 
 ```json
 // Invalid JSON with syntax error
@@ -224,6 +222,5 @@ Formatting 10KB of JSON takes milliseconds. Formatting 10MB can take seconds and
 
 Modern formatters handle up to 50MB reasonably well. Beyond that, switch to specialized tools or database viewers if the JSON comes from a data export.
 
-## Related
 
-Learn more about JSON syntax and structure in our [What is JSON?](/guides/what-is-json) guide, or compare JSON to other data formats in [JSON vs XML: Key Differences Explained](/guides/json-vs-xml). For a quick reference on all JSON syntax rules, see our [JSON Syntax Cheat Sheet](/cheatsheets/json-syntax).
+Learn more about JSON syntax and structure in our What is JSON? guide, or compare JSON to other data formats in JSON vs XML: Key Differences Explained. For a quick reference on all JSON syntax rules, see our JSON Syntax Cheat Sheet.

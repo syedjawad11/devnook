@@ -5,15 +5,10 @@ description: Every HTTP status code explained with real-world examples. Bookmark
   as your definitive HTTP reference for debugging and API development.
 og_image: /og/guides/http-status-codes-guide.png
 published_date: '2026-04-13'
-related_cheatsheet: /cheatsheets/http-status-codes
+related_cheatsheet: ''
 related_content: []
-related_posts:
-- /guides/what-is-rest-api
-- /guides/http-methods-explained
-- /blog/debugging-api-errors
-related_tools:
-- /tools/http-request-tester
-- /tools/curl-command-builder
+related_posts: []
+related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"Article\",\n  \"headline\": \"HTTP Status Codes: Complete Reference\
   \ (200, 301, 404, 500...)\",\n  \"description\": \"Every HTTP status code explained\
@@ -36,7 +31,7 @@ HTTP status codes tell you what happened with an HTTP request. Every response fr
 
 ## Overview
 
-HTTP status codes are three-digit numbers grouped into five classes by their first digit. The classes are: 1xx (informational), 2xx (success), 3xx (redirection), 4xx (client errors), and 5xx (server errors). When you make an HTTP request — whether through a browser, API call, or [curl command](/tools/curl-command-builder) — the server responds with one of these codes to indicate what happened.
+HTTP status codes are three-digit numbers grouped into five classes by their first digit. The classes are: 1xx (informational), 2xx (success), 3xx (redirection), 4xx (client errors), and 5xx (server errors). When you make an HTTP request — whether through a browser, API call, or curl command — the server responds with one of these codes to indicate what happened.
 
 Understanding status codes is essential for debugging web applications, building APIs, and interpreting server logs. The code itself is standardized, but servers can customize the accompanying message. A 404 response always means "Not Found" regardless of whether the message says "Page not found" or "Resource does not exist."
 
@@ -141,7 +136,7 @@ Server error codes indicate the server failed to fulfill a valid request. The pr
 
 **200 OK** — The universal success code. Your request worked and the server is sending you the data you asked for. When building APIs, this is your default response for successful GET requests. For POST requests that don't create resources, 200 is appropriate when you're returning data about the operation.
 
-**201 Created** — Use this instead of 200 when a POST or PUT request successfully creates a new resource. Include a `Location` header pointing to the new resource. This tells the client exactly where to find what they just created, which is particularly useful for [REST API design](/guides/what-is-rest-api).
+**201 Created** — Use this instead of 200 when a POST or PUT request successfully creates a new resource. Include a `Location` header pointing to the new resource. This tells the client exactly where to find what they just created, which is particularly useful for REST API design.
 
 **301 Moved Permanently** — The resource has a new permanent home. Search engines transfer SEO value to the new URL when they see this. Browsers cache 301 redirects aggressively, so only use this when you're certain the move is permanent. If you might move it back, use 302 or 307 instead.
 
@@ -182,7 +177,7 @@ The server is telling your browser that the cached version of the resource is st
 
 When debugging HTTP issues, start by identifying which class the status code belongs to. A 4xx code means fix your request — check parameters, authentication, and payload format. A 5xx code means the server has a problem — check server logs, connectivity, and upstream dependencies.
 
-Modern browser developer tools show status codes in the Network tab. For API development, tools like our [HTTP request tester](/tools/http-request-tester) let you inspect full request-response cycles including headers and timing information.
+Modern browser developer tools show status codes in the Network tab. For API development, tools like our HTTP request tester let you inspect full request-response cycles including headers and timing information.
 
 Here's a basic example of checking status codes in [JavaScript](/languages/javascript):
 
@@ -236,6 +231,5 @@ def fetch_with_error_handling(url):
             raise ValueError(f"Request failed with status {status}")
 ```
 
-## Related
 
-For a quick lookup table without explanations, see our [HTTP Status Codes Cheat Sheet](/cheatsheets/http-status-codes). If you're building APIs, read our guide on [HTTP Methods Explained](/guides/http-methods-explained) to understand how GET, POST, PUT, and DELETE interact with status codes. For hands-on testing, use our [HTTP Request Tester](/tools/http-request-tester) to send requests and inspect full responses including status codes and headers.
+For a quick lookup table without explanations, see our HTTP Status Codes Cheat Sheet. If you're building APIs, read our guide on HTTP Methods Explained to understand how GET, POST, PUT, and DELETE interact with status codes. For hands-on testing, use our HTTP Request Tester to send requests and inspect full responses including status codes and headers.

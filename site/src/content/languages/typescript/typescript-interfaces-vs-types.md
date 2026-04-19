@@ -10,10 +10,7 @@ og_image: og-default
 published_date: '2026-04-13'
 related_cheatsheet: ''
 related_content: []
-related_posts:
-- /languages/typescript/generics
-- /languages/typescript/union-types
-- /languages/javascript/objects
+related_posts: []
 related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"TechArticle\",\n  \"headline\": \"TypeScript: interface vs type\
@@ -210,4 +207,4 @@ In practice, many teams adopt a simple rule: `interface` for object shapes and c
 
 ## Next Steps
 
-After understanding interfaces and types, explore [TypeScript generics](/languages/typescript/generics) to make your types reusable across different data types. Learn about [union types](/languages/typescript/union-types) to handle multiple possible types in a type-safe way. For foundational knowledge, review [JavaScript objects](/languages/javascript/objects) to understand the runtime behavior TypeScript is typing.
+After understanding interfaces and types, explore TypeScript generics to make your types reusable across different data types. Learn about union types to handle multiple possible types in a type-safe way. For foundational knowledge, review JavaScript objects to understand the runtime behavior TypeScript is typing.

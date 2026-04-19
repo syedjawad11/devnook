@@ -10,10 +10,7 @@ og_image: og-default
 published_date: '2026-04-12'
 related_cheatsheet: ''
 related_content: []
-related_posts:
-- /languages/php/json-encode
-- /languages/php/arrays
-- /languages/javascript/json-parse
+related_posts: []
 related_tools:
 - /tools/json-formatter
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
@@ -192,7 +189,7 @@ While `json_decode()` converts JSON strings into PHP data structures, `json_enco
 
 The key difference is the direction of conversion. Decode transforms text into data structures you can manipulate. Encode transforms data structures into text you can transmit or store. Most applications use both: `json_encode()` when making API requests or saving data, and `json_decode()` when processing responses or loading stored data.
 
-For more details on the encoding process, see our guide on [JSON encode in PHP](/languages/php/json-encode).
+For more details on the encoding process, see our guide on JSON encode in PHP.
 
 ## Quick Reference
 
@@ -206,6 +203,6 @@ For more details on the encoding process, see our guide on [JSON encode in PHP](
 
 ## Next Steps
 
-After mastering JSON decode, learn how to [encode PHP data to JSON format](/languages/php/json-encode) to complete the data interchange cycle. Understanding [PHP arrays](/languages/php/arrays) will help you work more effectively with decoded data structures, as most decoded JSON becomes arrays.
+After mastering JSON decode, learn how to encode PHP data to JSON format to complete the data interchange cycle. Understanding PHP arrays will help you work more effectively with decoded data structures, as most decoded JSON becomes arrays.
 
-For working with JSON in frontend code, explore [how JavaScript handles JSON parsing](/languages/javascript/json-parse) to understand the full client-server JSON workflow. Visit the [PHP language hub](/languages/php) for more PHP tutorials and best practices.
+For working with JSON in frontend code, explore how JavaScript handles JSON parsing to understand the full client-server JSON workflow. Visit the [PHP language hub](/languages/php) for more PHP tutorials and best practices.

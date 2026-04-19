@@ -9,13 +9,8 @@ language: python
 og_image: /og/cheatsheets/python-string-methods.png
 published_date: '2026-04-13'
 related_content: []
-related_posts:
-- /languages/python/f-strings
-- /languages/python/list-comprehensions
-- /guides/string-formatting-guide
-related_tools:
-- /tools/python-repl
-- /tools/string-case-converter
+related_posts: []
+related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"Article\",\n  \"headline\": \"Python String Methods Cheat Sheet:\
   \ split, join, replace, format & More\",\n  \"description\": \"Every Python string\
@@ -157,7 +152,7 @@ f"{name} is {age} years old"  # 'Alice is 30 years old'
 "42".zfill(5)         # '00042'
 ```
 
-For more on f-strings, see our [Python f-strings guide](/languages/python/f-strings).
+For more on f-strings, see our Python f-strings guide.
 
 ## Type Checking
 
@@ -234,9 +229,8 @@ filename.removesuffix('.txt')  # 'report'
 
 - **Using `split()` with empty string** — `split('')` raises ValueError. Use `list(text)` to split into chars.
 - **Forgetting strings are immutable** — Methods return new strings; they don't modify in place. Use `text = text.strip()`, not just `text.strip()`.
-- **Using `+` for concatenation in loops** — Inefficient. Use `''.join(items)` or [list comprehensions](/languages/python/list-comprehensions) instead.
+- **Using `+` for concatenation in loops** — Inefficient. Use `''.join(items)` or list comprehensions instead.
 - **Using `lower()` instead of `casefold()` for comparisons** — `casefold()` handles Unicode edge cases correctly.
 
-## Related
 
-For string formatting specifically, check the [string formatting guide](/guides/string-formatting-guide). To practice these methods interactively, use our [Python REPL tool](/tools/python-repl). For working with case conversions online, try the [string case converter](/tools/string-case-converter).
+For string formatting specifically, check the string formatting guide. To practice these methods interactively, use our Python REPL tool. For working with case conversions online, try the string case converter.

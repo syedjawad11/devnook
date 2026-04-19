@@ -10,10 +10,7 @@ og_image: og-default
 published_date: '2026-04-13'
 related_cheatsheet: ''
 related_content: []
-related_posts:
-- /languages/go/channels
-- /languages/go/context
-- /languages/javascript/async-await
+related_posts: []
 related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"TechArticle\",\n  \"headline\": \"Go Goroutines Explained: Concurrency\
@@ -207,10 +204,10 @@ Use goroutines when you need massive concurrency — web servers handling thousa
 
 ## Next Steps
 
-After mastering golang goroutines, learn [channels](/languages/go/channels) to communicate safely between goroutines without shared memory. Channels are the idiomatic way to coordinate concurrent work in Go.
+After mastering golang goroutines, learn channels to communicate safely between goroutines without shared memory. Channels are the idiomatic way to coordinate concurrent work in Go.
 
-Explore the [context package](/languages/go/context) for cancellation, deadlines, and request-scoped values across goroutine boundaries — essential for production services where goroutines need coordinated shutdown.
+Explore the context package for cancellation, deadlines, and request-scoped values across goroutine boundaries — essential for production services where goroutines need coordinated shutdown.
 
-Compare Go's concurrency model with [JavaScript async/await](/languages/javascript/async-await) to understand different approaches to asynchronous programming across languages.
+Compare Go's concurrency model with JavaScript async/await to understand different approaches to asynchronous programming across languages.
 
 For comprehensive Go concurrency patterns, check out the [official Go documentation on concurrency](https://go.dev/doc/effective_go#concurrency), which covers advanced patterns like worker pools, semaphores, and pipeline patterns using goroutines and channels.
