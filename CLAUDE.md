@@ -2,94 +2,87 @@
 
 > Always read this file first at the start of a new session. Updated at end of every session.
 
+## Session start — do NOT auto-read these files
+
+Unless the user explicitly asks ("check X", "read X", "look at X"), **do not** open:
+
+- `new-content-plan.md` / `new_content_plan.md`
+- `new-project-summary.md`
+- `devnook-site-updates.md`
+- `my_file.md`
+- `session-history.md` (on demand only — "why did we X in session N?")
+- `archives/decisions-archive.md` (on demand only)
+- `docs/content-strategy.md` (on demand only — planning velocity, ring coverage)
+- Prior chat transcripts
+
+Start each session from this file + MEMORY.md only.
+
 ---
 
 ## Project Overview
 
-**DevNook** (devnook.dev) is a developer resource site targeting 1,000+ programmatic content pieces + 18 free browser-based client-side tools, monetized via Google AdSense.
+**DevNook** (devnook.dev) — developer resource site, 1,000+ programmatic posts + 18 client-side browser tools, monetized via AdSense (deferred until 50k visitors/month).
 
-**Domain:** devnook.dev (registered Cloudflare, April 2026)  
-**Tech stack:** Astro + Cloudflare Pages + Claude Code subagents  
-**Content model:** "Concentric Rings" — tools → web fundamentals → language concepts  
-**Agent model:** Claude Code subagents (Haiku/Sonnet), Python utilities for non-LLM ops, GitHub Actions publishing
+**Stack:** Astro + Cloudflare Pages, Claude Code subagents (Haiku/Sonnet), GitHub Actions drip-publish.
+**Repo:** `main` branch, Cloudflare Pages auto-deploy.
 
 ---
 
 ## Stage Progress
 
-| Stage | Status | Session Completed |
-|-------|--------|-------------------|
-| 1 — Skills | ✅ Complete | 2026-04-10 |
-| 2 — Dev Team | ✅ Complete | 2026-04-10 |
-| 3 — Tools Team | ✅ Complete | 2026-04-11 |
-| 4 — Content Pipeline Core | ✅ Complete | 2026-04-12 |
-| 5 — Content Pipeline Write | ✅ Complete | 2026-04-12 |
-| 6 — Publishing | ✅ Complete | 2026-04-13 |
-| 7 — Launch | ✅ Live — light-theme reskin complete | 2026-04-15 |
-| 8 — Subagent Architecture | 🚧 Phase 2 complete (session 13) | 2026-04-17 |
+| Stage | Status | Completed |
+|-------|--------|-----------|
+| 1 — Skills | ✅ | 2026-04-10 |
+| 2 — Dev Team | ✅ | 2026-04-10 |
+| 3 — Tools Team | ✅ | 2026-04-11 |
+| 4 — Content Pipeline Core | ✅ | 2026-04-12 |
+| 5 — Content Pipeline Write | ✅ | 2026-04-12 |
+| 6 — Publishing | ✅ | 2026-04-13 |
+| 7 — Launch | ✅ Live | 2026-04-15 |
+| 8 — Subagent Architecture | 🚧 Phase 2 complete | 2026-04-17 |
 
 ---
 
-## Last Session Summary
+## Last Session (2026-04-19, #21)
 
-**Session Date:** 2026-04-18 (session 20)
-**Session Goal:** Stage and schedule 7 QA-passed antigravity articles for Apr 19–20 drip publish.
-
-### Status: ✅ Complete — 7 articles staged, schedule committed and pushed
+**Status:** ✅ Linker subagent fully implemented + 45 internal links retrofitted into 21 live posts. Details in [session-history.md](session-history.md).
 
 ### What was done
 
-1. **Verified QA** — all 7 antigravity drafts already had `qa_status='passed'` in registry; spot-checked content looks clean.
+- Built `agents/content-team/link_utility.py` — rule-based internal link inserter (no LLM, 8 links max/post)
+- Built `agents/subagent-prompts/linker.md` — Haiku subagent for batch + retrofit modes
+- 8 pytest cases passing (`agents/content-team/tests/`)
+- Updated `publisher.md` staging query to `status='linked'`
+- Retired Gemini Flash link-insertion branch from `seo_optimizer.py`
+- Retrofitted 21 published posts (45 links) + 11 staged posts (14 links) — pushed live
 
-2. **Staged 7 articles** — moved from `agents/content-team/drafts/` to `content-staging/languages/{lang}/` via Python; registry updated to `status='staged'`.
-   - how-to-implement-singleton-design-pattern-in-javascript (javascript)
-   - how-to-parse-json-in-javascript (javascript)
-   - how-to-send-http-request-in-cpp (cpp)
-   - how-to-set-environment-variables-in-java (java)
-   - how-to-set-environment-variables-in-php (php)
-   - how-to-use-data-class-in-kotlin (kotlin)
-   - how-to-write-closure-in-swift (swift)
+### Next session priorities (#22)
 
-3. **Updated `.github/workflows/drip-publish.yml`**:
-   - Added `workflow_dispatch` count input (default: 3) for flexible manual triggering
-   - Added extra cron `0 10 20 4 *` (Apr 20 at 10:00 UTC, count=1) so 4 articles publish on Apr 20
-   - Publish count logic: workflow_dispatch uses input; `0 10 20 4 *` uses count=1; all other crons use count=3
+1. **Investigate missing staging file** — `python-file-handling-tutorial` is in registry as `staged` but file not found on disk; check if ingest failed or file is in wrong location, clean up registry if needed
+2. **Scale Writer** — run on 2 queued editorial posts (CSS/HTML minification)
+3. **Fix 2–3 minor website UI issues** (user will specify)
+4. **Verify GSC** — sitemap submission + indexing
+5. **Next antigravity batch** — ingest + QA + stage more languages articles
 
-4. **Drip schedule for the 7 new articles** (FIFO order, Apr 17 mtimes are oldest in queue):
-   - Apr 19 08:00 UTC (daily): singleton-js, parse-json-js, http-request-cpp
-   - Apr 20 08:00 UTC (daily): set-env-java, set-env-php, data-class-kotlin
-   - Apr 20 10:00 UTC (extra): write-closure-swift
-   - Apr 21 08:00 UTC (daily): lambda-java, dict-python, patterns-python (prior batch)
+### Deferred (do not do)
 
-### Next session priorities (session 21)
-
-1. **Scale Writer** — run Writer on 2 queued editorial posts (CSS minification, HTML minification)
-2. **Fix 2–3 minor website UI issues** (user noticed during review — not yet specified)
-3. **Verify GSC** — confirm sitemap submission + indexing working (if user completed GSC setup)
-4. **Next Antigravity batch** — ingest + QA + stage more languages articles
-
-### Deferred (do NOT do until traffic hits 50k visitors/month)
-- **AdSense integration** — explicitly deferred by user; revisit only at 50k visitors/month threshold
-
-### Deferred (unchanged)
-- Blog filter chips functional wiring (decorative only)
-- Search bar wiring (SearchBar.astro parked on disk)
+- **AdSense integration** — revisit only at 50k visitors/month
+- Blog filter chips wiring (decorative only)
+- Search bar wiring (`SearchBar.astro` parked)
 - Orphan `sitemap-generator-from-url.md` cleanup
-
-Historical session summaries (sessions 4–10) moved to [session-history.md](session-history.md).
 
 ---
 
-## Key File Locations
+## Key Paths
 
-**Architecture plan** — `development_stages/subagent-architecture-plan.md`  
-**Subagent prompts** — `agents/subagent-prompts/{planner,writer,ingest,antigravity-qa,builder,publisher}.md`  
-**Agent skills** — `agents/skills/{astro-conventions,content-schema,devnook-brand-voice,qa-rejection-criteria,seo-writing-rules,tool-build-patterns}.md`  
-**Registry** — `agents/content-team/registry.db` (25 columns, includes content_type + source)  
-**Drafts** — `agents/content-team/drafts/`  
-**Antigravity ingest source** — `../web_content/output/`  
-**Astro site** — `src/` (building cleanly, 60 pages, 17 tools)  
-**GitHub repo** — `https://github.com/syedjawad11/DevNook-.git` (main branch, Cloudflare Pages auto-deploy)
+- Subagent prompts: `agents/subagent-prompts/{planner,writer,ingest,antigravity-qa,builder,publisher}.md`
+- Skills: `agents/skills/{name}.md`
+- Registry: `agents/content-team/registry.db` (25 columns, includes content_type + source)
+- Drafts: `agents/content-team/drafts/`
+- Antigravity ingest source: `../web_content/output/`
+- Astro site: `src/`
+
+<!-- Architecture plan: development_stages/subagent-architecture-plan.md -->
 
 ---
 
@@ -98,90 +91,66 @@ Historical session summaries (sessions 4–10) moved to [session-history.md](ses
 ```
 ORCHESTRATOR (Opus/Sonnet main session)
   ├── Content Team
-  │   ├── Planner  (Haiku)  — keyword discovery → posts table (status=queued)
+  │   ├── Planner  (Haiku)  — keyword discovery → posts (status=queued)
   │   ├── Writer   (Sonnet) — drafts/{slug}.md (status=drafted, qa validated)
-  │   └── Ingest   (Haiku)  — ../web_content/output/ → drafts/ (status=drafted)
+  │   ├── Ingest   (Haiku)  — ../web_content/output/ → drafts/ (status=drafted)
+  │   ├── Antigravity QA (Sonnet) — fixes + approves antigravity drafts
+  │   └── Linker   (Haiku)  — inserts in-body links via link_utility.py (status=linked)
   ├── Dev Team
   │   └── Builder  (Sonnet) — Astro edits + npm run build
   └── Publish Team
-      └── Publisher (Haiku) — drafts → staging → src/content
-
-Orchestrator: spawns subagents, reviews JSON reports (~200 tokens each),
-              commits + pushes only on user approval.
-Python scripts: retained as non-LLM utilities (DB ops, file moves, HTTP scraping).
-  └── Antigravity QA (Sonnet) — fixes + approves antigravity drafts before publish
+      └── Publisher (Haiku) — linked drafts → staging → src/content
 ```
 
+Orchestrator spawns subagents, reviews JSON reports (~200 tok each), commits + pushes only on user approval. Python scripts retained as non-LLM utilities.
+
 **Workflow patterns:**
-- Pattern A (weekly content run): Planner → Ingest (parallel) → Writer (batch=5) → Publisher
-- Pattern A2 (Antigravity publish): Ingest → Antigravity QA (batch=10) → Publisher
-- Pattern B (new tool): Orchestrator checks spec → Builder → review + commit
-- Pattern C (bug fix): Orchestrator describes → Builder → review + commit
-- Pattern D (status check): inline sqlite3 query — no subagent needed
+- A — weekly content: Planner → Ingest (parallel) → Writer (batch=5) → Linker → Publisher
+- A2 — antigravity: Ingest → Antigravity QA (batch=10) → Linker → Publisher
+- B — new tool: Orchestrator → Builder → review + commit
+- C — bug fix: Orchestrator → Builder → review + commit
+- D — status check: inline sqlite3 query (no subagent)
 
 ---
 
 ## Important Decisions Log
 
-| Decision | Reason | Impact |
-|----------|--------|--------|
-| No Tailwind | Cleaner diffs, no purge complexity | All styles in tokens.css custom properties |
-| Plain Python scripts | No containers, no cloud scheduler | Local execution, simpler debugging |
-| SQLite + markdown for memory | No external memory framework | registry.db + PIPELINE_LOG.md |
-| 22 templates, round-robin | Prevents spam signals | Template counters tracked in registry.db |
-| Drip publish (not bulk) | Google Scaled Content Abuse mitigation | 2–3 posts/day via GitHub Actions |
-| All tools client-side only | API costs uncontrollable; privacy; zero infra | 18 tools, no Workers, no AI-powered tools |
-| Switched from hybrid to static output | OG endpoints import satori which crashes Cloudflare Workers runtime | `output: 'static'`, no adapter |
-| Global CSS in `public/styles/` not `src/styles/` | Astro only copies `public/` to `dist/`; absolute `/styles/*` refs need public/ | Never put absolute-path CSS in src/ |
-| PostCard prop is `href` not `slug` | All 5 call sites use `href`; was `slug` before session 8 | Never rename back to slug/url/path |
-| `tools/[slug].astro` uses `import.meta.glob` | Dynamic `await import()` crashes Vite static analysis | Never switch to dynamic import for tool loading |
-| Never call `build-tool.py build_tool()` for existing tools | Writes 3 files including page that collides with dynamic route | Call `generate_seo_explainer()` + `write_file()` directly |
-| Always uninstall adapter when removing from config | Package presence kept Pages in Functions mode even with `output: 'static'` | `npm uninstall` in same commit as config removal |
-| Nuclear reset beats debugging poisoned Pages state | Sessions 6–7 couldn't clear Functions-mode flags via commits or cache | Delete + recreate Pages project; preserve repo + DNS |
-| Subagent architecture replaces Python LLM pipeline | Monolithic Opus session burned context and token budget | 5 subagents (Haiku/Sonnet) in isolated contexts; Opus as orchestrator only |
-| Languages category owned by Antigravity | Clean firewall; DevNook editorial only (guides/blog/cheatsheets/tools) | Planner + Writer must never queue languages posts |
-| Antigravity QA never rejects | Gemini Pro 3.1 content trusted; QA fixes structural/SEO issues only | antigravity-qa subagent always sets qa_status='passed'; word range 1500–2500 |
-| Use `@astrojs/sitemap` not custom sitemap | Custom `sitemap-index.xml.ts` was broken (missing child sitemaps) | `@astrojs/sitemap@3.2.1` — v3.7+ incompatible with Astro 4.x |
+> Live guardrails only — if you forget these, you will break something. Historical reasoning in [archives/decisions-archive.md](archives/decisions-archive.md).
+
+| Decision | Impact |
+|----------|--------|
+| No Tailwind | All styles in `tokens.css` custom properties |
+| All tools client-side only | 18 tools, no Workers, no AI-powered tools |
+| Static output (not hybrid) | `output: 'static'`, no adapter — satori crashes Workers runtime |
+| Global CSS in `public/styles/` not `src/styles/` | Astro only copies `public/` to `dist/`; absolute `/styles/*` refs need public/ |
+| PostCard prop is `href` not `slug` | All 5 call sites use `href`; never rename to slug/url/path |
+| `tools/[slug].astro` uses `import.meta.glob` | Dynamic `await import()` crashes Vite static analysis |
+| Never call `build-tool.py build_tool()` for existing tools | Writes page that collides with dynamic route — use `generate_seo_explainer()` + `write_file()` |
+| Languages category owned by Antigravity | Planner + Writer must never queue languages posts |
+| Antigravity QA never rejects | Trusted Gemini Pro 3.1 content; QA fixes structural/SEO only, always sets `qa_status='passed'`, word range 1500–2500 |
+| Linker runs between QA/Writer and Publisher | Rule-based match first (`link_utility.py`), Haiku fill-in only if <3 links; Publisher staging query reads `status='linked'` |
+| Use `@astrojs/sitemap@3.2.1` not custom | Custom sitemap was broken; v3.7+ incompatible with Astro 4.x |
 
 ---
 
-## Environment Variables Required
+## Environment Variables
 
 ```bash
 ANTHROPIC_API_KEY=sk-ant-...       # writer, qa agents + tools-team
-GEMINI_API_KEY=AIza...             # legacy — not used in subagent architecture
-GOOGLE_SERVICE_ACCOUNT_JSON=...    # GSC Indexing API — add as GitHub secret for drip-publish
+GOOGLE_SERVICE_ACCOUNT_JSON=...    # GSC Indexing API — GitHub secret for drip-publish
 ```
 
 ---
 
-## Content Targets
-
-| Ring | Content Type | Target | Status |
-|------|-------------|--------|--------|
-| Ring 1 | Tool-adjacent guides | ~80 posts | 0 / 80 |
-| Ring 2 | Web dev fundamentals | ~200 posts | 0 / 200 |
-| Ring 3 | Language concepts | ~600+ posts | 0 / 600 |
-| Ring 4 | AI/comparison/editorial | ~200 posts | 0 / 200 |
-| Tools | Browser-based dev tools | 18 (client-side) | 0 / 18 |
-
-**Publishing velocity target:** 1,000+ posts in 6 months
-
----
-
-## How to Run (Subagent Architecture)
+## How to Run
 
 ```
-Invoke subagents via the Agent() tool in the main Opus/Sonnet session.
-Pass contents of agents/subagent-prompts/{name}.md as the prompt body.
+Invoke subagents via Agent() tool. Pass agents/subagent-prompts/{name}.md as prompt body.
 
-Status check (no subagent):
+Status check:
   python -c "import sqlite3; db=sqlite3.connect('agents/content-team/registry.db');
   [print(r) for r in db.execute('SELECT status, content_type, source, COUNT(*) FROM posts GROUP BY 1,2,3')]"
 
-Build site:
-  npm run build
-
-Dev server:
-  npm run dev
+Build:  npm run build
+Dev:    npm run dev
 ```
