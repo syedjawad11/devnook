@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 1219
 category: languages
 concept: goroutines
@@ -10,6 +9,7 @@ language: go
 og_image: og-default
 published_date: '2026-04-13'
 related_cheatsheet: ''
+related_content: []
 related_posts:
 - /languages/go/channels
 - /languages/go/context

@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 1246
 category: languages
 concept: json-decode
@@ -10,6 +9,7 @@ language: php
 og_image: og-default
 published_date: '2026-04-12'
 related_cheatsheet: ''
+related_content: []
 related_posts:
 - /languages/php/json-encode
 - /languages/php/arrays
@@ -34,7 +34,7 @@ template_id: lang-v1
 title: 'How to JSON Decode in PHP: Complete Guide'
 ---
 
-Learning how to JSON decode in PHP is essential for working with APIs, configuration files, and data interchange. PHP's `json_decode()` function converts JSON-formatted strings into native PHP data structures you can manipulate directly.
+Learning how to JSON decode in [PHP](/languages/php) is essential for working with APIs, configuration files, and data interchange. PHP's `json_decode()` function converts JSON-formatted strings into native PHP data structures you can manipulate directly.
 
 ## What is JSON Decode in PHP?
 

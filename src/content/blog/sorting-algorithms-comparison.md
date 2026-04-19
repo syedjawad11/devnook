@@ -1,11 +1,11 @@
 ---
-related_content: []
 actual_word_count: 1464
 category: blog
 description: Quick sort, merge sort, bubble sort — implemented in 4 languages. Understand
   O(n log n) vs O(n²) with visual complexity tables.
 og_image: /og/blog/sorting-algorithms-comparison.png
 published_date: '2026-04-13'
+related_content: []
 related_posts:
 - /languages/python/recursion
 - /guides/big-o-notation-guide
@@ -32,11 +32,11 @@ template_id: blog-v1
 title: 'Sorting Algorithms Explained: Python, JS, Go, and Java Side by Side'
 ---
 
-Sorting algorithms comparison is one of the first computer science topics developers encounter, yet understanding the practical performance differences between quick sort, merge sort, and bubble sort across languages remains valuable throughout your career. This guide implements the three most common sorting algorithms in Python, JavaScript, Go, and Java to show syntax patterns, built-in alternatives, and when time complexity matters.
+Sorting algorithms comparison is one of the first computer science topics developers encounter, yet understanding the practical performance differences between quick sort, merge sort, and bubble sort across languages remains valuable throughout your career. This guide implements the three most common sorting algorithms in Python, [JavaScript](/languages/javascript), Go, and Java to show syntax patterns, built-in alternatives, and when time complexity matters.
 
 ## TL;DR — Which Sorting Algorithm Should You Use?
 
-Use your language's built-in sort for production code unless you have a specific reason not to. All four languages implement optimized hybrid algorithms (Timsort in Python, merge-insertion in V8 JavaScript, pattern-defeating quicksort in Go, dual-pivot quicksort in Java) that outperform hand-rolled implementations. Write custom sorts only for educational purposes, specialized data structures, or when you need guaranteed worst-case performance.
+Use your language's built-in sort for production code unless you have a specific reason not to. All four languages implement optimized hybrid algorithms (Timsort in [Python](/languages/python), merge-insertion in V8 JavaScript, pattern-defeating quicksort in Go, dual-pivot quicksort in Java) that outperform hand-rolled implementations. Write custom sorts only for educational purposes, specialized data structures, or when you need guaranteed worst-case performance.
 
 | | Quick Sort | Merge Sort | Bubble Sort |
 |---|---|---|---|
@@ -76,7 +76,7 @@ Merge sort and bubble sort preserve the relative order of equal elements (stable
 
 ### Built-In Language Implementations
 
-Python uses Timsort (merge sort + insertion sort hybrid), JavaScript V8 uses Timsort as of 2018, Go uses pattern-defeating quicksort (quick sort variant), and Java uses dual-pivot quicksort for primitives and Timsort for objects. None use pure merge sort or naive quick sort because hybrid approaches perform better on real data.
+Python uses Timsort (merge sort + insertion sort hybrid), JavaScript V8 uses Timsort as of 2018, Go uses pattern-defeating quicksort (quick sort variant), and [Java](/languages/java) uses dual-pivot quicksort for primitives and Timsort for objects. None use pure merge sort or naive quick sort because hybrid approaches perform better on real data.
 
 ## Code Comparison — Quick Sort in Four Languages
 
@@ -112,7 +112,7 @@ const nums = [3, 6, 8, 10, 1, 2, 1];
 console.log(quicksort(nums));  // [1, 1, 2, 3, 6, 8, 10]
 ```
 
-**Go**
+**[Go](/languages/go)**
 ```go
 func quicksort(arr []int) []int {
     if len(arr) <= 1 {

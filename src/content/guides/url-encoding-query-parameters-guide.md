@@ -1,18 +1,24 @@
 ---
-title: "URL Encoding and Query Parameters: Complete Developer Guide"
-description: "Understand URL encoding, percent encoding, and how to safely encode query parameters to avoid bugs and security issues."
 category: guides
-template_id: guide-v1
 content_type: editorial
-tags: [url-encoding, percent-encoding, query-parameters, http, web-development]
+description: Understand URL encoding, percent encoding, and how to safely encode query
+  parameters to avoid bugs and security issues.
+og_image: /og/guides/url-encoding-query-parameters-guide.png
+published_date: '2026-04-17'
 related_posts:
-  - /guides/base64-encoding-decoding-guide
-  - /guides/json-formatter-validator-best-practices
-  - /blog/http-request-anatomy
+- /guides/base64-encoding-decoding-guide
+- /guides/json-formatter-validator-best-practices
+- /blog/http-request-anatomy
 related_tools:
-  - /tools/url-encoder-decoder
-published_date: "2026-04-17"
-og_image: "/og/guides/url-encoding-query-parameters-guide.png"
+- /tools/url-encoder-decoder
+tags:
+- url-encoding
+- percent-encoding
+- query-parameters
+- http
+- web-development
+template_id: guide-v1
+title: 'URL Encoding and Query Parameters: Complete Developer Guide'
 word_count_target: 1800
 ---
 
@@ -154,7 +160,7 @@ console.log(params.toString());
 // q=python+url+encoding&page=2&redirect=https%3A%2F%2Fexample.com%2Fpath%3Fkey%3Dvalue
 ```
 
-`URLSearchParams` is the right tool for building query strings in modern JavaScript. It handles encoding, serialization, and appending parameters without manual string concatenation.
+`URLSearchParams` is the right tool for building query strings in modern [JavaScript](/languages/javascript). It handles encoding, serialization, and appending parameters without manual string concatenation.
 
 ```javascript
 // Decoding
@@ -187,7 +193,7 @@ print(safe_url)
 # https://example.com/query?q=search%3Fredirect%3Dhttps%3A%2F%2Fevil.com — correct
 ```
 
-For full URL construction in Python, `urllib.parse.urlencode()` plus `urllib.parse.urlunparse()` gives you precise control over each URL component:
+For full URL construction in [Python](/languages/python), `urllib.parse.urlencode()` plus `urllib.parse.urlunparse()` gives you precise control over each URL component:
 
 ```python
 import urllib.parse

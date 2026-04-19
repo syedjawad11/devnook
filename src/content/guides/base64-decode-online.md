@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 1527
 category: guides
 description: Decode or encode Base64 strings instantly in your browser. Learn what
@@ -7,6 +6,7 @@ description: Decode or encode Base64 strings instantly in your browser. Learn wh
 og_image: /og/guides/base64-decode-online.png
 published_date: '2026-04-13'
 related_cheatsheet: /cheatsheets/http-headers
+related_content: []
 related_posts:
 - /guides/what-is-url-encoding
 - /guides/understanding-character-encodings
@@ -103,7 +103,7 @@ This example shows the core transformation — binary data represented as readab
 
 ## When You'll Use This
 
-- **Data URIs in HTML/CSS**: Embedding small images directly in markup with `data:image/png;base64,iVBORw0K...` to reduce HTTP requests
+- **Data URIs in HTML/CSS**: Embedding small images directly in markup with `data:image/png;base64,iVBORw0K...` to reduce [HTTP requests](/languages/cpp/http-requests)
 - **Basic authentication headers**: HTTP Basic Auth sends credentials as `Authorization: Basic <base64(username:password)>` — it's Base64, not encryption, so use HTTPS
 - **Storing binary data in databases**: Some legacy systems store files as Base64 text in VARCHAR columns instead of BLOB types
 - **JSON API responses**: Returning binary files (PDFs, images, certificates) from REST APIs that only support JSON payloads
@@ -112,7 +112,7 @@ This example shows the core transformation — binary data represented as readab
 ## Frequently Asked Questions
 
 **Can I decode Base64 without installing anything?**
-Yes. Use an online Base64 decoder like [DevNook's tool](/tools/base64-decoder). It runs entirely in your browser with JavaScript — no server uploads, no privacy concerns. Paste the encoded string, click decode, get your result instantly.
+Yes. Use an online Base64 decoder like [DevNook's tool](/tools/base64-decoder). It runs entirely in your browser with [JavaScript](/languages/javascript) — no server uploads, no privacy concerns. Paste the encoded string, click decode, get your result instantly.
 
 **Is Base64 the same as encryption?**
 No. Base64 is encoding for compatibility, not security. Encryption scrambles data with a key so only authorized parties can read it. Base64 just changes the format. Anyone can decode Base64 with no password or key. Never rely on Base64 to protect sensitive information.
@@ -145,7 +145,7 @@ const base64 = buffer.toString('base64');
 const original = Buffer.from(base64, 'base64');
 ```
 
-**Python**
+**[Python](/languages/python)**
 
 ```python
 import base64

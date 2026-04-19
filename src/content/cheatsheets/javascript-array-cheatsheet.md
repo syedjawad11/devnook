@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 1083
 category: cheatsheets
 concept: array-methods
@@ -9,6 +8,7 @@ download_png: false
 language: javascript
 og_image: /og/cheatsheets/javascript-array-cheatsheet.png
 published_date: '2026-04-13'
+related_content: []
 related_posts:
 - /languages/javascript/array-destructuring
 - /languages/javascript/map-vs-foreach
@@ -33,7 +33,7 @@ template_id: cheatsheet-v1
 title: 'JavaScript Array Methods Cheat Sheet: Quick Reference Guide'
 ---
 
-This JavaScript array cheatsheet covers every array method from ES5 through ES2023, organized by use case with syntax, parameters, and return values.
+This [JavaScript](/languages/javascript) array cheatsheet covers every array method from ES5 through ES2023, organized by use case with syntax, parameters, and return values.
 
 ## Creating & Converting Arrays
 
@@ -243,4 +243,4 @@ arr.fill(9, 1, 3);                // [1, 9, 9] (from index 1 to 3)
 
 ## Related
 
-For deep dives into specific array methods, see our guide on [JavaScript map vs forEach](/languages/javascript/map-vs-foreach) and [array destructuring patterns](/languages/javascript/array-destructuring). Test array methods interactively with our [JavaScript REPL](/tools/javascript-repl).
+For deep dives into specific [array methods](/languages/javascript/array-methods), see our guide on [JavaScript map vs forEach](/languages/javascript/map-vs-foreach) and [array destructuring patterns](/languages/javascript/array-destructuring). Test array methods interactively with our [JavaScript REPL](/tools/javascript-repl).

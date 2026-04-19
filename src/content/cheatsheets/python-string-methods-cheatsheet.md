@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 919
 category: cheatsheets
 concept: string-methods
@@ -9,6 +8,7 @@ download_png: false
 language: python
 og_image: /og/cheatsheets/python-string-methods.png
 published_date: '2026-04-13'
+related_content: []
 related_posts:
 - /languages/python/f-strings
 - /languages/python/list-comprehensions
@@ -34,7 +34,7 @@ template_id: cheatsheet-v2
 title: 'Python String Methods Cheat Sheet: split, join, replace, format & More'
 ---
 
-This Python string methods cheatsheet covers every built-in string operation you'll use regularly, organized by what you're trying to accomplish. Whether you're splitting CSV data, cleaning user input, or formatting output, the method you need is here.
+This [Python](/languages/python) string methods cheatsheet covers every built-in string operation you'll use regularly, organized by what you're trying to accomplish. Whether you're splitting CSV data, cleaning user input, or formatting output, the method you need is here.
 
 ## Splitting & Joining Strings
 

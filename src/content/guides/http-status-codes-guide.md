@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 2336
 category: guides
 description: Every HTTP status code explained with real-world examples. Bookmark this
@@ -7,6 +6,7 @@ description: Every HTTP status code explained with real-world examples. Bookmark
 og_image: /og/guides/http-status-codes-guide.png
 published_date: '2026-04-13'
 related_cheatsheet: /cheatsheets/http-status-codes
+related_content: []
 related_posts:
 - /guides/what-is-rest-api
 - /guides/http-methods-explained
@@ -184,7 +184,7 @@ When debugging HTTP issues, start by identifying which class the status code bel
 
 Modern browser developer tools show status codes in the Network tab. For API development, tools like our [HTTP request tester](/tools/http-request-tester) let you inspect full request-response cycles including headers and timing information.
 
-Here's a basic example of checking status codes in JavaScript:
+Here's a basic example of checking status codes in [JavaScript](/languages/javascript):
 
 ```javascript
 async function fetchWithErrorHandling(url) {
@@ -211,7 +211,7 @@ async function fetchWithErrorHandling(url) {
 }
 ```
 
-And in Python with requests:
+And in [Python](/languages/python) with requests:
 
 ```python
 import requests

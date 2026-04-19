@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 1044
 category: languages
 concept: closures
@@ -10,6 +9,7 @@ language: javascript
 og_image: og-default
 published_date: '2026-04-13'
 related_cheatsheet: ''
+related_content: []
 related_posts:
 - /languages/javascript/arrow-functions
 - /languages/javascript/promises
@@ -33,7 +33,7 @@ template_id: lang-v1
 title: 'JavaScript Closures: What They Are and Why They Matter'
 ---
 
-JavaScript closures are functions that retain access to variables from their outer scope even after that scope has finished executing. Every JavaScript developer encounters closures whether they realize it or not — they're the mechanism behind callbacks, event handlers, and most modern JavaScript patterns.
+[JavaScript](/languages/javascript) closures are functions that retain access to variables from their outer scope even after that scope has finished executing. Every JavaScript developer encounters closures whether they realize it or not — they're the mechanism behind callbacks, event handlers, and most modern JavaScript patterns.
 
 ## What is a Closure in JavaScript?
 

@@ -1,18 +1,24 @@
 ---
-title: "Base64 Encoding and Decoding: A Complete Developer Guide"
-description: "Learn how Base64 encoding works, when to use it, and best practices for encoding/decoding data in your applications."
 category: guides
-template_id: guide-v1
 content_type: editorial
-tags: [base64, encoding, decoding, data-formats, web-development]
+description: Learn how Base64 encoding works, when to use it, and best practices for
+  encoding/decoding data in your applications.
+og_image: /og/guides/base64-encoding-decoding-guide.png
+published_date: '2026-04-17'
 related_posts:
-  - /guides/url-encoding-query-parameters-guide
-  - /guides/json-formatter-validator-best-practices
-  - /blog/binary-data-web-formats
+- /guides/url-encoding-query-parameters-guide
+- /guides/json-formatter-validator-best-practices
+- /blog/binary-data-web-formats
 related_tools:
-  - /tools/base64-encoder-decoder
-published_date: "2026-04-17"
-og_image: "/og/guides/base64-encoding-decoding-guide.png"
+- /tools/base64-encoder-decoder
+tags:
+- base64
+- encoding
+- decoding
+- data-formats
+- web-development
+template_id: guide-v1
+title: 'Base64 Encoding and Decoding: A Complete Developer Guide'
 word_count_target: 1800
 ---
 
@@ -240,7 +246,7 @@ print(safe_decode("SGVsbG8"))  # b'Hello'  — missing padding handled
 
 ### Encoding Strings vs Bytes
 
-Python 3 requires explicit encoding before calling `b64encode`:
+[Python](/languages/python) 3 requires explicit encoding before calling `b64encode`:
 
 ```python
 import base64
@@ -341,7 +347,7 @@ Base64 is CPU-cheap and appropriate for most use cases. Watch for these patterns
 - **Large files**: Do not load the entire file into memory before encoding. Use streaming in multiples of 3-byte chunks as shown above.
 - **Repeated encoding in hot paths**: Cache encoded results when the source data is immutable.
 - **JSON payload size**: Base64 adds 33% overhead. If bandwidth is a concern, binary protocols (MessagePack, Protocol Buffers) or multipart form uploads are more efficient alternatives.
-- **Browser memory**: When handling user-uploaded files in JavaScript, use the `FileReader` API with `readAsDataURL()` which performs Base64 encoding natively without manual string manipulation.
+- **Browser memory**: When handling user-uploaded files in [JavaScript](/languages/javascript), use the `FileReader` API with `readAsDataURL()` which performs Base64 encoding natively without manual string manipulation.
 
 ## Base64 vs Other Encoding Approaches
 

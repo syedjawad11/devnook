@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 1278
 category: languages
 concept: promises
@@ -10,6 +9,7 @@ language: javascript
 og_image: /og/languages/javascript/promises.png
 published_date: '2026-04-13'
 related_cheatsheet: /cheatsheets/javascript-async-patterns
+related_content: []
 related_posts:
 - /languages/javascript/async-functions
 - /languages/javascript/fetch-api
@@ -34,7 +34,7 @@ template_id: lang-v3
 title: 'JavaScript Promises Explained: then(), catch(), and async/await'
 ---
 
-JavaScript Promises are objects representing the eventual completion or failure of an asynchronous operation. They provide a cleaner alternative to callback-based async code and form the foundation of modern async/await syntax.
+JavaScript Promises are objects representing the eventual completion or failure of an asynchronous operation. They provide a cleaner alternative to callback-based async code and form the foundation of modern [async/await](/languages/rust/async-await) syntax.
 
 ## Syntax at a Glance
 
@@ -186,14 +186,14 @@ Avoid Promises for synchronous operations — wrapping `Math.random()` in a Prom
 
 ## Quick Comparison: JavaScript vs Python
 
-| | JavaScript | Python |
+| | [JavaScript](/languages/javascript) | Python |
 |---|---|---|
 | **Syntax** | `new Promise((resolve, reject) => {})` | `asyncio.Future()` or `asyncio.create_task()` |
 | **Async keyword** | `async function foo() {}` | `async def foo():` |
 | **Await keyword** | `await promise` | `await coroutine` |
 | **Error handling** | `.catch()` or `try/catch` | `try/except` with `await` |
 | **Parallel execution** | `Promise.all([p1, p2])` | `asyncio.gather(t1, t2)` |
-| **Built-in support** | Native since ES6 (2015) | Native since Python 3.5 (2015) |
+| **Built-in support** | Native since ES6 (2015) | Native since [Python](/languages/python) 3.5 (2015) |
 
 JavaScript Promises are first-class language features, while Python's equivalent uses the `asyncio` library. JavaScript's `.then()` chaining has no direct Python equivalent — Python relies entirely on `async/await` syntax.
 
@@ -276,4 +276,4 @@ console.log(results);
 
 ## Related
 
-Learn how [async functions](/languages/javascript/async-functions) build on Promises to simplify asynchronous code. See the [Fetch API guide](/languages/javascript/fetch-api) for real-world Promise usage in HTTP requests. Check the [Asynchronous JavaScript Guide](/guides/asynchronous-javascript-guide) for a complete overview of async patterns. Test Promise code interactively with the [JavaScript REPL](/tools/javascript-repl). Reference the [JavaScript Async Patterns Cheat Sheet](/cheatsheets/javascript-async-patterns) for quick syntax reminders.
+Learn how [async functions](/languages/javascript/async-functions) build on Promises to simplify asynchronous code. See the [Fetch API guide](/languages/javascript/fetch-api) for real-world Promise usage in [HTTP requests](/languages/cpp/http-requests). Check the [Asynchronous JavaScript Guide](/guides/asynchronous-javascript-guide) for a complete overview of async patterns. Test Promise code interactively with the [JavaScript REPL](/tools/javascript-repl). Reference the [JavaScript Async Patterns Cheat Sheet](/cheatsheets/javascript-async-patterns) for quick syntax reminders.
