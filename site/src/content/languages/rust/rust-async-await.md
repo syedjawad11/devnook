@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 1291
 category: languages
 concept: async-await
@@ -10,6 +9,7 @@ language: rust
 og_image: /og/languages/rust/async-await.png
 published_date: '2026-04-12'
 related_cheatsheet: /cheatsheets/rust-concurrency
+related_content: []
 related_posts:
 - /languages/rust/lifetimes
 - /languages/rust/error-handling
@@ -63,7 +63,7 @@ This blocking approach forces requests to wait on each other. Each `fetch_user` 
 
 ## The Rust Solution: Async/Await
 
-Understanding how async/await works in Rust requires recognizing that it's a zero-cost abstraction for cooperative multitasking. Rust's async/await transforms your code into state machines called futures that can pause execution and resume later without blocking threads.
+Understanding how [async/await](/languages/typescript/async-await) works in Rust requires recognizing that it's a zero-cost abstraction for cooperative multitasking. Rust's async/await transforms your code into state machines called futures that can pause execution and resume later without blocking threads.
 
 ```rust
 use tokio::time::{sleep, Duration};
@@ -102,7 +102,7 @@ Unlike languages with built-in async runtimes, Rust lets you choose your executo
 
 ## Going Further — Real-World Patterns
 
-**Pattern 1: Concurrent HTTP Requests with Error Handling**
+**Pattern 1: Concurrent [HTTP Requests](/languages/cpp/http-requests) with Error Handling**
 
 ```rust
 use reqwest;

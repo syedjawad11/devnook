@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 1407
 category: languages
 concept: array-methods
@@ -10,6 +9,7 @@ language: javascript
 og_image: /og/languages/javascript/array-methods.png
 published_date: '2026-04-13'
 related_cheatsheet: /cheatsheets/javascript-array-methods
+related_content: []
 related_posts:
 - /languages/javascript/arrow-functions
 - /languages/javascript/destructuring
@@ -32,7 +32,7 @@ template_id: lang-v3
 title: 'JavaScript Array Methods: map(), filter(), reduce() and More'
 ---
 
-JavaScript array methods transform how you process collections. Instead of writing loops, these functional methods let you express data transformations declaratively in a single line.
+[JavaScript](/languages/javascript) array methods transform how you process collections. Instead of writing loops, these functional methods let you express data transformations declaratively in a single line.
 
 ## Syntax at a Glance
 
@@ -202,7 +202,7 @@ For async operations, use `for await...of` or `Promise.all()` with `map()`, not 
 
 ## Quick Comparison: JavaScript vs Python
 
-| | JavaScript | Python |
+| | JavaScript | [Python](/languages/python) |
 |---|---|---|
 | Transform | `arr.map(x => x * 2)` | `[x * 2 for x in arr]` |
 | Filter | `arr.filter(x => x > 0)` | `[x for x in arr if x > 0]` |

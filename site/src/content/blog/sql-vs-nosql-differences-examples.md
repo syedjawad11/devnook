@@ -1,11 +1,11 @@
 ---
-related_content: []
 actual_word_count: 1637
 category: blog
 description: 'SQL vs NoSQL: learn key differences, performance characteristics, use
   cases, and when to choose each database type with practical code examples.'
 og_image: /og/blog/sql-vs-nosql-differences-examples.png
 published_date: '2026-04-12'
+related_content: []
 related_posts:
 - /guides/database-normalization
 - /guides/rest-api-design

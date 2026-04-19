@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 936
 category: tools
 concept: null
@@ -10,6 +9,7 @@ language: null
 og_image: /og/tools/sitemap-generator-from-url.png
 published_date: '2026-04-12'
 related_cheatsheet: /cheatsheets/http-status-codes
+related_content: []
 related_guides:
 - /guides/xml-sitemaps-explained
 - /guides/seo-basics-for-developers
@@ -65,7 +65,7 @@ XML sitemaps follow a specific schema. Each URL entry includes the `<loc>` eleme
 
 Sitemap generators use web crawling algorithms similar to search engine bots. Starting from the seed URL, the crawler fetches the page HTML, parses it for anchor tags, extracts href attributes, and adds discovered URLs to a queue. The process repeats recursively until all reachable pages are found or a maximum depth limit is reached.
 
-The crawler respects `robots.txt` directives to avoid disallowed paths. It follows only internal links (same domain) and ignores external links, JavaScript-generated URLs (unless executing JavaScript), and links with `rel="nofollow"`. The result is a complete map of your site's static structure.
+The crawler respects `robots.txt` directives to avoid disallowed paths. It follows only internal links (same domain) and ignores external links, [JavaScript](/languages/javascript)-generated URLs (unless executing JavaScript), and links with `rel="nofollow"`. The result is a complete map of your site's static structure.
 
 ## Sitemap Limits and Best Practices
 

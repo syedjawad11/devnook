@@ -1,5 +1,4 @@
 ---
-related_content: []
 actual_word_count: 1109
 category: languages
 concept: async-await
@@ -10,6 +9,7 @@ language: typescript
 og_image: /og/languages/typescript/async-await.png
 published_date: '2026-04-12'
 related_cheatsheet: /cheatsheets/typescript-async-patterns
+related_content: []
 related_posts:
 - /languages/javascript/promises
 - /languages/python/async-await
@@ -34,11 +34,11 @@ template_id: lang-v4
 title: Async Await in TypeScript — How It Compares to Python, Go & More
 ---
 
-TypeScript's async/await syntax provides a clean, readable way to handle asynchronous operations with the added benefit of static type checking. If you're wondering how to use async await in TypeScript, the language builds on JavaScript's foundation while adding compile-time safety that catches errors before runtime. Every major programming language now has some form of asynchronous programming support, but each makes different design choices about syntax, error handling, and type safety.
+TypeScript's [async/await](/languages/rust/async-await) syntax provides a clean, readable way to handle asynchronous operations with the added benefit of static type checking. If you're wondering how to use async await in TypeScript, the language builds on JavaScript's foundation while adding compile-time safety that catches errors before runtime. Every major programming language now has some form of asynchronous programming support, but each makes different design choices about syntax, error handling, and type safety.
 
 ## How TypeScript Handles Async Await
 
-TypeScript treats async functions as functions that always return a Promise, with the type system tracking both the resolved value type and potential errors. This design decision means you get editor autocomplete and compile-time checks for your asynchronous code, catching type mismatches that would be runtime errors in JavaScript.
+TypeScript treats async functions as functions that always return a Promise, with the type system tracking both the resolved value type and potential errors. This design decision means you get editor autocomplete and compile-time checks for your asynchronous code, catching type mismatches that would be runtime errors in [JavaScript](/languages/javascript).
 
 The language requires explicit Promise typing in function signatures, making the asynchronous nature of your code visible in the type signature itself. This transparency helps prevent common mistakes like forgetting to await a Promise or trying to use the result before it resolves.
 
@@ -73,11 +73,11 @@ async function displayUserInfo(id: number): Promise<void> {
 }
 ```
 
-TypeScript's approach means you declare what type a Promise will resolve to, and the compiler enforces that contract throughout your codebase. The `async` keyword automatically wraps the return value in a Promise, so returning `User` in an async function actually returns `Promise<User>`. This implicit wrapping is identical to JavaScript but with type checking layered on top.
+[TypeScript](/languages/typescript)'s approach means you declare what type a Promise will resolve to, and the compiler enforces that contract throughout your codebase. The `async` keyword automatically wraps the return value in a Promise, so returning `User` in an async function actually returns `Promise<User>`. This implicit wrapping is identical to JavaScript but with type checking layered on top.
 
 ## The Same Concept in Other Languages
 
-**Python**
+**[Python](/languages/python)**
 ```python
 import asyncio
 import aiohttp
@@ -120,7 +120,7 @@ async function displayUserInfo(id) {
 }
 ```
 
-**Rust**
+**[Rust](/languages/rust)**
 ```rust
 use reqwest;
 use serde::{Deserialize, Serialize};
@@ -207,7 +207,7 @@ TypeScript inherits JavaScript's async/await syntax by design, maintaining full 
 
 The explicit Promise typing requirement serves a practical purpose beyond type safety. When you see `Promise<User>` in a function signature, you immediately know three things: the function is asynchronous, it will eventually resolve to a User object, and you need to await it or handle it as a Promise. This visibility reduces cognitive load when reading unfamiliar code.
 
-TypeScript's approach to error handling stays true to JavaScript's exception model rather than adopting Rust's Result type or Go's explicit error returns. This consistency means existing JavaScript patterns and libraries work without modification, preserving the ecosystem's value while adding safety rails through the type system.
+TypeScript's approach to error handling stays true to JavaScript's exception model rather than adopting Rust's Result type or [Go](/languages/go)'s explicit error returns. This consistency means existing JavaScript patterns and libraries work without modification, preserving the ecosystem's value while adding safety rails through the type system.
 
 ## When to Pick TypeScript for Async Operations
 
