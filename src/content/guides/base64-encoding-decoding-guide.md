@@ -8,9 +8,7 @@ published_date: '2026-04-17'
 related_posts:
 - /guides/url-encoding-query-parameters-guide
 - /guides/json-formatter-validator-best-practices
-- /blog/binary-data-web-formats
-related_tools:
-- /tools/base64-encoder-decoder
+related_tools: []
 tags:
 - base64
 - encoding
@@ -362,8 +360,8 @@ Hex encoding is easier to read during debugging but doubles the data size. Base6
 
 ## Try It in Your Browser
 
-The [DevNook Base64 Encoder/Decoder tool](/tools/base64-encoder-decoder) lets you encode and decode Base64 instantly in your browser without sending data to any server. Paste in any text or binary string, select standard or URL-safe mode, and get the result immediately.
+The DevNook Base64 Encoder/Decoder tool lets you encode and decode Base64 instantly in your browser without sending data to any server. Paste in any text or binary string, select standard or URL-safe mode, and get the result immediately.
 
-For working with URL-encoded strings, see the [URL Encoding and Query Parameters guide](/guides/url-encoding-query-parameters-guide). To validate JSON payloads that contain Base64-encoded fields, the [JSON Formatter and Validator](/tools/json-formatter-validator) helps catch structural errors before they reach production.
+For working with URL-encoded strings, see the [URL Encoding and Query Parameters guide](/guides/url-encoding-query-parameters-guide). To validate JSON payloads that contain Base64-encoded fields, the [JSON Formatter and Validator](/tools/json-formatter) helps catch structural errors before they reach production.
 
 Base64 is a reliable, well-understood standard. Understanding its mechanics—the 3-byte grouping, the 64-character alphabet, the padding rules—removes the mystery and makes debugging encoding problems straightforward.

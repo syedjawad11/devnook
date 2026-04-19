@@ -5,13 +5,10 @@ description: Unix timestamps count seconds since January 1, 1970. Learn why deve
   use them, how they work, and how to convert timestamps in any language.
 og_image: /og/guides/unix-timestamp-explained.png
 published_date: '2026-04-13'
-related_cheatsheet: /cheatsheets/date-time-conversions
+related_cheatsheet: ''
 related_content: []
-related_posts:
-- /guides/iso-8601-date-format
-- /guides/timezones-explained
-related_tools:
-- /tools/timestamp-converter
+related_posts: []
+related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"Article\",\n  \"headline\": \"Unix Timestamp: What It Is and How\
   \ to Convert It\",\n  \"description\": \"Unix timestamps count seconds since January\
@@ -263,10 +260,9 @@ Store timestamps as `BIGINT` (or `INTEGER` if you're certain all dates are after
 
 The 64-bit timestamp standard effectively solves the 2038 problem for modern systems. Languages and databases have largely migrated to 64-bit integers, which support dates until the year 292,277,026,596. By that point, we'll have different problems.
 
-Some newer systems use alternative formats. [ISO 8601](/guides/iso-8601-date-format) provides human-readable timestamps with time zone support. Protocol Buffers uses a Timestamp message with seconds and nanoseconds fields. However, Unix timestamps remain the de facto standard for system-level time tracking due to their simplicity and universal support.
+Some newer systems use alternative formats. ISO 8601 provides human-readable timestamps with time zone support. Protocol Buffers uses a Timestamp message with seconds and nanoseconds fields. However, Unix timestamps remain the de facto standard for system-level time tracking due to their simplicity and universal support.
 
 For most applications, Unix timestamps are the right choice. They're compact, fast to compare, easy to store, and supported everywhere. When you need human readability or explicit time zone information, convert to ISO 8601 or another format for display.
 
-## Related
 
-Use our [timestamp converter tool](/tools/timestamp-converter) to convert between Unix timestamps and human-readable dates in real-time. For more on date formats, see our guide on [ISO 8601 date formatting](/guides/iso-8601-date-format) and our explanation of [how time zones work](/guides/timezones-explained). Check the [date and time conversion cheat sheet](/cheatsheets/date-time-conversions) for quick reference on common conversions.
+Use our timestamp converter tool to convert between Unix timestamps and human-readable dates in real-time. For more on date formats, see our guide on ISO 8601 date formatting and our explanation of how time zones work. Check the date and time conversion cheat sheet for quick reference on common conversions.

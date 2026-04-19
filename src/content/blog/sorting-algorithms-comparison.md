@@ -7,12 +7,8 @@ og_image: /og/blog/sorting-algorithms-comparison.png
 published_date: '2026-04-13'
 related_content: []
 related_posts:
-- /languages/python/recursion
-- /guides/big-o-notation-guide
 - /languages/javascript/array-methods
-related_tools:
-- /tools/code-formatter
-- /tools/python-repl
+related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"BlogPosting\",\n  \"headline\": \"Sorting Algorithms Explained:\
   \ Python, JS, Go, and Java Side by Side\",\n  \"description\": \"Quick sort, merge\
@@ -243,11 +239,10 @@ Merge sort requires a separate merge function to combine sorted halves. The merg
 
 Use your language's built-in sort: `sorted()` in Python, `Array.sort()` in JavaScript, `sort.Slice()` in Go, `Collections.sort()` or `Arrays.sort()` in Java. These implementations are faster, battle-tested, and handle edge cases you'll miss in a custom implementation.
 
-Write custom sorting algorithms to understand recursion, time complexity analysis, and algorithm tradeoffs. Reference the implementations in this guide when learning [recursion patterns](/languages/python/recursion) or studying [Big O notation](/guides/big-o-notation-guide). For production sorting needs, benchmark your language's built-in against specialized libraries if performance profiling shows sorting is a bottleneck.
+Write custom sorting algorithms to understand recursion, time complexity analysis, and algorithm tradeoffs. Reference the implementations in this guide when learning recursion patterns or studying Big O notation. For production sorting needs, benchmark your language's built-in against specialized libraries if performance profiling shows sorting is a bottleneck.
 
-## Related
 
-- [Python Recursion: Base Cases and Stack Depth](/languages/python/recursion)
-- [Big O Notation: The Complete Guide](/guides/big-o-notation-guide)
-- [JavaScript Array Methods Cheat Sheet](/cheatsheets/javascript-array-methods)
-- [Code Formatter Tool](/tools/code-formatter)
+- Python Recursion: Base Cases and Stack Depth
+- Big O Notation: The Complete Guide
+- JavaScript Array Methods Cheat Sheet
+- Code Formatter Tool

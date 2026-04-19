@@ -6,13 +6,9 @@ description: JWTs are the industry standard for stateless authentication. Unders
   the header, payload, signature — and when not to use JWT.
 og_image: /og/guides/what-is-jwt.png
 published_date: '2026-04-13'
-related_cheatsheet: /cheatsheets/http-status-codes
-related_posts:
-- /guides/what-is-rest-api
-- /guides/oauth2-explained
-- /guides/session-vs-token-auth
+related_cheatsheet: ''
+related_posts: []
 related_tools:
-- /tools/jwt-debugger
 - /tools/base64-encoder
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"Article\",\n  \"headline\": \"What is JWT? JSON Web Tokens Explained\
@@ -175,7 +171,7 @@ Decode the second part (payload):
 }
 ```
 
-The third part is the signature — a cryptographic hash that you verify against the header and payload using the secret key. You can use our [JWT Debugger](/tools/jwt-debugger) to inspect tokens without revealing your secret.
+The third part is the signature — a cryptographic hash that you verify against the header and payload using the secret key. You can use our JWT Debugger to inspect tokens without revealing your secret.
 
 ## Security Best Practices
 
@@ -217,8 +213,7 @@ HMAC algorithms (HS256, HS384, HS512) use the same secret for signing and verifi
 - Signing algorithms like HS256 (symmetric) work for single applications, while RS256 (asymmetric) suits microservices architectures where multiple services verify but don't issue tokens
 - JWTs aren't encrypted by default — never store sensitive data in the payload, and use JWE if encryption is required
 
-## Related
 
-For authentication workflows that use JWTs, see our guide on [OAuth 2.0 Explained](/guides/oauth2-explained). Compare token-based authentication with session-based approaches in [Session vs Token Authentication](/guides/session-vs-token-auth). To understand the APIs that commonly use JWTs, read [What is a REST API?](/guides/what-is-rest-api)
+For authentication workflows that use JWTs, see our guide on OAuth 2.0 Explained. Compare token-based authentication with session-based approaches in Session vs Token Authentication. To understand the APIs that commonly use JWTs, read What is a REST API?
 
-Use our [JWT Debugger](/tools/jwt-debugger) to decode and inspect tokens during development, and [Base64 Encoder](/tools/base64-encoder) to understand how header and payload encoding works.
+Use our JWT Debugger to decode and inspect tokens during development, and [Base64 Encoder](/tools/base64-encoder) to understand how header and payload encoding works.

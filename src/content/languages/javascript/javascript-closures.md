@@ -11,9 +11,7 @@ published_date: '2026-04-13'
 related_cheatsheet: ''
 related_content: []
 related_posts:
-- /languages/javascript/arrow-functions
 - /languages/javascript/promises
-- /languages/javascript/async-await
 related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"TechArticle\",\n  \"headline\": \"JavaScript Closures: What They\
@@ -170,4 +168,4 @@ Think of scope as the rulebook for variable access, and closures as the memory s
 
 ## Next Steps
 
-After understanding closures, explore [arrow functions](/languages/javascript/arrow-functions) to learn how they handle `this` differently in closures. Then study [promises](/languages/javascript/promises) and [async/await](/languages/javascript/async-await), which rely heavily on closures for managing asynchronous state. For more JavaScript fundamentals, visit our [JavaScript language hub](/languages/javascript).
+After understanding closures, explore arrow functions to learn how they handle `this` differently in closures. Then study [promises](/languages/javascript/promises) and async/await, which rely heavily on closures for managing asynchronous state. For more JavaScript fundamentals, visit our [JavaScript language hub](/languages/javascript).

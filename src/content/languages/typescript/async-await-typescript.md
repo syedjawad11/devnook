@@ -8,14 +8,12 @@ difficulty: intermediate
 language: typescript
 og_image: /og/languages/typescript/async-await.png
 published_date: '2026-04-12'
-related_cheatsheet: /cheatsheets/typescript-async-patterns
+related_cheatsheet: ''
 related_content: []
 related_posts:
 - /languages/javascript/promises
-- /languages/python/async-await
 - /languages/rust/async-await
-related_tools:
-- /tools/typescript-playground
+related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"TechArticle\",\n  \"headline\": \"Async Await in TypeScript —\
   \ How It Compares to Python, Go & More\",\n  \"description\": \"How TypeScript handles\
@@ -224,7 +222,4 @@ TypeScript implements async/await as a typed layer over JavaScript's native Prom
 ## Related
 
 - [JavaScript Promises: Complete Guide](/languages/javascript/promises)
-- [Async Await in Python](/languages/python/async-await)
 - [Async Await in Rust](/languages/rust/async-await)
-- [TypeScript Async Patterns Cheat Sheet](/cheatsheets/typescript-async-patterns)
-- [TypeScript Playground Tool](/tools/typescript-playground)

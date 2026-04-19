@@ -8,9 +8,7 @@ published_date: '2026-04-17'
 related_posts:
 - /guides/base64-encoding-decoding-guide
 - /guides/json-formatter-validator-best-practices
-- /blog/http-request-anatomy
-related_tools:
-- /tools/url-encoder-decoder
+related_tools: []
 tags:
 - url-encoding
 - percent-encoding
@@ -396,7 +394,7 @@ cursor = conn.cursor()
 
 ## Encode and Decode URLs in Your Browser
 
-The [DevNook URL Encoder/Decoder tool](/tools/url-encoder-decoder) handles percent encoding, query string parsing, and full URL analysis directly in your browser. Paste in a raw URL to decode all components, or enter plain text to get the encoded form instantly.
+The DevNook URL Encoder/Decoder tool handles percent encoding, query string parsing, and full URL analysis directly in your browser. Paste in a raw URL to decode all components, or enter plain text to get the encoded form instantly.
 
 Related reading: the [Base64 Encoding guide](/guides/base64-encoding-decoding-guide) covers a different encoding scheme used for binary data in APIs and HTTP headers. For JSON payloads delivered over HTTP with encoded parameters, see the [JSON Formatter and Validator guide](/guides/json-formatter-validator-best-practices).
 

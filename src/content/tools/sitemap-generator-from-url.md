@@ -8,15 +8,13 @@ difficulty: null
 language: null
 og_image: /og/tools/sitemap-generator-from-url.png
 published_date: '2026-04-12'
-related_cheatsheet: /cheatsheets/http-status-codes
+related_cheatsheet: ''
 related_content: []
 related_guides:
 - /guides/xml-sitemaps-explained
 - /guides/seo-basics-for-developers
 related_tools:
-- /tools/robots-txt-generator
 - /tools/meta-tag-generator
-- /tools/json-ld-generator
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"SoftwareApplication\",\n  \"name\": \"Sitemap Generator from URL\
   \ — Free Online Tool\",\n  \"applicationCategory\": \"DeveloperApplication\",\n\
@@ -77,16 +75,16 @@ Set realistic priority values. Don't mark every page as 1.0 — search engines i
 
 Regenerate sitemaps whenever you publish new content, delete pages, or restructure URLs. For blogs and news sites publishing daily, automate sitemap generation using build hooks or cron jobs. For static sites, regenerate the sitemap during your build process before deployment.
 
-If you're using a [robots.txt generator](/tools/robots-txt-generator) to control crawler access, ensure your sitemap location is declared in the `robots.txt` file. Add a line like `Sitemap: https://yoursite.com/sitemap.xml` so crawlers can find it automatically without manual submission.
+If you're using a robots.txt generator to control crawler access, ensure your sitemap location is declared in the `robots.txt` file. Add a line like `Sitemap: https://yoursite.com/sitemap.xml` so crawlers can find it automatically without manual submission.
 
 ## Sitemap Formats Beyond XML
 
 While XML is the standard, search engines also support RSS and Atom feeds as sitemaps for frequently updated content. Some platforms use sitemap index files to organize sitemaps by content type (posts, pages, images, videos). Video sitemaps include extra metadata like thumbnail URLs and duration. Image sitemaps help Google Images discover visual content.
 
-For modern web apps with client-side routing, you may need to generate sitemaps programmatically since traditional crawlers can't execute JavaScript. In these cases, export routes from your framework (Next.js, Nuxt, etc.) and build the sitemap from the route manifest. Learn more about [how REST APIs work](/guides/what-is-rest-api) to understand how your web application serves pages to crawlers.
+For modern web apps with client-side routing, you may need to generate sitemaps programmatically since traditional crawlers can't execute JavaScript. In these cases, export routes from your framework (Next.js, Nuxt, etc.) and build the sitemap from the route manifest. Learn more about how REST APIs work to understand how your web application serves pages to crawlers.
 
 ## Validating Your Sitemap
 
 After generating a sitemap, validate it before submitting to search engines. Upload the file to Google Search Console and check the Coverage report for errors. Common issues include URLs returning 404s, redirect chains, and non-canonical URLs listed in the sitemap. Fix these before resubmitting.
 
-Use XML validators to check syntax. The sitemap must start with an XML declaration and use the correct namespace: `xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"`. All URLs must be absolute (starting with http:// or https://), properly escaped, and accessible to crawlers. For advanced SEO metadata, pair your sitemap with [JSON-LD structured data](/tools/json-ld-generator) to give search engines richer page context.
+Use XML validators to check syntax. The sitemap must start with an XML declaration and use the correct namespace: `xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"`. All URLs must be absolute (starting with http:// or https://), properly escaped, and accessible to crawlers. For advanced SEO metadata, pair your sitemap with JSON-LD structured data to give search engines richer page context.

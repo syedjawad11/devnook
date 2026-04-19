@@ -8,14 +8,10 @@ difficulty: intermediate
 language: javascript
 og_image: /og/languages/javascript/promises.png
 published_date: '2026-04-13'
-related_cheatsheet: /cheatsheets/javascript-async-patterns
+related_cheatsheet: ''
 related_content: []
-related_posts:
-- /languages/javascript/async-functions
-- /languages/javascript/fetch-api
-- /guides/asynchronous-javascript-guide
-related_tools:
-- /tools/javascript-repl
+related_posts: []
+related_tools: []
 schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https://schema.org\"\
   ,\n  \"@type\": \"TechArticle\",\n  \"headline\": \"JavaScript Promises Explained:\
   \ then(), catch(), and async/await\",\n  \"description\": \"Promises replaced callback\
@@ -274,6 +270,5 @@ console.log(results);
 
 **Promise.any()** resolves when the first Promise fulfills, ignoring rejections unless all reject.
 
-## Related
 
-Learn how [async functions](/languages/javascript/async-functions) build on Promises to simplify asynchronous code. See the [Fetch API guide](/languages/javascript/fetch-api) for real-world Promise usage in [HTTP requests](/languages/cpp/http-requests). Check the [Asynchronous JavaScript Guide](/guides/asynchronous-javascript-guide) for a complete overview of async patterns. Test Promise code interactively with the [JavaScript REPL](/tools/javascript-repl). Reference the [JavaScript Async Patterns Cheat Sheet](/cheatsheets/javascript-async-patterns) for quick syntax reminders.
+Learn how async functions build on Promises to simplify asynchronous code. See the Fetch API guide for real-world Promise usage in HTTP requests. Check the Asynchronous JavaScript Guide for a complete overview of async patterns. Test Promise code interactively with the JavaScript REPL. Reference the JavaScript Async Patterns Cheat Sheet for quick syntax reminders.

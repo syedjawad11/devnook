@@ -8,9 +8,7 @@ published_date: '2026-04-17'
 related_posts:
 - /guides/base64-encoding-decoding-guide
 - /guides/url-encoding-query-parameters-guide
-- /blog/rest-api-design-best-practices
-related_tools:
-- /tools/json-formatter-validator
+related_tools: []
 tags:
 - json
 - validation
@@ -378,7 +376,7 @@ Go's struct tags (`json:"name"`) control the JSON field names. Setting `json:"-"
 
 ### TypeScript
 
-TypeScript projects benefit from typed [JSON parsing](/languages/javascript/json-parsing) via Zod or similar:
+TypeScript projects benefit from typed JSON parsing via Zod or similar:
 
 ```typescript
 import { z } from "zod";
@@ -406,7 +404,7 @@ Zod schema validation gives you both runtime type checking and [TypeScript](/lan
 
 ## Format and Validate Instantly with DevNook
 
-The [DevNook JSON Formatter and Validator](/tools/json-formatter-validator) formats, validates, and highlights errors in JSON directly in your browser. No data leaves your machine. Paste in raw JSON from an API response or configuration file and get immediate feedback on structure and validity.
+The [DevNook JSON Formatter and Validator](/tools/json-formatter) formats, validates, and highlights errors in JSON directly in your browser. No data leaves your machine. Paste in raw JSON from an API response or configuration file and get immediate feedback on structure and validity.
 
 For JSON that contains Base64-encoded binary fields, see the [Base64 Encoding and Decoding guide](/guides/base64-encoding-decoding-guide). When debugging URLs with JSON payloads, the [URL Encoding guide](/guides/url-encoding-query-parameters-guide) covers how to safely encode JSON strings in query parameters.
 
