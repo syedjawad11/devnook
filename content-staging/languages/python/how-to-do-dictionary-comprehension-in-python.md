@@ -1,24 +1,29 @@
 ---
-title: "How to Do Dictionary Comprehension in Python: A Complete Guide"
-description: "Master Python dictionary comprehension to build, filter, and transform dicts with concise Pythonic syntax, plus performance tips and advanced patterns."
 category: languages
-language: python
 concept: dictionary-comprehension
+description: Master Python dictionary comprehension to build, filter, and transform
+  dicts with concise Pythonic syntax, plus performance tips and advanced patterns.
 difficulty: intermediate
-template_id: lang-v2
-tags: ["python", "dictionary-comprehension", "dictionaries", "functional-programming"]
+language: python
+og_image: /og/languages/python/dictionary-comprehension.png
+published_date: '2026-04-17'
 related_posts:
-  - /languages/python/list-comprehensions
-  - /languages/python/loops
+- /languages/python/list-comprehensions
+- /languages/python/loops
 related_tools: []
-published_date: "2026-04-17"
-og_image: "/og/languages/python/dictionary-comprehension.png"
+tags:
+- python
+- dictionary-comprehension
+- dictionaries
+- functional-programming
+template_id: lang-v2
+title: 'How to Do Dictionary Comprehension in Python: A Complete Guide'
 word_count_target: 1500
 ---
 
 # How to Do Dictionary Comprehension in Python: A Complete Guide
 
-When you need to construct or transform a Python dictionary from an iterable, writing a traditional `for` loop is the instinctive first approach — but dictionary comprehensions express the same intent in a single line that reads closer to mathematical set notation.
+When you need to construct or transform a [Python](/languages/python) dictionary from an iterable, writing a traditional `for` loop is the instinctive first approach — but dictionary comprehensions express the same intent in a single line that reads closer to mathematical set notation.
 
 ## The Problem
 

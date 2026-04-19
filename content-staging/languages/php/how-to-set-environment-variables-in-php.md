@@ -1,25 +1,32 @@
 ---
-title: "How to Set Environment Variables in PHP: Dotenv and Superglobals"
-description: "Master the secure usage of environment variables in PHP. Learn how to configure .env files, use getenv(), and protect sensitive credentials."
 category: languages
-language: "php"
-concept: "environment-variables"
-difficulty: "beginner"
-template_id: "lang-v1"
-tags: ["php", "environment-variables", "security", "dotenv"]
+concept: environment-variables
+description: Master the secure usage of environment variables in PHP. Learn how to
+  configure .env files, use getenv(), and protect sensitive credentials.
+difficulty: beginner
+language: php
+og_image: /og/languages/php/environment-variables.png
+published_date: '2026-04-15'
+related_posts:
+- how-to-connect-database-in-php
+- php-http-requests
 related_tools: []
-related_posts: ["how-to-connect-database-in-php", "php-http-requests"]
-published_date: "2026-04-15"
-og_image: "/og/languages/php/environment-variables.png"
+tags:
+- php
+- environment-variables
+- security
+- dotenv
+template_id: lang-v1
+title: 'How to Set Environment Variables in PHP: Dotenv and Superglobals'
 ---
 
 # How to Set Environment Variables in PHP: Dotenv and Superglobals
 
-Handling secrets precisely is the cornerstone of backend web development. In PHP, securely setting and accessing environment variables abstracts sensitive data away from raw source code and commits.
+Handling secrets precisely is the cornerstone of backend web development. In PHP, securely setting and accessing [environment variables](/languages/java/environment-variables) abstracts sensitive data away from raw source code and commits.
 
 ## What are Environment Variables in PHP?
 
-Environment variables in PHP are dynamic key-value pairs inherently provided by the hosting operating system, web server (like Nginx or Apache), or injected via configuration scripts heavily utilized during runtime execution. Rather than hardcoding a database password directly into a `config.php` file, developers request the value dynamically via PHP's built-in `$_ENV` superglobal or `getenv()` function. This mechanism ensures that different environments (local development, staging, production) can run the exact same programmatic source code with totally different injected contexts.
+Environment variables in [PHP](/languages/php) are dynamic key-value pairs inherently provided by the hosting operating system, web server (like Nginx or Apache), or injected via configuration scripts heavily utilized during runtime execution. Rather than hardcoding a database password directly into a `config.php` file, developers request the value dynamically via PHP's built-in `$_ENV` superglobal or `getenv()` function. This mechanism ensures that different environments (local development, staging, production) can run the exact same programmatic source code with totally different injected contexts.
 
 ## Why PHP Developers Use Environment Variables
 

@@ -1,16 +1,23 @@
 ---
-title: "How to Write a Closure in Swift: A Modern Guide"
-description: "Understand the core mechanics of closures in Swift, including capturing values, escaping contexts, and practical completion handlers."
 category: languages
-language: "swift"
-concept: "closures"
-difficulty: "intermediate"
-template_id: "lang-v1"
-tags: ["swift", "closures", "ios-development", "functional-programming"]
+concept: closures
+description: Understand the core mechanics of closures in Swift, including capturing
+  values, escaping contexts, and practical completion handlers.
+difficulty: intermediate
+language: swift
+og_image: /og/languages/swift/closures.png
+published_date: '2026-04-15'
+related_posts:
+- delegation-vs-closures-in-swift
+- async-await-in-swift
 related_tools: []
-related_posts: ["delegation-vs-closures-in-swift", "async-await-in-swift"]
-published_date: "2026-04-15"
-og_image: "/og/languages/swift/closures.png"
+tags:
+- swift
+- closures
+- ios-development
+- functional-programming
+template_id: lang-v1
+title: 'How to Write a Closure in Swift: A Modern Guide'
 ---
 
 # How to Write a Closure in Swift: A Modern Guide
@@ -172,4 +179,4 @@ If `expectation.fulfill()` is never reached within 5 seconds, the test naturally
 
 ## Next Steps
 
-Once you master closure delegation, the subsequent step in Swift evolution is migrating to structured concurrency. Dive deeply into Async/Await in Swift to understand how Apple is currently pushing developers away from nested closure boilerplate toward clean, linear execution paths.
+Once you master closure delegation, the subsequent step in Swift evolution is migrating to structured concurrency. Dive deeply into [Async/Await](/languages/rust/async-await) in Swift to understand how Apple is currently pushing developers away from nested closure boilerplate toward clean, linear execution paths.
