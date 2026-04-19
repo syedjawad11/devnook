@@ -3,16 +3,59 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
 
-const blogPosts = await getCollection('blog');
-const sortedPosts = blogPosts.sort((a, b) => {
-  const dateA = new Date(a.data.published_date || '1970-01-01');
-  const dateB = new Date(b.data.published_date || '1970-01-01');
-  return dateB.getTime() - dateA.getTime();
-});
+const allBlogPosts = await getCollection('blog');
+const allGuides = await getCollection('guides');
+const allLangPosts = await getCollection('languages');
+
+type CombinedPost = {
+  title: string;
+  description: string;
+  tags: string[];
+  date: string;
+  href: string;
+  filterCat: string;
+};
+
+const combinedPosts: CombinedPost[] = [
+  ...allBlogPosts.map(p => ({
+    title: p.data.title,
+    description: p.data.description,
+    tags: p.data.tags,
+    date: p.data.published_date,
+    href: `/blog/${p.slug}/`,
+    filterCat: 'blog',
+  })),
+  ...allGuides.map(p => ({
+    title: p.data.title,
+    description: p.data.description,
+    tags: p.data.tags,
+    date: p.data.published_date,
+    href: `/guides/${p.slug}/`,
+    filterCat: 'guides',
+  })),
+  ...allLangPosts.map(p => ({
+    title: p.data.title,
+    description: p.data.description,
+    tags: p.data.tags,
+    date: p.data.published_date,
+    href: `/languages/${p.data.language}/${p.data.concept}/`,
+    filterCat: 'languages',
+  })),
+];
+
+const sortedPosts = combinedPosts.sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+);
 
 const [featured, ...rest] = sortedPosts;
 
-const FILTERS = ['All', 'Comparisons', 'AI & Productivity', 'Tutorials', 'How-tos'];
+const FILTERS = [
+  { label: 'All',               key: 'all' },
+  { label: 'Comparisons',       key: 'blog' },
+  { label: 'AI & Productivity', key: 'ai' },
+  { label: 'Tutorials',         key: 'languages' },
+  { label: 'How-tos',           key: 'guides' },
+];
 
 function formatMonth(dateStr?: string) {
   if (!dateStr) return '';
@@ -37,25 +80,34 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
 
       {sortedPosts.length > 0 && (
         <>
-          {/* Decorative filter chips — non-functional in v1, kept for visual parity with design */}
-          <div class="filters" role="group" aria-label="Filter posts (visual only)">
+          <div class="filters" role="group" aria-label="Filter posts">
             {FILTERS.map((f, i) => (
-              <button type="button" class={`chip ${i === 0 ? 'active' : ''}`} disabled>{f}</button>
+              <button
+                type="button"
+                class={`chip ${i === 0 ? 'active' : ''}`}
+                data-filter={f.key}
+              >{f.label}</button>
             ))}
           </div>
 
           {featured && (
-            <a class="featured" href={`/blog/${featured.slug}/`}>
+            <a
+              class="featured"
+              href={featured.href}
+              data-post-item
+              data-filter-cat={featured.filterCat}
+              data-tags={featured.tags.join(',')}
+            >
               <div class="featured-thumb" aria-hidden="true">
-                <span class="thumb-mark">{(featured.data.title ?? '').charAt(0)}</span>
+                <span class="thumb-mark">{(featured.title ?? '').charAt(0)}</span>
               </div>
               <div class="featured-body">
                 <div class="featured-meta">
                   <span class="pill">Featured</span>
-                  <span class="featured-date">{formatMonth(featured.data.published_date)}</span>
+                  <span class="featured-date">{formatMonth(featured.date)}</span>
                 </div>
-                <h2>{featured.data.title}</h2>
-                <p>{featured.data.description}</p>
+                <h2>{featured.title}</h2>
+                <p>{featured.description}</p>
                 <span class="read-more">Read article &rarr;</span>
               </div>
             </a>
@@ -64,17 +116,21 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
           {rest.length > 0 && (
             <div class="posts-grid">
               {rest.map((post) => (
-                <PostCard
-                  title={post.data.title}
-                  description={post.data.description}
-                  href={`/blog/${post.slug}/`}
-                  tags={post.data.tags}
-                  date={post.data.published_date}
-                  category="blog"
-                />
+                <div data-post-item data-filter-cat={post.filterCat} data-tags={post.tags.join(',')}>
+                  <PostCard
+                    title={post.title}
+                    description={post.description}
+                    href={post.href}
+                    tags={post.tags}
+                    date={post.date}
+                    category={post.filterCat}
+                  />
+                </div>
               ))}
             </div>
           )}
+
+          <p class="no-results" hidden>No posts match this filter.</p>
         </>
       )}
 
@@ -86,6 +142,46 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
     </div>
   </main>
 </BaseLayout>
+
+<script>
+  const AI_TAGS = ['ai', 'llm', 'gpt', 'chatgpt', 'gemini', 'claude', 'openai', 'machine-learning', 'productivity'];
+
+  const chips = document.querySelectorAll<HTMLButtonElement>('.chip[data-filter]');
+  const postItems = document.querySelectorAll<HTMLElement>('[data-post-item]');
+  const noResults = document.querySelector<HTMLElement>('.no-results');
+
+  function isAiPost(el: HTMLElement): boolean {
+    const tags = (el.dataset.tags ?? '').toLowerCase().split(',');
+    const cat = el.dataset.filterCat ?? '';
+    return tags.some(t => AI_TAGS.includes(t.trim())) || cat === 'ai';
+  }
+
+  function filterPosts(key: string) {
+    let visible = 0;
+    postItems.forEach(el => {
+      const cat = el.dataset.filterCat ?? '';
+      let show = false;
+      if (key === 'all') {
+        show = true;
+      } else if (key === 'ai') {
+        show = isAiPost(el);
+      } else {
+        show = cat === key;
+      }
+      el.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    if (noResults) noResults.hidden = visible > 0;
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      filterPosts(chip.dataset.filter ?? 'all');
+    });
+  });
+</script>
 
 <style>
   .blog-index {
@@ -138,7 +234,13 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
     font-size: 13px;
     font-weight: 500;
     font-family: var(--font-body);
-    cursor: default;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+  }
+
+  .chip:hover:not(.active) {
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
   }
 
   .chip.active {
@@ -241,6 +343,13 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: var(--space-4);
+  }
+
+  .no-results {
+    text-align: center;
+    color: var(--color-text-muted);
+    padding: var(--space-6) 0;
+    font-size: 1rem;
   }
 
   .empty-state {
