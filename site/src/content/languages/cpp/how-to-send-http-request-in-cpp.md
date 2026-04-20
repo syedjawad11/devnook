@@ -1,16 +1,24 @@
 ---
-title: "How to Send an HTTP Request in C++: Cpr and libcurl Explained"
-description: "Learn how to send HTTP GET and POST requests in C++ using popular libraries like libcurl and Cpr, including performance and edge cases."
 category: languages
-language: "cpp"
-concept: "http-requests"
-difficulty: "intermediate"
-template_id: "lang-v1"
-tags: ["cpp", "http-requests", "networking", "libcurl", "cpr"]
+concept: http-requests
+description: Learn how to send HTTP GET and POST requests in C++ using popular libraries
+  like libcurl and Cpr, including performance and edge cases.
+difficulty: intermediate
+language: cpp
+og_image: /og/languages/cpp/http-requests.png
+published_date: '2026-04-15'
+related_posts:
+- how-to-parse-json-in-cpp
+- async-await-in-cpp
 related_tools: []
-related_posts: ["how-to-parse-json-in-cpp", "async-await-in-cpp"]
-published_date: "2026-04-15"
-og_image: "/og/languages/cpp/http-requests.png"
+tags:
+- cpp
+- http-requests
+- networking
+- libcurl
+- cpr
+template_id: lang-v1
+title: 'How to Send an HTTP Request in C++: Cpr and libcurl Explained'
 ---
 
 # How to Send an HTTP Request in C++: Cpr and libcurl Explained
@@ -173,4 +181,4 @@ This dependency injection approach avoids standing up a local Express server jus
 
 ## Next Steps
 
-After mastering external communication, the logical next step is processing the response data efficiently in memory. You should explore How to Parse JSON in C++ to digest the payloads cleanly. Additionally, handling network delays gracefully without locking your main execution context is critical; look into Async/Await Patterns in C++ to optimize your application architecture.
+After mastering external communication, the logical next step is processing the response data efficiently in memory. You should explore How to Parse JSON in C++ to digest the payloads cleanly. Additionally, handling network delays gracefully without locking your main execution context is critical; look into [Async/Await](/languages/rust/async-await) Patterns in C++ to optimize your application architecture.

@@ -1,25 +1,31 @@
 ---
-title: "How to Call Lambda Functions in Java: A Complete Guide"
-description: "Learn how to call and leverage lambda expressions in Java to eliminate anonymous class boilerplate, pass behavior efficiently, and write functional-style code."
 category: languages
-language: java
 concept: lambda-functions
+description: Learn how to call and leverage lambda expressions in Java to eliminate
+  anonymous class boilerplate, pass behavior efficiently, and write functional-style
+  code.
 difficulty: intermediate
-template_id: lang-v2
-tags: ["java", "lambda-functions", "functional-programming", "java-8"]
+language: java
+og_image: /og/languages/java/lambda-functions.png
+published_date: '2026-04-17'
 related_posts:
-  - /languages/java/streams-api
-  - /languages/java/anonymous-inner-classes
+- /languages/java/streams-api
+- /languages/java/anonymous-inner-classes
 related_tools:
-  - /tools/java-repl
-published_date: "2026-04-17"
-og_image: "/og/languages/java/lambda-functions.png"
+- /tools/java-repl
+tags:
+- java
+- lambda-functions
+- functional-programming
+- java-8
+template_id: lang-v2
+title: 'How to Call Lambda Functions in Java: A Complete Guide'
 word_count_target: 1500
 ---
 
 # How to Call Lambda Functions in Java: A Complete Guide
 
-Learning how to call lambda functions in Java is essential for writing concise, functional-style code after Java 8. Before Java 8 arrived in 2014, passing a block of behavior to a method required instantiating an anonymous inner class — a pattern so verbose it often hid the actual intent of the code beneath a wall of boilerplate.
+Learning how to call lambda functions in [Java](/languages/java) is essential for writing concise, functional-style code after Java 8. Before Java 8 arrived in 2014, passing a block of behavior to a method required instantiating an anonymous inner class — a pattern so verbose it often hid the actual intent of the code beneath a wall of boilerplate.
 
 ## The Problem
 
