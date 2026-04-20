@@ -43,26 +43,25 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-04-19, #21)
+## Last Session (2026-04-20, #23)
 
-**Status:** ✅ Linker subagent fully implemented + 45 internal links retrofitted into 21 live posts. Details in [session-history.md](session-history.md).
+**Status:** ✅ Content pipeline run — 5 editorial articles written, linked, and staged for Apr 24–25 drip.
 
 ### What was done
 
-- Built `agents/content-team/link_utility.py` — rule-based internal link inserter (no LLM, 8 links max/post)
-- Built `agents/subagent-prompts/linker.md` — Haiku subagent for batch + retrofit modes
-- 8 pytest cases passing (`agents/content-team/tests/`)
-- Updated `publisher.md` staging query to `status='linked'`
-- Retired Gemini Flash link-insertion branch from `seo_optimizer.py`
-- Retrofitted 21 published posts (45 links) + 11 staged posts (14 links) — pushed live
+- Ran full pipeline (Planner → Writer → Linker → Publisher) for 5 editorial posts
+- Planner queued 3 new posts (git-commands-cheatsheet, css-flexbox-vs-grid, curl-command-guide) to fill gaps in cheatsheets + blog
+- Writer drafted all 5 — 5/5 passed QA, 0 rejected
+- Linker ran batch pass via `link_utility.py`
+- Publisher staged all 5 to `content-staging/`: guides (CSS minification, HTML minification, curl), cheatsheets (git commands), blog (CSS flexbox vs grid)
+- `python-file-handling-tutorial` investigated — draft exists in `drafts/` and file is in `content-staging/languages/python/`; registry shows `staged` correctly — not actually missing, was a false alarm from session 22
 
-### Next session priorities (#22)
+### Next session priorities (#24)
 
-1. **Investigate missing staging file** — `python-file-handling-tutorial` is in registry as `staged` but file not found on disk; check if ingest failed or file is in wrong location, clean up registry if needed
-2. **Scale Writer** — run on 2 queued editorial posts (CSS/HTML minification)
+1. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml` and confirm no errors
+2. **Push to remote** — `content-staging/` committed locally (c808cbf); push `main` so drip-publish picks up on Apr 24
 3. **Fix 2–3 minor website UI issues** (user will specify)
-4. **Verify GSC** — sitemap submission + indexing
-5. **Next antigravity batch** — ingest + QA + stage more languages articles
+4. **Next antigravity batch** — ingest + QA + stage more languages articles
 
 ### Deferred (do not do)
 
@@ -129,7 +128,7 @@ Orchestrator spawns subagents, reviews JSON reports (~200 tok each), commits + p
 | Languages category owned by Antigravity | Planner + Writer must never queue languages posts |
 | Antigravity QA never rejects | Trusted Gemini Pro 3.1 content; QA fixes structural/SEO only, always sets `qa_status='passed'`, word range 1500–2500 |
 | Linker runs between QA/Writer and Publisher | Rule-based match first (`link_utility.py`), Haiku fill-in only if <3 links; Publisher staging query reads `status='linked'` |
-| Use `@astrojs/sitemap@3.2.1` not custom | Custom sitemap was broken; v3.7+ incompatible with Astro 4.x |
+| Use `@astrojs/sitemap@3.2.1` not custom | Custom sitemap was broken; v3.7+ incompatible with Astro 4.x. Current version generates `sitemap-0.xml` (0-indexed) — do not expect `sitemap-1.xml` |
 
 ---
 
