@@ -43,25 +43,31 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-04-20, #23)
+## Last Session (2026-04-22, #24)
 
-**Status:** ✅ Content pipeline run — 5 editorial articles written, linked, and staged for Apr 24–25 drip.
+**Status:** ✅ Build-time auto internal links plugin shipped to production (commit `65472f1`).
 
 ### What was done
 
-- Ran full pipeline (Planner → Writer → Linker → Publisher) for 5 editorial posts
-- Planner queued 3 new posts (git-commands-cheatsheet, css-flexbox-vs-grid, curl-command-guide) to fill gaps in cheatsheets + blog
-- Writer drafted all 5 — 5/5 passed QA, 0 rejected
-- Linker ran batch pass via `link_utility.py`
-- Publisher staged all 5 to `content-staging/`: guides (CSS minification, HTML minification, curl), cheatsheets (git commands), blog (CSS flexbox vs grid)
-- `python-file-handling-tutorial` investigated — draft exists in `drafts/` and file is in `content-staging/languages/python/`; registry shows `staged` correctly — not actually missing, was a false alarm from session 22
+- Implemented `src/plugins/auto-internal-links/index.mjs` — copy of `devnook_plugin/index.mjs` enhanced with `autoAnchors: true` mode
+- `autoAnchors` derives phrases from post title (cleaned of marketing suffixes) + humanized slug + bare language name (languages collection only, deduped via `seenLangUrls` Set)
+- Added custom `devnookUrlBuilder` to `astro.config.mjs` — fixes language concept URL routing: uses `frontmatter.language` + `frontmatter.concept` (not filename) to produce correct `/languages/{lang}/{concept}/` URLs
+- Added `fast-glob` + `gray-matter` as devDependencies
+- Dry-run audit revealed URL mismatch bug for language pages; fixed with `devnookUrlBuilder`
+- HTML spot-check confirmed correct behavior: 87 anchors from 42 files, ~30+ pages received links, code blocks/headings clean, existing manual links untouched
+- Committed + pushed: `git pull --rebase` needed (remote had newer drip-publish commits), then pushed cleanly
+- Cloudflare Pages build triggered; plugin live in production
 
-### Next session priorities (#24)
+### Next session priorities (#25)
 
-1. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml` and confirm no errors
-2. **Push to remote** — `content-staging/` committed locally (c808cbf); push `main` so drip-publish picks up on Apr 24
-3. **Fix 2–3 minor website UI issues** (user will specify)
-4. **Next antigravity batch** — ingest + QA + stage more languages articles
+1. **Step 6 — Retire Python Linker** (after verifying production HTML has `auto-internal-link` class):
+   - Verify: `curl -s https://devnook.dev/blog/sorting-algorithms-comparison/ | grep 'auto-internal-link' | head`
+   - Update `agents/subagent-prompts/publisher.md` staging query: `status IN ('drafted','linked')` (no longer requires `status='linked'`)
+   - Remove Linker step from workflow patterns A and A2 in this CLAUDE.md
+   - Keep `link_utility.py` + `linker.md` dormant in repo (do not delete yet)
+   - Existing `status='linked'` rows in `registry.db` stay as historical data — no migration needed
+2. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml` and confirm no errors
+3. **Next antigravity batch** — ingest + QA + stage more languages articles
 
 ### Deferred (do not do)
 
@@ -93,8 +99,8 @@ ORCHESTRATOR (Opus/Sonnet main session)
   │   ├── Planner  (Haiku)  — keyword discovery → posts (status=queued)
   │   ├── Writer   (Sonnet) — drafts/{slug}.md (status=drafted, qa validated)
   │   ├── Ingest   (Haiku)  — ../web_content/output/ → drafts/ (status=drafted)
-  │   ├── Antigravity QA (Sonnet) — fixes + approves antigravity drafts
-  │   └── Linker   (Haiku)  — inserts in-body links via link_utility.py (status=linked)
+  │   └── Antigravity QA (Sonnet) — fixes + approves antigravity drafts
+  │   [Linker retired — build-time rehype plugin handles internal links]
   ├── Dev Team
   │   └── Builder  (Sonnet) — Astro edits + npm run build
   └── Publish Team
@@ -104,8 +110,8 @@ ORCHESTRATOR (Opus/Sonnet main session)
 Orchestrator spawns subagents, reviews JSON reports (~200 tok each), commits + pushes only on user approval. Python scripts retained as non-LLM utilities.
 
 **Workflow patterns:**
-- A — weekly content: Planner → Ingest (parallel) → Writer (batch=5) → Linker → Publisher
-- A2 — antigravity: Ingest → Antigravity QA (batch=10) → Linker → Publisher
+- A — weekly content: Planner → Ingest (parallel) → Writer (batch=5) → Publisher
+- A2 — antigravity: Ingest → Antigravity QA (batch=10) → Publisher
 - B — new tool: Orchestrator → Builder → review + commit
 - C — bug fix: Orchestrator → Builder → review + commit
 - D — status check: inline sqlite3 query (no subagent)
@@ -127,7 +133,8 @@ Orchestrator spawns subagents, reviews JSON reports (~200 tok each), commits + p
 | Never call `build-tool.py build_tool()` for existing tools | Writes page that collides with dynamic route — use `generate_seo_explainer()` + `write_file()` |
 | Languages category owned by Antigravity | Planner + Writer must never queue languages posts |
 | Antigravity QA never rejects | Trusted Gemini Pro 3.1 content; QA fixes structural/SEO only, always sets `qa_status='passed'`, word range 1500–2500 |
-| Linker runs between QA/Writer and Publisher | Rule-based match first (`link_utility.py`), Haiku fill-in only if <3 links; Publisher staging query reads `status='linked'` |
+| Linker retired (session 25) | Replaced by `src/plugins/auto-internal-links/index.mjs` (build-time rehype plugin). `link_utility.py` + `linker.md` kept dormant in repo. Publisher staging query now uses `status IN ('drafted','linked')`. Existing `linked` rows in registry kept as historical data. |
+| Auto internal links plugin (rehype, build-time) | `src/plugins/auto-internal-links/index.mjs`; `autoAnchors: true`; `devnookUrlBuilder` required — language concept URLs use `frontmatter.language`+`frontmatter.concept`, NOT filename; 87 anchors from 42 files at session 24 |
 | Use `@astrojs/sitemap@3.2.1` not custom | Custom sitemap was broken; v3.7+ incompatible with Astro 4.x. Current version generates `sitemap-0.xml` (0-indexed) — do not expect `sitemap-1.xml` |
 
 ---
