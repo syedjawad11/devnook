@@ -43,31 +43,33 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-04-22, #24)
+## Last Session (2026-04-23, #25)
 
-**Status:** ✅ Build-time auto internal links plugin shipped to production (commit `65472f1`).
+**Status:** ✅ Linker retirement finalized + 9 orphan antigravity posts recovered and queued for drip.
 
 ### What was done
 
-- Implemented `src/plugins/auto-internal-links/index.mjs` — copy of `devnook_plugin/index.mjs` enhanced with `autoAnchors: true` mode
-- `autoAnchors` derives phrases from post title (cleaned of marketing suffixes) + humanized slug + bare language name (languages collection only, deduped via `seenLangUrls` Set)
-- Added custom `devnookUrlBuilder` to `astro.config.mjs` — fixes language concept URL routing: uses `frontmatter.language` + `frontmatter.concept` (not filename) to produce correct `/languages/{lang}/{concept}/` URLs
-- Added `fast-glob` + `gray-matter` as devDependencies
-- Dry-run audit revealed URL mismatch bug for language pages; fixed with `devnookUrlBuilder`
-- HTML spot-check confirmed correct behavior: 87 anchors from 42 files, ~30+ pages received links, code blocks/headings clean, existing manual links untouched
-- Committed + pushed: `git pull --rebase` needed (remote had newer drip-publish commits), then pushed cleanly
-- Cloudflare Pages build triggered; plugin live in production
+- **Orphan batch recovery (Workflow A2)**: 9 antigravity articles had bypassed Ingest and were sitting in `../web_content/output/_ingested/2026-04-22/`. Moved back to `../web_content/output/` root, ran Ingest → Antigravity QA (batch=9, all passed) → Publisher stage. All 9 now in `content-staging/languages/` with `status='staged'`
+- One QA correction: `how-to-do-file-handling-in-google-colab.md` — language frontmatter corrected `go` → `python`, 9 code blocks retagged
+- **Drip ordering**: 16 total staged (7 older editorial from 2026-04-17 + 9 new antigravity from 2026-04-23). All have `opportunity_score=NULL` so order falls to `created_at ASC` — older 7 publish first (2026-04-24 through 2026-04-26), new 9 interleave after (2026-04-27 through 2026-04-29). User chose Option A (accept ordering)
+- **Registry binary merge conflict**: remote `e52faa1` touched registry.db; reconciled by extracting remote DB via Python subprocess (Windows bash redirect corrupts binaries) and copying 3 `published_at` values for editorial posts into local DB. Committed as `758683e`
+- **Linker retirement** (from session 24 plan):
+  - Production HTML verified to contain `auto-internal-link` class
+  - `agents/subagent-prompts/publisher.md` staging query already updated to `status IN ('drafted','linked')`
+  - Linker removed from workflow patterns A/A2 in this file
+  - `link_utility.py` + `linker.md` + tests kept dormant (committed as reference)
+- **Cleanup commits**:
+  - `d0cac56` — Linker retirement (CLAUDE.md + dormant linker files)
+  - `4881d65` — antigravity-qa subagent prompt added
+  - `ab2cb7a` — .gitignore `.claude/`, archives, docs/content-strategy.md, devnook-site-updates.md
+- Removed duplicate folders: `templates/templates/templates/`, empty `{braces}` dir, `devnook_plugin/` (superseded by `src/plugins/auto-internal-links/`)
 
-### Next session priorities (#25)
+### Next session priorities (#26)
 
-1. **Step 6 — Retire Python Linker** (after verifying production HTML has `auto-internal-link` class):
-   - Verify: `curl -s https://devnook.dev/blog/sorting-algorithms-comparison/ | grep 'auto-internal-link' | head`
-   - Update `agents/subagent-prompts/publisher.md` staging query: `status IN ('drafted','linked')` (no longer requires `status='linked'`)
-   - Remove Linker step from workflow patterns A and A2 in this CLAUDE.md
-   - Keep `link_utility.py` + `linker.md` dormant in repo (do not delete yet)
-   - Existing `status='linked'` rows in `registry.db` stay as historical data — no migration needed
-2. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml` and confirm no errors
-3. **Next antigravity batch** — ingest + QA + stage more languages articles
+1. **Monitor drip runs** — confirm 2026-04-24/25/26 publish the 3 older editorial posts correctly; 2026-04-27/28/29 publish the 9 antigravity posts. Watch for any QA-flagged issues on the `colab` language correction
+2. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml` and confirm no errors (carryover from #24)
+3. **Next antigravity batch** — after current 9 finish draining, ingest + QA the next wave
+4. **Optional**: delete `link_utility.py` + `linker.md` + `agents/content-team/tests/` after a few weeks of stable auto-internal-links plugin operation
 
 ### Deferred (do not do)
 
