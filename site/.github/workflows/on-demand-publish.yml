@@ -46,6 +46,6 @@ jobs:
 
       - name: Commit and push
         run: |
-          git add src/content/ agents/content-team/registry.db
+          git add src/content/ content-staging/ agents/content-team/registry.db
           git commit -m "feat: launch day publish - ${{ github.event.inputs.count }} posts [skip ci]" || echo "Nothing to commit"
           git push || echo "Nothing to push"
