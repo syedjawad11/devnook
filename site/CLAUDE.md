@@ -43,33 +43,35 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-04-23, #25)
+## Last Session (2026-04-24, #26)
 
-**Status:** ✅ Linker retirement finalized + 9 orphan antigravity posts recovered and queued for drip.
+**Status:** ✅ Fixed silent drip-publish bug that had been stalling the queue since 2026-04-22. Manually published today's 3 posts.
 
 ### What was done
 
-- **Orphan batch recovery (Workflow A2)**: 9 antigravity articles had bypassed Ingest and were sitting in `../web_content/output/_ingested/2026-04-22/`. Moved back to `../web_content/output/` root, ran Ingest → Antigravity QA (batch=9, all passed) → Publisher stage. All 9 now in `content-staging/languages/` with `status='staged'`
-- One QA correction: `how-to-do-file-handling-in-google-colab.md` — language frontmatter corrected `go` → `python`, 9 code blocks retagged
-- **Drip ordering**: 16 total staged (7 older editorial from 2026-04-17 + 9 new antigravity from 2026-04-23). All have `opportunity_score=NULL` so order falls to `created_at ASC` — older 7 publish first (2026-04-24 through 2026-04-26), new 9 interleave after (2026-04-27 through 2026-04-29). User chose Option A (accept ordering)
-- **Registry binary merge conflict**: remote `e52faa1` touched registry.db; reconciled by extracting remote DB via Python subprocess (Windows bash redirect corrupts binaries) and copying 3 `published_at` values for editorial posts into local DB. Committed as `758683e`
-- **Linker retirement** (from session 24 plan):
-  - Production HTML verified to contain `auto-internal-link` class
-  - `agents/subagent-prompts/publisher.md` staging query already updated to `status IN ('drafted','linked')`
-  - Linker removed from workflow patterns A/A2 in this file
-  - `link_utility.py` + `linker.md` + tests kept dormant (committed as reference)
-- **Cleanup commits**:
-  - `d0cac56` — Linker retirement (CLAUDE.md + dormant linker files)
-  - `4881d65` — antigravity-qa subagent prompt added
-  - `ab2cb7a` — .gitignore `.claude/`, archives, docs/content-strategy.md, devnook-site-updates.md
-- Removed duplicate folders: `templates/templates/templates/`, empty `{braces}` dir, `devnook_plugin/` (superseded by `src/plugins/auto-internal-links/`)
+- **Investigated "drip ran but nothing changed"**: today's 08:00 UTC drip (commit `1fc0b89`) modified only `registry.db` with zero markdown diffs. Traced back: commits `15f586c` (Apr 22), `e52faa1` (Apr 23), `1fc0b89` (Apr 24) all had the same pathology — only registry.db changed, no content moved. First clean drip was `f8f379a` (Apr 21) which added 3 files to src/content with **no matching content-staging deletions**.
+- **Root cause**: [`.github/workflows/drip-publish.yml`](.github/workflows/drip-publish.yml) and [`on-demand-publish.yml`](.github/workflows/on-demand-publish.yml) only ran `git add src/content/ agents/content-team/registry.db`. Meanwhile [`agents/publish/publish.py`](agents/publish/publish.py) uses `shutil.move()` which deletes from `content-staging/` on the runner's FS — but with staging/ not in `git add`, those deletions never got committed. Every fresh checkout restored the stale files, and `get_staged_files()` walks the filesystem (not the DB) picking oldest-by-mtime, so it kept re-picking already-published files forever.
+- **Fix committed (`997e8fd`)**: added `content-staging/` to `git add` in both workflow files.
+- **Stale staging cleanup**: removed 4 zombie files that had been getting re-picked daily:
+  - `content-staging/blog/css-flexbox-vs-grid.md` (live since Apr 21)
+  - `content-staging/cheatsheets/git-commands-cheatsheet.md` (live since Apr 21)
+  - `content-staging/guides/css-minification-performance-optimization.md` (live since Apr 21)
+  - `content-staging/languages/javascript/how-to-implement-singleton-design-pattern-in-javascript.md` (live since Apr 20)
+- **Manual drip for today (`39b4ac8`)**: ran `publish.py --count 3` locally. First run picked up 2 more stale files (cpp/http-request, java/lambda — both already live since Apr 20) + 1 real (java/env-vars). Cleaned the last stale, ran --count 2 more to reach 3 real new publishes:
+  - `languages/java/how-to-set-environment-variables-in-java`
+  - `languages/javascript/how-to-parse-json-in-javascript`
+  - `languages/kotlin/how-to-use-data-class-in-kotlin`
+- **Timestamp restoration**: the 2 stale re-publishes (cpp/http-request, java/lambda) had their `published_at` and `published_date` overwritten to 2026-04-24 by the broken run. Restored to original 2026-04-20 values via direct SQL so they don't float to the top of recent-posts sorts.
+- **Registry state now**: 32 published / 16 staged / 10 rejected. No stale files left in content-staging.
 
-### Next session priorities (#26)
+### Next session priorities (#27)
 
-1. **Monitor drip runs** — confirm 2026-04-24/25/26 publish the 3 older editorial posts correctly; 2026-04-27/28/29 publish the 9 antigravity posts. Watch for any QA-flagged issues on the `colab` language correction
-2. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml` and confirm no errors (carryover from #24)
-3. **Next antigravity batch** — after current 9 finish draining, ingest + QA the next wave
-4. **Optional**: delete `link_utility.py` + `linker.md` + `agents/content-team/tests/` after a few weeks of stable auto-internal-links plugin operation
+1. **Verify the fix on 2026-04-25 drip** — after 08:00 UTC run, check `git show origin/main --stat` for the scheduled commit. Expected: both `src/content/…md` additions AND `content-staging/…md` deletions in the same commit. If only `registry.db` changes, fix didn't take.
+2. **Audit prior "re-publish" registry entries** — the bug inflated `published_at` on at least 2 other posts (css-flexbox, git-commands, css-minification all have Apr 24 timestamps but have been live since Apr 21; they weren't restored this session because the user asked them to count as "today's drip"). Decide whether to restore or leave.
+3. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml` and confirm no errors (carryover from #24/#25)
+4. **Monitor remaining queue drain** — 16 staged, mix of 1 old programmatic (Apr 12), 2 editorial (Apr 17, Apr 20), 6 older antigravity (Apr 17), 7 newer antigravity (Apr 23). At 3/day the queue drains ~2026-05-09.
+5. **Next antigravity batch** — after queue drains, ingest + QA the next wave.
+6. **Optional**: delete `link_utility.py` + `linker.md` + `agents/content-team/tests/` after a few weeks of stable plugin operation.
 
 ### Deferred (do not do)
 
@@ -138,6 +140,7 @@ Orchestrator spawns subagents, reviews JSON reports (~200 tok each), commits + p
 | Linker retired (session 25) | Replaced by `src/plugins/auto-internal-links/index.mjs` (build-time rehype plugin). `link_utility.py` + `linker.md` kept dormant in repo. Publisher staging query now uses `status IN ('drafted','linked')`. Existing `linked` rows in registry kept as historical data. |
 | Auto internal links plugin (rehype, build-time) | `src/plugins/auto-internal-links/index.mjs`; `autoAnchors: true`; `devnookUrlBuilder` required — language concept URLs use `frontmatter.language`+`frontmatter.concept`, NOT filename; 87 anchors from 42 files at session 24 |
 | Use `@astrojs/sitemap@3.2.1` not custom | Custom sitemap was broken; v3.7+ incompatible with Astro 4.x. Current version generates `sitemap-0.xml` (0-indexed) — do not expect `sitemap-1.xml` |
+| Publish workflows must `git add content-staging/` (session 26) | `publish.py` uses `shutil.move` which deletes staging files; without staging in `git add`, deletions never commit and every next checkout restores them. `get_staged_files()` walks the FS (not the DB), so stale files get re-picked by mtime. Always include `content-staging/` in `git add` for any workflow that moves files out of it. |
 
 ---
 
