@@ -9,11 +9,8 @@ template_id: "lang-v5"
 tags: ["kotlin", "cli-tool", "tutorial", "command-line"]
 difficulty: "intermediate"
 related_posts:
-  - /languages/kotlin/data-classes
-  - /languages/kotlin/coroutines
-  - /languages/kotlin/extension-functions
-related_tools:
-  - /tools/kotlin-playground
+  - /languages/kotlin/data-class
+related_tools: []
 og_image: "/og/languages/kotlin/cli-tool.png"
 ---
 
@@ -646,8 +643,7 @@ The test suite validates each layer of the CLI tool independently. The `testCate
 
 ## Where to Go Next
 
-- Learn how to structure CLI output with [data classes in Kotlin](/languages/kotlin/data-classes) — the foundation for type-safe domain models
-- Add concurrent file processing with [coroutines in Kotlin](/languages/kotlin/coroutines) — scan multiple directories simultaneously
-- Extend the tool with [extension functions in Kotlin](/languages/kotlin/extension-functions) — add custom behavior to `File` without subclassing
-- Visit the [Kotlin language hub](/languages/kotlin) for more concept guides
-- Experiment with Kotlin code in the [Kotlin Playground tool](/tools/kotlin-playground)
+- Learn how to structure CLI output with [data classes in Kotlin](/languages/kotlin/data-class/) — the foundation for type-safe domain models
+- Add concurrent file processing with coroutines in Kotlin — scan multiple directories simultaneously
+- Extend the tool with extension functions in Kotlin — add custom behavior to `File` without subclassing
+- Visit the [Kotlin language hub](/languages/kotlin/) for more concept guides
