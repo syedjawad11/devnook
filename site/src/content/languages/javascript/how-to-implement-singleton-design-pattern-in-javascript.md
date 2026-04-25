@@ -219,9 +219,3 @@ afterEach(() => {
 ## Summary
 
 The Singleton pattern is paramount when you need unfragmented global access to a specific object or resource, such as logging hubs or connection strings. In JavaScript, you can implement this by intercepting the `constructor()` return value or powerfully leveraging ES6 exported instances. While singletons enhance orchestration, their immortal state requires developers to exercise caution regarding test pollution and accidental global mutations.
-
-## Related
-
-- [Understanding JavaScript Closures](/languages/javascript/closures)
-- [ES6 Modules Deep Dive](/languages/javascript/es6-modules)
-- [JavaScript Cheat Sheet](/cheatsheets/javascript)

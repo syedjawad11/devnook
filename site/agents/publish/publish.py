@@ -9,6 +9,7 @@ Usage:
 """
 
 import argparse
+import re
 import shutil
 import sqlite3
 import sys
@@ -44,6 +45,31 @@ def get_staged_files(count: int, category_filter: str = "all") -> list:
         all_files = [f for f in all_files if category_filter in str(f)]
     
     return all_files[:count]
+
+_RELATED_SECTION_RE = re.compile(
+    r"\n[ \t]*##[ \t]+Related\b[^\n]*\n.*?(?=\n##[ \t]|\Z)",
+    re.DOTALL | re.IGNORECASE,
+)
+
+
+def strip_related_section(file_path: Path) -> bool:
+    """Remove any hand-written `## Related` section from the post body.
+
+    Why: PostLayout.astro auto-derives the Related list from frontmatter at render
+    time. LLM-written `## Related` markdown sections produce broken /languages/{lang}/{concept}
+    links because agents have no visibility into what is published. This is the
+    safety net described in CLAUDE.md.
+
+    Returns True if the file was modified.
+    """
+    text = file_path.read_text(encoding="utf-8")
+    cleaned = _RELATED_SECTION_RE.sub("", text)
+    if cleaned != text:
+        cleaned = cleaned.rstrip() + "\n"
+        file_path.write_text(cleaned, encoding="utf-8")
+        return True
+    return False
+
 
 def move_to_content(staging_path: Path) -> Path:
     """Move a file from content-staging to src/content, preserving directory structure."""
@@ -93,6 +119,8 @@ def publish(count: int, category_filter: str = "all"):
         
         # Move file to src/content
         dest_path = move_to_content(staging_path)
+        if strip_related_section(dest_path):
+            print(f"  -- Stripped hand-written ## Related section from {slug}")
         print(f"  >> Published: {slug}")
         
         # Update registry

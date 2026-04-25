@@ -146,9 +146,3 @@ public class PaymentService {
 ## Summary
 
 Hardcoding secrets restricts scalability and compromises security. Setting and reading environment variables in Java via `System.getenv()` allows you to separate configuration from code and easily pivot between local, staging, and production environments. Remember that Java's JVM caches these values at startup, creating a secure, read-only representation of the native OS context that powers twelve-factor compliance.
-
-## Related
-
-- [Handling Application Configuration in Java](/languages/java/properties-files)
-- [Passing Argument Vectors in Java](/languages/java/command-line-args)
-- [Java Cheat Sheet](/cheatsheets/java)

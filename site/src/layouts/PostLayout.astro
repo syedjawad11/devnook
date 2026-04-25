@@ -22,27 +22,62 @@ interface Props {
 const { frontmatter } = Astro.props;
 
 type RelatedItem = { title: string; slug: string; category: string };
-const [allGuides, allBlog, allCheatsheets, allLanguages, allTools] = await Promise.all([
+const [allGuides, allBlog, allCheatsheets, allLanguages] = await Promise.all([
   getCollection('guides'),
   getCollection('blog'),
   getCollection('cheatsheets'),
   getCollection('languages'),
-  getCollection('tools'),
 ]);
-const pathMap = new Map<string, RelatedItem>();
-for (const e of allGuides)
-  pathMap.set(`/guides/${e.slug}`, { title: e.data.title, slug: `/guides/${e.slug}`, category: 'Guide' });
-for (const e of allBlog)
-  pathMap.set(`/blog/${e.slug}`, { title: e.data.title, slug: `/blog/${e.slug}`, category: 'Blog' });
-for (const e of allCheatsheets)
-  pathMap.set(`/cheatsheets/${e.slug}`, { title: e.data.title, slug: `/cheatsheets/${e.slug}`, category: 'Cheatsheet' });
-for (const e of allLanguages)
-  pathMap.set(`/languages/${e.slug}`, { title: e.data.title, slug: `/languages/${e.slug}`, category: e.data.language });
-for (const e of allTools)
-  pathMap.set(`/tools/${e.data.tool_slug ?? e.slug}`, { title: e.data.title, slug: `/tools/${e.data.tool_slug ?? e.slug}`, category: 'Tool' });
-const resolvedRelatedPosts: RelatedItem[] = (frontmatter.related_posts ?? [])
-  .map((path: string) => pathMap.get(path))
-  .filter((item: RelatedItem | undefined): item is RelatedItem => item !== undefined);
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '');
+const currentTags: string[] = frontmatter.tags ?? [];
+const currentLanguage = frontmatter.language ?? '';
+const currentCategory = frontmatter.category ?? '';
+
+type Candidate = RelatedItem & { score: number; pubDate: string };
+
+function computeScore(data: any, entryCategory: string): number {
+  let s = 0;
+  if (currentLanguage && data.language === currentLanguage) s += 3;
+  if (currentCategory && entryCategory === currentCategory) s += 2;
+  for (const tag of (data.tags ?? []) as string[]) {
+    if (currentTags.includes(tag)) s += 1;
+  }
+  return s;
+}
+
+const candidates: Candidate[] = [];
+
+for (const e of allGuides) {
+  const path = `/guides/${e.slug}`;
+  if (path === currentPath) continue;
+  const s = computeScore(e.data, 'guides');
+  if (s > 0) candidates.push({ title: e.data.title, slug: path, category: 'Guide', score: s, pubDate: String((e.data as any).published_date ?? '') });
+}
+for (const e of allBlog) {
+  const path = `/blog/${e.slug}`;
+  if (path === currentPath) continue;
+  const s = computeScore(e.data, 'blog');
+  if (s > 0) candidates.push({ title: e.data.title, slug: path, category: 'Blog', score: s, pubDate: String((e.data as any).published_date ?? '') });
+}
+for (const e of allCheatsheets) {
+  const path = `/cheatsheets/${e.slug}`;
+  if (path === currentPath) continue;
+  const s = computeScore(e.data, 'cheatsheets');
+  if (s > 0) candidates.push({ title: e.data.title, slug: path, category: 'Cheatsheet', score: s, pubDate: String((e.data as any).published_date ?? '') });
+}
+for (const e of allLanguages) {
+  const lang = (e.data as any).language;
+  const concept = (e.data as any).concept;
+  if (!lang || !concept) continue;
+  const path = `/languages/${lang}/${concept}`;
+  if (path === currentPath) continue;
+  const s = computeScore(e.data, 'languages');
+  if (s > 0) candidates.push({ title: e.data.title, slug: path, category: lang, score: s, pubDate: String((e.data as any).published_date ?? '') });
+}
+
+candidates.sort((a, b) => b.score - a.score || b.pubDate.localeCompare(a.pubDate));
+const resolvedRelatedPosts: RelatedItem[] = candidates.slice(0, 3).map(({ title, slug, category }) => ({ title, slug, category }));
 
 const formattedDate = new Date(frontmatter.published_date).toLocaleDateString('en-US', {
   year: 'numeric',
