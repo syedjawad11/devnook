@@ -1,7 +1,7 @@
 ---
 category: tools
 description: Encode and decode Base64 strings instantly in your browser. Supports
-  text and URL-safe Base64.
+  standard text and URL-safe Base64 formats — no data sent to servers.
 og_image: /og/tools/base64-encoder.png
 published_date: '2026-04-13'
 related_content:
