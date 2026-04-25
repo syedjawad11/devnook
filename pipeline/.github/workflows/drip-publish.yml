@@ -25,7 +25,7 @@ jobs:
       - name: Checkout devnook site
         uses: actions/checkout@v4
         with:
-          repository: syedjawad/devnook
+          repository: syedjawad11/devnook
           token: ${{ secrets.DEVNOOK_REPO_PAT }}
           path: ../devnook
           fetch-depth: 0
