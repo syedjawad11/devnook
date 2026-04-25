@@ -1,7 +1,8 @@
 ---
 category: tools
-description: Format, validate, and minify JSON instantly in your browser. No data
-  sent to servers.
+description: Format, validate, and minify JSON instantly in your browser — no data
+  sent to servers. Beautify or compress JSON with syntax error detection and instant
+  feedback.
 og_image: /og/tools/json-formatter.png
 published_date: '2026-04-13'
 related_content:
