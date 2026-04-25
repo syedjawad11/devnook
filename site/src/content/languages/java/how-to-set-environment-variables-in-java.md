@@ -57,7 +57,7 @@ By relying on `System.getenv()`, your code remains identical across all stages o
 
 The primary mechanism for accessing system variables in Java is the `System.getenv(String name)` method. This triggers a native call to the host OS (Linux, Windows, macOS) and fetches the value bound to the specified key. The mapping is case-sensitive on most UNIX systems but generally case-insensitive on Windows, though best practice universally dictates `UPPER_SNAKE_CASE` for variable keys.
 
-Importantly, Java does perfectly allow you to *read* [environment variables](/languages/php/environment-variables) via `System.getenv()`, but you cannot dynamically *set* or alter OS environment variables from within a running JVM using standard API methods. The environment map provided to the JVM is read-only. 
+Importantly, Java does perfectly allow you to *read* environment variables via `System.getenv()`, but you cannot dynamically *set* or alter OS environment variables from within a running JVM using standard API methods. The environment map provided to the JVM is read-only. 
 
 ## Going Further — Real-World Patterns
 
