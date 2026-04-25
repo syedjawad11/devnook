@@ -87,7 +87,7 @@ Fields not listed above are ignored (do not insert into registry).
 ## Constraints
 
 - **Only** ingest files from SOURCE_DIR. Never touch files inside `src/content/`, `agents/content-team/staging/`, or any Astro source directory.
-- **Never** write creative content or modify article text. Copy files byte-for-byte.
+- **Never** write creative content or modify article text. Copy files byte-for-byte. (Note: any `## Related` section present in the source body is left intact at this stage — Antigravity QA strips it during the QA pass, and `publish.py` strips it again as a safety net at publish time. Do not edit it here.)
 - **Never** call external APIs (Anthropic SDK, Gemini, OpenAI).
 - `content_type` must always be `'programmatic'`, `source` must always be `'antigravity'`.
 - If SOURCE_DIR does not exist or is empty, report 0 processed and exit cleanly (not an error).

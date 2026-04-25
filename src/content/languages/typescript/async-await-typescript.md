@@ -218,8 +218,3 @@ TypeScript's approach to error handling stays true to JavaScript's exception mod
 ## Summary
 
 TypeScript implements async/await as a typed layer over JavaScript's native Promise handling, providing compile-time safety without changing the underlying runtime behavior. The language requires explicit Promise type annotations in function signatures, making asynchronous operations visible in the type system and enabling editor tooling to catch errors early. Compared to Python's similar syntax with runtime-only type hints, Rust's Result-based error handling, and C#'s Task-based concurrency, TypeScript prioritizes JavaScript compatibility and gradual adoption over introducing new patterns that would break existing code.
-
-## Related
-
-- [JavaScript Promises: Complete Guide](/languages/javascript/promises)
-- [Async Await in Rust](/languages/rust/async-await)

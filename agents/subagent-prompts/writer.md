@@ -72,6 +72,7 @@ Read these files before starting any article:
 - **Never** call external APIs (Anthropic SDK, Gemini, OpenAI).
 - Do **not** duplicate content from `agents/skills/` files into the article — reference them for guidance only.
 - Frontmatter `content_type` must match the registry value — do not overwrite it.
+- **Never write a `## Related` (or `## Related Posts` / `## Related Articles`) markdown section in the body.** Related posts are auto-derived at render time by `src/layouts/PostLayout.astro` from frontmatter (`language`, `category`, `tags`). Hand-written link lists guess slugs that may not exist and produce broken links. Leave related-link surfacing to the layout. If you wrote one before reading this, delete it before writing the file.
 
 ## Report format
 

@@ -304,9 +304,3 @@ JUnit 5's `@ParameterizedTest` with `@ValueSource` is particularly useful for te
 ## Summary
 
 Java lambda expressions solve the verbosity problem of pre-Java 8 anonymous inner classes by expressing behavioral intent concisely. They work by implementing functional interfaces — any interface with exactly one abstract method. Beneath the syntax, `invokedynamic` ensures that lambdas carry no class-file bloat, that non-capturing lambdas are singletons, and that the JIT compiler can inline simple lambdas entirely. Paired with `java.util.function` interfaces and the Streams API, lambdas transform Java from a language centered on objects and classes into one that handles both paradigms cleanly.
-
-## Related
-
-- [How to Use the Java Streams API](/languages/java/streams-api)
-- [Understanding Functional Interfaces in Java](/languages/java/functional-interfaces)
-- [Java Cheat Sheet](/cheatsheets/java)

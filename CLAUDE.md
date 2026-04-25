@@ -141,6 +141,7 @@ Orchestrator spawns subagents, reviews JSON reports (~200 tok each), commits + p
 | Auto internal links plugin (rehype, build-time) | `src/plugins/auto-internal-links/index.mjs`; `autoAnchors: true`; `devnookUrlBuilder` required — language concept URLs use `frontmatter.language`+`frontmatter.concept`, NOT filename; 87 anchors from 42 files at session 24 |
 | Use `@astrojs/sitemap@3.2.1` not custom | Custom sitemap was broken; v3.7+ incompatible with Astro 4.x. Current version generates `sitemap-0.xml` (0-indexed) — do not expect `sitemap-1.xml` |
 | Publish workflows must `git add content-staging/` (session 26) | `publish.py` uses `shutil.move` which deletes staging files; without staging in `git add`, deletions never commit and every next checkout restores them. `get_staged_files()` walks the FS (not the DB), so stale files get re-picked by mtime. Always include `content-staging/` in `git add` for any workflow that moves files out of it. |
+| Related posts auto-derived at render time (session 27) | `src/layouts/PostLayout.astro` builds the related list from `getCollection()` using a language/category/tags score — never from a hand-written `## Related` markdown section in the body. Agents (writer, antigravity-qa) must NOT write `## Related` sections; they guess slugs (e.g. `/languages/javascript/closures`) that don't exist and produce 404s. `publish.py:strip_related_section()` is the safety net that scrubs any leftover `## Related` block at publish time. Frontmatter `related_posts` is unused going forward — leave as `[]`. |
 
 ---
 

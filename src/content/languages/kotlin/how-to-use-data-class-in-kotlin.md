@@ -182,9 +182,3 @@ class DataClassTest {
 ## Summary
 
 The Data Class resolves deep OOP bloat requirements natively in Kotlin architectures. Assigning the `data` prefix before a class generates `hashCode()`, `toString()`, `copy()`, and `equals()` instantly, relying completely on the strictly declared properties existing within the primary constructor map. With robust features permitting structured declarations and immutability cloning behaviors, data classes function elegantly to encapsulate information strictly.
-
-## Related
-
-- [Kotlin Collections Deep Dive](/languages/kotlin/collections)
-- [Managing Kotlin Exceptions](/languages/kotlin/exceptions)
-- [Kotlin Cheat Sheet](/cheatsheets/kotlin)

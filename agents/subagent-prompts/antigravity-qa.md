@@ -72,6 +72,7 @@ Work through each check. If the issue exists, fix it immediately in the file —
 | At least one fenced code block present | If none, add a minimal illustrative code snippet after the first H2 |
 | All fenced code blocks have a language tag (` ```java `, ` ```python `, etc.) | Add language tag matching the post `language` field |
 | Internal links: at least 1, maximum 8 | If INTERNAL_LINKS provided and count < 1, weave in 1–2 most relevant links |
+| No `## Related` / `## Related Posts` / `## Related Articles` section in body | **Strip the entire section** (heading + bullet list, up to next H2 or EOF). Related posts are auto-derived by `src/layouts/PostLayout.astro` from frontmatter — hand-written sections produce broken links. |
 
 #### Word count check
 
@@ -102,6 +103,7 @@ WHERE slug = ?
 
 - **Never reject** Antigravity content. Always set `qa_status='passed'` after processing.
 - **Never rewrite article body prose.** Fix structural/SEO issues only — heading levels, frontmatter fields, keyword placement in existing sentences, code block language tags.
+- **Strip any `## Related` section.** The site auto-derives related posts at render time; LLM-authored related sections guess slugs and produce broken links. Removal is a structural fix, not body-prose editing.
 - **Never change `category`** away from `languages`.
 - **Never call external APIs** (Anthropic SDK, Gemini, OpenAI).
 - **Never fabricate internal link slugs** — only use slugs from INTERNAL_LINKS if provided.
