@@ -40,21 +40,26 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-04-25, #28)
+## Last Session (2026-04-25, #29)
 
-**Status:** ✅ Cross-repo CI live + devnook repo cleaned of pipeline code.
+**Status:** ✅ SEO audit fixes — meta descriptions + broken internal links resolved.
 
 ### What was done
 
-- **Phase 7 — Content workspace CI live**: pushed `../devnook_content_workspace/` to `github.com/syedjawad11/devnook-content` (private). Configured `GH_PAT` and `DEVNOOK_REPO_PAT` secrets. `GOOGLE_SERVICE_ACCOUNT_JSON` deferred — `publish.py` has a guard that skips GSC ping when unset. `on-demand-publish.yml` run #3 verified green (20s): published `how-to-check-regex-pattern-in-javascript.md` to devnook via cross-repo git push.
-- **Repo rename**: GitHub site repo renamed `DevNook-` → `devnook` (trailing hyphen was breaking workflow `repository:` references). Local remote URL updated. PAT re-scoped to new name.
-- **Phase 6 — Pipeline code removed from devnook**: `b420443` deleted `agents/{content-team,publish,utils,tools-team,dev-team}/`, `agents/{__init__.py,requirements.txt,skills/__init__.py}`, 4 stale skill markdown files, 6 stale subagent prompts, `content-staging/`, `templates/`, and `.github/workflows/{drip-publish,on-demand-publish}.yml`. 133 files, build verified at 72 pages.
+- **Meta description expansion** (`9c54b81`): SEO audit flagged 14 pages with descriptions under 120 chars. Fixed 3 sources:
+  - `src/pages/languages/[lang]/index.astro` line 52 — template rewrite covers all 12 language hub pages in one edit (now 143–161 chars)
+  - `src/content/tools/json-formatter.md` frontmatter — expanded to 162 chars
+  - `src/content/tools/base64-encoder.md` frontmatter — expanded to 137 chars
+- **Broken internal links** (`a906f0c`): SEO audit flagged 12 pages. Two distinct root causes:
+  - **Real 404 links (fixed)**: `how-to-build-cli-tool-in-kotlin.md` — removed links to non-existent coroutines/extension-functions/kotlin-playground pages, fixed `data-classes` → `data-class` slug; `java/how-to-set-environment-variables-in-java.md` — removed link to non-existent `/languages/php/environment-variables`
+  - **Cloudflare Email Obfuscation (not a code issue)**: 10 pages have email addresses in code examples (e.g. `alice@example.com`) that Cloudflare rewrites to `cdn-cgi/l/email-protection`. Fix: Cloudflare dashboard → devnook.dev → Scrape Shield → Email Address Obfuscation → Off
 
-### Next session priorities (#29)
+### Next session priorities (#30)
 
-1. **Verify scheduled drip** — daily cron at 08:00 UTC. Watch tomorrow's run land 3 posts.
-2. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml`
-3. **Optional cleanup** — delete `link_utility.py` + dormant linker tests after another week of stable plugin operation
+1. **Cloudflare dashboard** — disable Email Address Obfuscation (Scrape Shield) to clear cdn-cgi 404s on 10 pages
+2. **Verify scheduled drip** — daily cron at 08:00 UTC, confirm posts landing
+3. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml`
+4. **Optional cleanup** — delete `link_utility.py` + dormant linker tests after another week of stable plugin operation
 
 ### Deferred (do not do)
 
