@@ -30,7 +30,7 @@ jobs:
         with:
           repository: syedjawad11/devnook
           token: ${{ secrets.DEVNOOK_REPO_PAT }}
-          path: ../devnook
+          path: devnook
           fetch-depth: 0
 
       - uses: actions/setup-python@v5
@@ -44,12 +44,13 @@ jobs:
         run: |
           git config user.name "DevNook Publisher"
           git config user.email "publisher@devnook.dev"
-          git -C ../devnook config user.name "DevNook Publisher"
-          git -C ../devnook config user.email "publisher@devnook.dev"
+          git -C devnook config user.name "DevNook Publisher"
+          git -C devnook config user.email "publisher@devnook.dev"
 
       - name: Publish posts
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          DEVNOOK_PATH: devnook
         run: |
           python agents/publish/publish.py \
             --count ${{ github.event.inputs.count }} \
