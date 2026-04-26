@@ -273,4 +273,4 @@ Because the Strategy pattern accepts any callable, there is no need for `unittes
 
 ## Next Steps
 
-To fully understand how Python enables Strategy and Observer patterns through its function model, study [What is a Closure in Python?](/languages/python/closures) — closures are the mechanism that lets functions carry environment state across call sites. For patterns that manipulate class behavior at definition time, [How to Use Decorators in Python](/languages/python/decorators) covers the metaprogramming tools that make Python patterns uniquely expressive.
+To fully understand how Python enables Strategy and Observer patterns through its function model, study closures in Python — they are the mechanism that lets functions carry environment state across call sites. For patterns that manipulate class behavior at definition time, decorators in Python cover the metaprogramming tools that make Python patterns uniquely expressive.

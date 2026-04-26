@@ -53,7 +53,7 @@ Inline sqlite3 query (no subagent needed)
 
 | Path | Purpose |
 |------|---------|
-| `agents/content-team/registry.db` | SQLite registry (36 published / 12 staged / 10 rejected as of 2026-04-25) |
+| `agents/content-team/registry.db` | SQLite registry (36 published / 16 staged / 10 rejected as of 2026-04-25) |
 | `agents/content-team/registry.py` | DB helpers — get_db, update_post_status, get_queued_posts, get_published_slugs, log_pipeline_run, get_next_template |
 | `agents/content-team/drafts/` | Writer output, QA-approved posts |
 | `agents/content-team/staging.py` | Moves approved drafts → content-staging/ |
@@ -108,6 +108,7 @@ posts (
 | Related posts not written by agents | PostLayout.astro auto-derives related list at render time. Agents must NOT write `## Related` sections. `strip_related_section()` in publish.py is the safety net. |
 | `related_posts` frontmatter field unused | Leave as `[]` in all new drafts |
 | No API-based Python LLM calls | All LLM work goes through Agent() subagent invocations; no llm_router, no anthropic SDK in Python |
+| Meta description minimum 120 characters | Hard floor for all new posts. Existing SEO rule in `agents/skills/seo-writing-rules.md` (140–160 chars) already satisfies this, but the 120-char floor must be enforced by Writer + QA so no future regression occurs. Past short-meta posts have already been fixed — do not re-audit. |
 
 ---
 
@@ -152,35 +153,22 @@ Both workflows:
 
 ---
 
-## Last Session (2026-04-25, #27)
+## Last Session (2026-04-26, #30)
 
-**Status:** ✅ Workspace split complete. Content pipeline migrated from devnook/ into this dedicated workspace.
+**Status:** ✅ Complete. Hardened both Writer and Antigravity QA subagent prompts against fabricated `/languages/` URLs.
 
-### What was done
-- Created `devnook_content_workspace/` with fresh `git init`
-- Copied all pipeline files (content-team, publish, subagent-prompts, skills, workflows, content-staging)
-- Excluded LLM-caller Python files (`*_agent.py`, `llm_router.py`, `gemini_client.py`, `build-tool.py`)
-- Fixed `registry.py` DB_PATH (simplified to `Path(__file__).parent / "registry.db"`)
-- Fixed `staging.py` import (now imports registry directly from same directory)
-- Fixed `publish.py`: CONTENT_DIR now points to `../devnook/src/content/`; added cross-repo git block
-- Updated both CI workflows: added devnook checkout step, updated pip path, removed src/content from CI git add
-- Also done earlier in session 27: related-posts auto-derivation fix in PostLayout.astro + strip_related_section() in publish.py
+### What was done in #30
+- **Added constraint to `agents/subagent-prompts/antigravity-qa.md`** (Constraints section, after "Never fabricate internal link slugs"): agents must never write a `/languages/` URL unless the exact path appears verbatim in INTERNAL_LINKS; if not found, strip the hyperlink and leave anchor text as plain text.
+- **Added constraint to `agents/subagent-prompts/writer.md`** (Constraints section, after the `## Related` constraint): agents must never write a `/languages/` URL unless the exact path appears verbatim in INTERNAL_LINKS; must not derive URLs from filenames or slugs — correct URL uses `concept` from the registry, accessible only via INTERNAL_LINKS.
 
-### Migration status (session 27 end state)
+### Current state after #30
+- Registry unchanged: **36 published / 16 staged / 10 rejected**, 0 queued
+- Staged breakdown: 12 language posts (positions 1–12) + 4 cheatsheets (positions 13–16)
+- Drip cron (08:00 UTC, 3/day) continues publishing — no manual action needed
 
-Phases 1–5 complete. Two phases remain before the split is fully live:
+### Key rules established / confirmed in #30
+- `/languages/` URLs in body prose are only allowed if the exact path is in INTERNAL_LINKS — applies to both Writer and Antigravity QA
+- Antigravity QA strips any non-verified `/languages/` hyperlink (anchor text kept); Writer must not derive them at all
 
-- **Phase 6 (point of no return)** — `git rm -r` pipeline dirs from devnook once CI is confirmed working
-- **Phase 7** — create private GitHub repo for this workspace, push initial commit, add secrets
-
-### Next session priorities (#28)
-
-1. **Phase 7 — Wire up CI**: create private GitHub repo, `git add` + initial commit, push, add secrets: `GOOGLE_SERVICE_ACCOUNT_JSON`, `DEVNOOK_REPO_PAT`, `GH_PAT`
-2. **Phase 6 — Clean devnook**: after CI is confirmed, `git rm -r agents/content-team agents/publish agents/utils agents/tools-team agents/dev-team content-staging templates` in devnook; commit + push
-3. **Verify first automated drip** — confirm drip-publish.yml commits devnook content AND content-staging deletions in the two-repo flow
-4. **Monitor queue drain** — 12 staged at 3/day drains ~2026-05-09
-5. **Next antigravity batch** — after queue drains
-
-### Registry state
-- 36 published / 12 staged / 10 rejected as of 2026-04-25
-- One stale registry entry fixed: `python-file-handling-tutorial` was stuck as "staged" but already live; corrected to "published"
+### Next session priorities
+- No open tasks. Next content run: decide category for next batch (more cheatsheets, guides, or blog posts) and repeat Planner → Writer → stage flow.

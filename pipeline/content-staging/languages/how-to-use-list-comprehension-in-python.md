@@ -253,7 +253,7 @@ The test suite above validates two functions that use list comprehensions intern
 
 ## Next Steps
 
-- **Generator expressions** extend the comprehension concept with lazy evaluation — essential for processing large datasets without memory pressure. See [generators in Python](/languages/python/generators) for a detailed walkthrough.
+- **Generator expressions** extend the comprehension concept with lazy evaluation — essential for processing large datasets without memory pressure. Use `()` instead of `[]` to create a generator instead of a list.
 - **Dictionary and set comprehensions** use the same syntax principles but produce `dict` and `set` objects. Learn how in [dictionary comprehension in Python](/languages/python/dictionary-comprehension).
-- **Lambda functions** pair naturally with `map()` and `filter()` when comprehensions are not the right fit. Explore the tradeoffs in [lambda functions in Python](/languages/python/lambda-functions).
-- Visit the [Python language hub](/languages/python) for more concept guides, or try expressions interactively with the [Python REPL tool](/tools/python-repl).
+- **Lambda functions** pair naturally with `map()` and `filter()` when comprehensions are not the right fit. Explore the tradeoffs between comprehensions and lambda with `map()` and `filter()`.
+- Visit the [Python language hub](/languages/python) for more concept guides.

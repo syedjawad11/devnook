@@ -73,6 +73,39 @@ def strip_related_section(file_path: Path) -> bool:
     return False
 
 
+def validate_language_links(staging_path: Path) -> list:
+    """
+    Scan body prose for /languages/{lang}/{segment} links and verify each
+    segment is a valid concept in the registry (not a filename-based slug).
+    Returns a list of problem descriptions; empty list means clean.
+    """
+    text = staging_path.read_text(encoding="utf-8")
+    link_re = re.compile(r'\]\((/languages/([^/\s"]+)/([^/\s")]+))')
+    problems = []
+
+    conn = sqlite3.connect(DB_PATH)
+    for m in link_re.finditer(text):
+        full_path, lang, segment = m.group(1), m.group(2), m.group(3).rstrip("/")
+        is_concept = conn.execute(
+            "SELECT 1 FROM posts WHERE language = ? AND concept = ?",
+            (lang, segment),
+        ).fetchone()
+        if is_concept:
+            continue
+        slug_row = conn.execute(
+            "SELECT concept FROM posts WHERE language = ? AND slug = ?",
+            (lang, segment),
+        ).fetchone()
+        if slug_row:
+            problems.append(
+                f"{full_path} uses filename slug — correct URL is /languages/{lang}/{slug_row[0]}"
+            )
+        else:
+            problems.append(f"{full_path} not found in registry (broken link)")
+    conn.close()
+    return problems
+
+
 def move_to_content(staging_path: Path) -> Path:
     """Move a file from content-staging to src/content, preserving directory structure."""
     # staging_path: content-staging/languages/python/python-list-comprehensions.md
@@ -118,7 +151,15 @@ def publish(count: int, category_filter: str = "all"):
     for staging_path in files:
         meta = get_post_meta(staging_path)
         slug = meta["slug"]
-        
+
+        # Guard: reject files with filename-based or broken /languages/ links
+        link_problems = validate_language_links(staging_path)
+        if link_problems:
+            print(f"  [SKIP] {slug}: invalid /languages/ links — fix before publishing:")
+            for p in link_problems:
+                print(f"         {p}")
+            continue
+
         # Move file to src/content
         dest_path = move_to_content(staging_path)
         if strip_related_section(dest_path):

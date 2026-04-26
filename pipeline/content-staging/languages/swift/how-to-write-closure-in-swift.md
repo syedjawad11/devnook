@@ -179,4 +179,4 @@ If `expectation.fulfill()` is never reached within 5 seconds, the test naturally
 
 ## Next Steps
 
-Once you master closure delegation, the subsequent step in Swift evolution is migrating to structured concurrency. Dive deeply into [Async/Await](/languages/rust/async-await) in Swift to understand how Apple is currently pushing developers away from nested closure boilerplate toward clean, linear execution paths.
+Once you master closure delegation, the subsequent step in Swift evolution is migrating to structured concurrency. Dive deeply into async/await in Swift to understand how Apple is currently pushing developers away from nested closure boilerplate toward clean, linear execution paths.

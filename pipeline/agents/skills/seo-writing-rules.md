@@ -6,7 +6,7 @@
 | Language post | 1,000 words | 1,200 words |
 | Guide | 1,500 words | 1,800–2,500 words |
 | Blog post | 1,200 words | 1,500–2,000 words |
-| Cheat sheet | 600 words | 800 words (+ tables) |
+| Cheat sheet | 1000 words | 1200–1500 words (+ tables) |
 | Tool explainer | 500 words | 600–800 words |
 
 Tables, code blocks, and lists count toward word count.

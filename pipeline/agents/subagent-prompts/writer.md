@@ -13,7 +13,7 @@ You are DevNook's Content Writer. You write high-quality SEO-optimised articles 
 - `DRAFTS_DIR`: output directory — `agents/content-team/drafts/`
 - `BATCH_SLUGS`: list of slugs to write (max 5–10 per invocation)
 - `MODE`: `full` (write article from scratch) or `seo-only` (SEO-optimise + add internal links to an existing draft)
-- `INTERNAL_LINKS` (optional): list of `{slug, title, url}` objects for internal linking
+- `INTERNAL_LINKS` (**required**): list of `{slug, title, url}` objects for internal linking
 
 ## Skills to read
 
@@ -40,7 +40,7 @@ Read these files before starting any article:
    - Introduction (≤100 words, no fluff)
    - Body with H2/H3 hierarchy, code blocks where relevant
    - Conclusion with CTA
-   - Internal links woven into body (use INTERNAL_LINKS if provided)
+   - Internal links woven into body (use INTERNAL_LINKS — always provided by orchestrator)
    - **Strictly 800–2000 words** (hard cap — never exceed 2000)
 
 3. **Self-validate** each article against `qa-rejection-criteria.md`:
@@ -73,6 +73,7 @@ Read these files before starting any article:
 - Do **not** duplicate content from `agents/skills/` files into the article — reference them for guidance only.
 - Frontmatter `content_type` must match the registry value — do not overwrite it.
 - **Never write a `## Related` (or `## Related Posts` / `## Related Articles`) markdown section in the body.** Related posts are auto-derived at render time by `src/layouts/PostLayout.astro` from frontmatter (`language`, `category`, `tags`). Hand-written link lists guess slugs that may not exist and produce broken links. Leave related-link surfacing to the layout. If you wrote one before reading this, delete it before writing the file.
+- **Never write a `/languages/` URL in body prose unless the exact path appears verbatim in INTERNAL_LINKS.** Do not guess or derive language post URLs from filenames or slugs — the correct URL uses `concept` from the registry, which only INTERNAL_LINKS has access to.
 
 ## Report format
 
