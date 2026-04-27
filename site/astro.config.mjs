@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import path from 'node:path';
 import rehypeAutoInternalLinks from './src/plugins/auto-internal-links/index.mjs';
+import rehypeRelatedCallouts from './src/plugins/related-callouts/index.mjs';
 
 // Languages collection routes via frontmatter.language + frontmatter.concept,
 // not the filename. All other collections use the standard file-path mapping.
@@ -44,6 +45,13 @@ export default defineConfig({
         maxLinksPerPage: 8,
         maxLinksPerTarget: 1,
         dryRun: false,
+        verbose: true,
+        urlBuilder: devnookUrlBuilder,
+      }],
+      [rehypeRelatedCallouts, {
+        contentDir: 'src/content',
+        wordThreshold: 500,
+        maxCallouts: 3,
         verbose: true,
         urlBuilder: devnookUrlBuilder,
       }],

@@ -315,3 +315,42 @@ pre code {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-text-faint);
 }
+
+/* Related callouts — injected by rehype-related-callouts plugin */
+.related-callout {
+  display: block;
+  margin: var(--space-6) 0;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-accent-light);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.related-callout__icon {
+  font-style: normal;
+  color: var(--color-accent);
+  font-weight: 600;
+  margin-right: var(--space-1);
+}
+
+.related-callout__lead {
+  font-style: italic;
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin-right: var(--space-1);
+}
+
+.related-callout__link {
+  color: var(--color-accent);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 2px;
+  transition: text-decoration-color 0.15s ease;
+}
+
+.related-callout__link:hover {
+  text-decoration-color: var(--color-accent);
+}
