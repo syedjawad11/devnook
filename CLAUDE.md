@@ -40,26 +40,25 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-04-25, #29)
+## Last Session (2026-04-27, #32)
 
-**Status:** ✅ SEO audit fixes — meta descriptions + broken internal links resolved.
+**Status:** ✅ In-body related post callouts — build-time rehype plugin shipped and live on Cloudflare Pages.
 
 ### What was done
 
-- **Meta description expansion** (`9c54b81`): SEO audit flagged 14 pages with descriptions under 120 chars. Fixed 3 sources:
-  - `src/pages/languages/[lang]/index.astro` line 52 — template rewrite covers all 12 language hub pages in one edit (now 143–161 chars)
-  - `src/content/tools/json-formatter.md` frontmatter — expanded to 162 chars
-  - `src/content/tools/base64-encoder.md` frontmatter — expanded to 137 chars
-- **Broken internal links** (`a906f0c`): SEO audit flagged 12 pages. Two distinct root causes:
-  - **Real 404 links (fixed)**: `how-to-build-cli-tool-in-kotlin.md` — removed links to non-existent coroutines/extension-functions/kotlin-playground pages, fixed `data-classes` → `data-class` slug; `java/how-to-set-environment-variables-in-java.md` — removed link to non-existent `/languages/php/environment-variables`
-  - **Cloudflare Email Obfuscation (not a code issue)**: 10 pages have email addresses in code examples (e.g. `alice@example.com`) that Cloudflare rewrites to `cdn-cgi/l/email-protection`. Fix: Cloudflare dashboard → devnook.dev → Scrape Shield → Email Address Obfuscation → Off
+- **Created `src/plugins/related-callouts/index.mjs`**: New build-time rehype plugin following the same pattern as `auto-internal-links`. Scans all content via fast-glob + gray-matter, scores related posts (language +3, category +2, tag +1), and splices up to 3 `<aside class="related-callout">` nodes at interior H2 boundaries (skips first + last H2). Skips articles under 500 words or with fewer than 3 H2s. Module-level cache; tools collection excluded.
+- **Updated `astro.config.mjs`**: Added import + plugin registration after `rehypeAutoInternalLinks` (order matters — auto-links runs first).
+- **Updated `public/styles/global.css`**: Appended `.related-callout` CSS block (left-border blue accent, `--color-accent-light` background). Must be global CSS — rehype-injected HTML bypasses Astro scoped styles.
+- **Build verified**: 76 pages built, 38 articles received 3 callouts each, 16 skipped (short/insufficient H2s), 18 tools untouched.
+- **Committed `5dd6c22`** and pushed to `main` → Cloudflare Pages deploy triggered.
 
-### Next session priorities (#30)
+### Next session priorities (#33)
 
-1. **Cloudflare dashboard** — disable Email Address Obfuscation (Scrape Shield) to clear cdn-cgi 404s on 10 pages
-2. **Verify scheduled drip** — daily cron at 08:00 UTC, confirm posts landing
-3. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml`
-4. **Optional cleanup** — delete `link_utility.py` + dormant linker tests after another week of stable plugin operation
+1. **Spot-check tomorrow's drip posts** — verify no broken links in newly staged content
+2. **Apply "never write /languages/ URL" rule** — add to `antigravity-qa.md` and `writer.md` in `../devnook_content_workspace/agents/subagent-prompts/`
+3. **Cloudflare dashboard** — disable Email Address Obfuscation (Scrape Shield → Off) to clear cdn-cgi 404s on 10 pages (carry-over from #29)
+4. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml`
+5. **Repo-wide broken link audit** — sweep remaining published posts using `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root
 
 ### Deferred (do not do)
 
@@ -78,6 +77,7 @@ Start each session from this file + MEMORY.md only.
 - Global styles: `public/styles/` (NOT src/styles/)
 - Tools: `src/pages/tools/[slug].astro` + `public/tools/*.html`
 - Auto-internal-links plugin: `src/plugins/auto-internal-links/index.mjs`
+- Related callouts plugin: `src/plugins/related-callouts/index.mjs`
 - Dev subagent: `agents/subagent-prompts/builder.md`
 - Dev skills: `agents/skills/astro-conventions.md`, `agents/skills/tool-build-patterns.md`
 
@@ -116,6 +116,9 @@ Spawn with: `Agent(prompt=open('agents/subagent-prompts/builder.md').read(), ...
 | Related posts auto-derived at render time (session 27) | `src/layouts/PostLayout.astro` builds the related list from `getCollection()` using a language/category/tags score — never from a hand-written `## Related` markdown section. `frontmatter.related_posts` is unused; leave as `[]`. |
 | Linker retired (session 25) | Replaced by `src/plugins/auto-internal-links/index.mjs` (build-time rehype plugin). `link_utility.py` kept dormant in devnook root — delete after stable operation. |
 | Content pipeline is external | No registry, no staging, no publish scripts in this repo. `src/content/` is written by `../devnook_content_workspace/agents/publish/publish.py` via cross-repo git push. |
+| Language post URLs must use `concept`, not filename | Content pipeline agents historically guessed `/languages/{lang}/{filename-slug}` in body prose. Correct path is always `/languages/{lang}/{concept}` from registry. `publish.py` now has `validate_language_links()` guard that skips files with filename-based links at publish time. `link_utility.py._url_for_row()` is already correct — the bug is agents bypassing it. |
+| Auto-internal-links plugin covers all categories | `src/plugins/auto-internal-links/index.mjs` scans the full `contentDir` via `fast-glob` — all of `guides`, `blog`, `cheatsheets`, `languages`. Not language-only. `devnookUrlBuilder` note only describes URL *generation* for language posts. |
+| Related callouts plugin (session 32) | `src/plugins/related-callouts/index.mjs` — build-time rehype plugin injects up to 3 `<aside class="related-callout">` nodes at interior H2 boundaries. Scoring mirrors PostLayout.astro. CSS in `public/styles/global.css` (not scoped). Per-post opt-out: `excludeRelatedCallouts: true` in frontmatter. |
 
 ---
 
