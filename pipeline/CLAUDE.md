@@ -170,5 +170,23 @@ Both workflows:
 - `/languages/` URLs in body prose are only allowed if the exact path is in INTERNAL_LINKS — applies to both Writer and Antigravity QA
 - Antigravity QA strips any non-verified `/languages/` hyperlink (anchor text kept); Writer must not derive them at all
 
+### What was done in #31
+- **Fixed `validate_language_links()` blind spot** in `agents/publish/publish.py`: added a second regex (`single_re`) that catches and flags malformed single-segment `/languages/{anything}` paths (e.g. `/languages/how-to-handle-error-in-rust`) which previously bypassed the guard entirely. Publisher now runs two passes: single-segment check (always flagged) then two-segment registry check (existing logic).
+
+## Last Session (2026-04-29, #33)
+
+**Status:** ✅ Complete. Fixed overly aggressive language link validator and registry desync; pipeline unblocked.
+
+### What was done in #33
+- **Diagnosed Apr 29 drip failure**: All 7 remaining staged posts were skipped because `validate_language_links()` `single_re` (added in #31) incorrectly flagged valid language category landing page links (`/languages/go`, `/languages/python`, etc.) as malformed single-segment paths.
+- **Fixed `validate_language_links()` in `agents/publish/publish.py`**: `single_re` now only flags single-segment paths that contain a hyphen — language names are never hyphenated but post slugs always are. Valid category links like `/languages/go` pass through cleanly.
+- **Fixed registry desync**: 4 posts published Apr 25–26 were stuck in `staged` status due to `registry.db` not persisting in those CI commits. Updated to `published`: `how-to-check-regex-pattern-in-javascript`, `how-to-do-file-handling-in-google-colab`, `how-to-parse-json-in-ruby`, `how-to-use-environment-variables-in-rust`.
+- **Committed and pushed** both fixes to `devnook-content` repo (`6aa0a54`).
+
+### Current state after #33
+- Registry: **45 published / 7 staged / 10 rejected**, 0 queued
+- 7 staged posts drain: Apr 30 (3) + May 1 (3) + May 2 (1)
+- Queue empty after May 2
+
 ### Next session priorities
-- No open tasks. Next content run: decide category for next batch (more cheatsheets, guides, or blog posts) and repeat Planner → Writer → stage flow.
+- Run Planner → Writer to refill staging queue before May 2 (queue empties that day)
