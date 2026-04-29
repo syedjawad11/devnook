@@ -75,16 +75,32 @@ def strip_related_section(file_path: Path) -> bool:
 
 def validate_language_links(staging_path: Path) -> list:
     """
-    Scan body prose for /languages/{lang}/{segment} links and verify each
-    segment is a valid concept in the registry (not a filename-based slug).
+    Scan body prose for /languages/ links and verify they are valid.
+    Two checks:
+      1. Single-segment paths (/languages/{slug}) — flag if the segment looks like a post
+         slug (contains a hyphen). Short hyphen-free segments are language category landing
+         pages (e.g. /languages/go, /languages/rust) and are always valid.
+      2. Two-segment paths (/languages/{lang}/{concept}) — verify concept exists in registry.
     Returns a list of problem descriptions; empty list means clean.
     """
     text = staging_path.read_text(encoding="utf-8")
-    link_re = re.compile(r'\]\((/languages/([^/\s"]+)/([^/\s")]+))')
+    # Single-segment: only flag if the segment contains a hyphen (looks like a post slug)
+    single_re = re.compile(r'\]\((/languages/([^/\s")]+))\)')
+    # Catches properly-formed two-segment paths e.g. /languages/rust/error-handling
+    two_seg_re = re.compile(r'\]\((/languages/([^/\s"]+)/([^/\s")]+))')
     problems = []
 
+    # Flag single-segment /languages/ links that look like post slugs (contain hyphens).
+    # Short hyphen-free segments like /languages/go are valid category landing pages.
+    for m in single_re.finditer(text):
+        segment = m.group(2)
+        if "-" in segment:
+            problems.append(
+                f"{m.group(1)} is a malformed /languages/ link (missing language subdir)"
+            )
+
     conn = sqlite3.connect(DB_PATH)
-    for m in link_re.finditer(text):
+    for m in two_seg_re.finditer(text):
         full_path, lang, segment = m.group(1), m.group(2), m.group(3).rstrip("/")
         is_concept = conn.execute(
             "SELECT 1 FROM posts WHERE language = ? AND concept = ?",
