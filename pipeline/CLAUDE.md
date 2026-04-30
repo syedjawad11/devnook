@@ -173,6 +173,30 @@ Both workflows:
 ### What was done in #31
 - **Fixed `validate_language_links()` blind spot** in `agents/publish/publish.py`: added a second regex (`single_re`) that catches and flags malformed single-segment `/languages/{anything}` paths (e.g. `/languages/how-to-handle-error-in-rust`) which previously bypassed the guard entirely. Publisher now runs two passes: single-segment check (always flagged) then two-segment registry check (existing logic).
 
+## Last Session (2026-04-30, #34)
+
+**Status:** ✅ Complete. Fixed broken `/languages/` links blocking the drip queue; pipeline unblocked.
+
+### What was done in #34
+- **Diagnosed Apr 29 & Apr 30 drip failures**: 4 of 7 staged posts contained broken `/languages/{lang}/{concept}` cross-references to posts not yet in the registry. The FIFO queue always served these 4 posts first (tied oldest mtime), so every cron run picked 3 broken posts, all 3 failed `validate_language_links()`, and zero posts were published.
+- **Fixed 4 staged files** — stripped 9 broken hyperlinks while preserving anchor text (per antigravity-qa.md rule). Also corrected a `list-comprehensions` → `list-comprehension` plural typo in the dictionary comprehension post that pointed to a rejected (404) concept.
+  - `content-staging/languages/how-to-use-destructuring-in-javascript.md` — stripped `spread-operator`, `arrow-functions` links
+  - `content-staging/languages/how-to-use-interfaces-in-go.md` — stripped `structs`, `error-handling`, `concurrency` links
+  - `content-staging/languages/how-to-use-pattern-matching-in-rust.md` — stripped `rust/error-handling`, `python/match-statement`, `go/type-switch` links
+  - `content-staging/languages/python/how-to-do-dictionary-comprehension-in-python.md` — fixed `list-comprehension` URL, stripped `generators` link
+- **Committed and pushed** fix to `devnook-content` repo (`253e9d2`).
+
+### Current state after #34
+- Registry: **45 published / 7 staged / 10 rejected**, 0 queued
+- All 7 staged posts now pass validator; drip cron will resume normally at 08:00 UTC May 1
+- Queue empties after ~May 2 (7 posts ÷ 3/day)
+
+### Next session priorities
+- Run Planner → Writer to refill staging queue (queue empties ~May 2)
+- Future improvement (out of scope today): `validate_language_links()` should filter by `status='published'` so rejected/staged concepts can't be linked to
+
+---
+
 ## Last Session (2026-04-29, #33)
 
 **Status:** ✅ Complete. Fixed overly aggressive language link validator and registry desync; pipeline unblocked.
