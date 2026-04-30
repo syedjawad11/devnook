@@ -329,8 +329,8 @@ Go interfaces solve the coupling problem by defining contracts through method se
 
 ## Related
 
-- Learn how Go handles structured data with [structs in Go](/languages/go/structs)
-- Understand Go's unique error handling approach in [error handling in Go](/languages/go/error-handling)
-- Explore concurrent programming with [concurrency in Go](/languages/go/concurrency)
+- Learn how Go handles structured data with structs in Go
+- Understand Go's unique error handling approach in error handling in Go
+- Explore concurrent programming with concurrency in Go
 - Visit the [Go language hub](/languages/go) for more concept guides
 - Try Go code interactively with the [Go Playground tool](/tools/go-playground)

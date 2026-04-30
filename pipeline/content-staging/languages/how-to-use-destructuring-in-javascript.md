@@ -374,8 +374,8 @@ The test suite validates two functions that rely on destructuring for their core
 
 ## Related
 
-- Combine destructuring with the [spread operator in JavaScript](/languages/javascript/spread-operator) for powerful data manipulation patterns
+- Combine destructuring with the spread operator in JavaScript for powerful data manipulation patterns
 - Understand variable scoping in [closures in JavaScript](/languages/javascript/closures)
-- Streamline function expressions with [arrow functions in JavaScript](/languages/javascript/arrow-functions)
+- Streamline function expressions with arrow functions in JavaScript
 - Visit the [JavaScript language hub](/languages/javascript) for more concept guides
 - Try destructuring patterns interactively with the [JavaScript REPL tool](/tools/javascript-repl)

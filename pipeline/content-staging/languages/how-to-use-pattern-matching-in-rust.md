@@ -343,8 +343,8 @@ Rust's pattern matching stands apart from equivalent features in other languages
 
 ## Related
 
-- Explore how Rust uses pattern matching for error handling in [error handling in Rust](/languages/rust/error-handling)
-- Compare with Python's newer match statement in [match statement in Python](/languages/python/match-statement)
-- See how Go handles type discrimination in [type switch in Go](/languages/go/type-switch)
+- Explore how Rust uses pattern matching for error handling in error handling in Rust
+- Compare with Python's newer match statement in match statement in Python
+- See how Go handles type discrimination in type switch in Go
 - Visit the [Rust language hub](/languages/rust) for more concept guides
 - Try Rust code interactively with the [Rust Playground tool](/tools/rust-playground)

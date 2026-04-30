@@ -323,6 +323,6 @@ Dictionary comprehensions are a first-class Python feature that replace verbose 
 
 ## Related
 
-- [Python List Comprehensions: The Complete Guide](/languages/python/list-comprehensions)
-- [How Generators Work in Python](/languages/python/generators)
+- [Python List Comprehensions: The Complete Guide](/languages/python/list-comprehension)
+- How Generators Work in Python
 - [Python Cheat Sheet](/cheatsheets/python)
