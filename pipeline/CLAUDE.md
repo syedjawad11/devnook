@@ -197,6 +197,31 @@ Both workflows:
 
 ---
 
+## Last Session (2026-05-01, #35)
+
+**Status:** ✅ Complete. Diagnosed CI non-failures; cleared staging queue manually.
+
+### What was done in #35
+- **Installed and authenticated gh CLI** to enable direct CI log inspection.
+- **Diagnosed Apr 29–30 "failures"**: Workflow runs were all green (exit 0), not authentication or PAT failures. The publisher silently skipped all 3 picked posts each day because they had broken `/languages/` links — same root cause session #34 fixed. No CI infrastructure issues.
+- **Confirmed all 4 remaining staged posts pass validation** after session #34's fixes.
+- **Published all 4 staged posts manually** (user requested clearing the queue ahead of evening batch creation):
+  - `how-to-use-destructuring-in-javascript`
+  - `how-to-use-interfaces-in-go`
+  - `how-to-use-pattern-matching-in-rust`
+  - `how-to-do-dictionary-comprehension-in-python`
+- **Committed and pushed** both repos: devnook (`e36c4da`) and devnook-content (`bfe8772`).
+
+### Current state after #35
+- Registry: **52 published / 0 staged / 10 rejected**, 0 queued
+- Staging queue is empty — drip cron will publish nothing until queue is refilled
+- CI is healthy; no secrets rotation needed
+
+### Next session priorities
+- Run Planner → Writer pipeline to generate a new batch of articles and stage them (planned for evening of May 1)
+
+---
+
 ## Last Session (2026-04-29, #33)
 
 **Status:** ✅ Complete. Fixed overly aggressive language link validator and registry desync; pipeline unblocked.
