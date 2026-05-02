@@ -24,7 +24,7 @@ og_image: /og/tools/colour-converter.png
 
 ## What is the Colour Converter?
 
-The Colour Converter is a free browser-based tool that instantly translates colour values between HEX, RGB, HSL, and CSS named colour formats. Whether you are a web designer working with a brand colour palette or a developer translating design tokens into code, this converter handles all common CSS colour representations with one click.
+The Colour Converter is a free browser-based tool that instantly translates colour values between HEX, RGB, HSL, and CSS named colour formats. Whether you are a web designer working with a brand colour palette, a developer translating design tokens into code, or a creator aligning brand colours for [meta tag OG images](/tools/meta-tag-generator), this converter handles all common CSS colour representations with one click.
 
 All conversions happen entirely in your browser — no colour values are sent to any server.
 
@@ -60,3 +60,5 @@ Rounding to whole-number HSL values loses fractional precision, so converting HE
 
 **Does this tool support alpha/transparency?**  
 Not currently. Transparent colours (`rgba`, `hsla`) are not supported — use the HEX, RGB, or HSL formats only.
+
+When you're ready to apply your colours in code, the [HTML Formatter](/tools/html-formatter) tidies up your markup — or explore layout patterns in the [CSS Flexbox Cheat Sheet](/cheatsheets/css-flexbox-cheatsheet).

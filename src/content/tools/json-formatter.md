@@ -24,7 +24,7 @@ tool_slug: json-formatter
 
 ## What is JSON Formatter & Validator?
 
-JSON Formatter & Validator is a free browser-based tool that formats, validates, and minifies JSON data instantly. Whether you're debugging API responses, cleaning up config files, or preparing JSON for production, this json formatter online handles it without sending your data to any server. Everything runs locally in your browser, keeping your data private and secure.
+JSON Formatter & Validator is a free browser-based tool that formats, validates, and minifies JSON data instantly. Whether you're debugging API responses, cleaning up config files, preparing JSON for production, or converting [CSV data to JSON](/tools/csv-to-json) first, this json formatter online handles it without sending your data to any server. Everything runs locally in your browser, keeping your data private and secure.
 
 ## How to Use the JSON Formatter
 
@@ -38,7 +38,7 @@ The validator shows exactly where errors occur, making it fast to fix malformed 
 
 ## When to Use This Tool
 
-- **Debugging API responses**: Format compact JSON from curl or Postman to read structure clearly
+- **Debugging API responses**: Format compact JSON from [curl](/guides/curl-command-guide) or Postman to read structure clearly
 - **Cleaning config files**: Standardize indentation across team JSON configs
 - **Preparing for production**: Minify JSON to reduce file size before deployment
 - **Learning JSON syntax**: Validate examples while learning JSON structure and rules
@@ -57,4 +57,4 @@ Yes. The tool handles JSON files up to several megabytes. Performance depends on
 
 Format adds indentation and line breaks for readability. Minify removes all whitespace to create the smallest possible valid JSON, ideal for production environments or network transmission.
 
-Try the [JSON Formatter & Validator](/tools/json-formatter) now — completely free, no sign-up required.
+Inspecting a JWT? The payload is JSON — [decode it here](/tools/jwt-decoder). Try the [JSON Formatter & Validator](/tools/json-formatter) now — completely free, no sign-up required.

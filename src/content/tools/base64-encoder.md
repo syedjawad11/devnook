@@ -40,7 +40,7 @@ The tool validates your input and displays error messages if the Base64 string i
 
 - Embedding images directly in CSS or HTML (`data:` URIs)
 - Transmitting binary data in JSON payloads
-- Encoding authentication credentials in HTTP headers
+- Encoding [authentication credentials](/guides/base64-encoding-decoding-guide) in HTTP headers
 - Storing binary data in text-based configuration files
 - URL-safe encoding for passing data in query parameters
 

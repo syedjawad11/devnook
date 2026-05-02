@@ -39,9 +39,9 @@ The tool validates input automatically and displays clear error messages if your
 
 ## When Would You Use This CSV to JSON Converter?
 
-- **API integration**: Convert CSV exports from databases or spreadsheets into JSON for API consumption
+- **API integration**: Convert CSV exports from databases or spreadsheets into JSON for API consumption — validate and format the output with the [JSON Formatter](/tools/json-formatter)
 - **Data migration**: Transform legacy CSV files into modern JSON format for web applications
-- **Testing and development**: Generate mock JSON datasets from CSV test data
+- **Testing and development**: Generate mock JSON datasets from CSV test data, or [compare two CSV snapshots](/tools/diff-viewer) to spot changes
 - **Reverse conversion**: Export JSON API responses back to CSV for spreadsheet analysis
 - **Configuration files**: Convert between CSV config files and JSON for different deployment environments
 
@@ -59,4 +59,4 @@ Absolutely. Select "Custom" from the delimiter dropdown and enter any single cha
 
 The converter fills missing values with empty strings and displays a warning. JSON output will include all detected columns with null or empty values where data is absent.
 
-Ready to convert your data? Try the [CSV ↔ JSON Converter](/tools/csv-to-json) now — no signup required.
+Ready to convert your data? Once converted, loop over the results with [JavaScript array methods](/cheatsheets/javascript-array-cheatsheet). Try the [CSV ↔ JSON Converter](/tools/csv-to-json) now — no signup required.

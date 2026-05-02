@@ -35,7 +35,7 @@ All generation happens locally in your browser. Nothing is sent to any server.
 4. Choose a **License**: MIT, Apache 2.0, GPL v3, or None
 5. Toggle optional sections: **Badges** and **Contributing**
 6. Click **Generate README**
-7. Click **Copy Markdown** to copy the output, then paste it into your project's `README.md`
+7. Click **Copy Markdown** to copy the output, then paste it into your project's `README.md` — or preview it with the [Markdown to HTML Converter](/tools/markdown-to-html)
 
 ## What Sections Are Included
 
@@ -55,5 +55,7 @@ The generated README includes these sections, adapted to the project type you se
 - **Write for a newcomer** — Assume the reader has never heard of your project. The first paragraph should explain what it does and why someone would use it.
 - **Keep installation steps copy-paste-ready** — Use code blocks for every terminal command.
 - **Add a badge for CI status** — A passing build badge signals that the project is actively maintained.
-- **Update the README when the API changes** — Outdated documentation is worse than no documentation.
+- **Update the README when the API changes** — Outdated documentation is worse than no documentation. Use the [Diff Viewer](/tools/diff-viewer) to spot exactly what changed between versions.
 - **Link to full docs separately** — If your project has extensive documentation, link to a `/docs` folder or an external site rather than cramming everything into the README.
+
+For essential CLI commands to use alongside your README, see the [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet).

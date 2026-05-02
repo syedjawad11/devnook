@@ -41,8 +41,8 @@ The formatter handles complex queries including subqueries, CTEs, and multi-tabl
 - **Code reviews**: Format team members' SQL queries to meet style guidelines before merging
 - **Legacy database cleanup**: Beautify old, unformatted queries in existing codebases
 - **Learning SQL**: Study well-formatted examples to understand query structure
-- **Database migrations**: Clean up migration scripts for better version control readability
-- **Documentation**: Present SQL examples in technical docs with consistent formatting
+- **Database migrations**: Clean up migration scripts for better version control readability, or [convert exported CSV data](/tools/csv-to-json) to JSON for your application layer
+- **Documentation**: Present SQL examples in technical docs with consistent formatting — and format any [JSON payloads](/tools/json-formatter) your queries return
 
 ## FAQ
 
@@ -58,4 +58,4 @@ Yes, the formatter supports CREATE PROCEDURE, CREATE TRIGGER, and other DDL stat
 
 Never. The formatter only capitalizes SQL keywords. Your identifiers, string literals, and comments remain unchanged.
 
-[Format your SQL queries now with our free sql code formatter](/tools/sql-formatter) — no signup required.
+Curious about non-relational alternatives? Explore [SQL vs NoSQL differences](/blog/sql-vs-nosql-differences-examples). [Format your SQL queries now with our free sql code formatter](/tools/sql-formatter) — no signup required.

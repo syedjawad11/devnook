@@ -39,8 +39,8 @@ All generation happens in your browser using the Web Crypto API — no data is s
 
 ## When to Use This
 
-- **Database primary keys:** Generate unique record IDs without auto-increment conflicts
-- **API request tracking:** Create unique correlation IDs for distributed tracing
+- **Database primary keys:** Generate unique record IDs without auto-increment conflicts — unlike [hash-based IDs](/tools/hash-generator), UUIDs carry no reversible information
+- **API request tracking:** Create unique correlation IDs for distributed tracing — these IDs appear in [JSON payloads](/tools/json-formatter) across your logging system
 - **File naming:** Generate collision-free filenames for uploads or temporary files
 - **Session identifiers:** Create secure, unpredictable session tokens
 
@@ -58,4 +58,4 @@ With 122 random bits, the collision probability is astronomically low (about 1 i
 
 Yes. This uuid generator online uses `crypto.randomUUID()` or `crypto.getRandomValues()` — both are cryptographically secure random number generators suitable for production use.
 
-[Try the UUID v4 Generator now](/tools/uuid-generator) — generate as many identifiers as you need, instantly and securely.
+To validate UUID format patterns, use the [Regex Tester](/tools/regex-tester). [Try the UUID v4 Generator now](/tools/uuid-generator) — generate as many identifiers as you need, instantly and securely.
