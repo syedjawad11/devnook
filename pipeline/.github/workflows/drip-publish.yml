@@ -8,7 +8,7 @@ on:
       count:
         description: 'Number of posts to publish'
         required: false
-        default: '3'
+        default: '2'
         type: string
 
 jobs:
@@ -50,9 +50,9 @@ jobs:
         id: set_count
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "count=${{ inputs.count || '3' }}" >> $GITHUB_OUTPUT
+            echo "count=${{ inputs.count || '2' }}" >> $GITHUB_OUTPUT
           else
-            echo "count=3" >> $GITHUB_OUTPUT
+            echo "count=2" >> $GITHUB_OUTPUT
           fi
 
       - name: Run drip publisher
