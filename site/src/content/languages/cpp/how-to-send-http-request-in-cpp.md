@@ -21,8 +21,6 @@ template_id: lang-v1
 title: 'How to Send an HTTP Request in C++: Cpr and libcurl Explained'
 ---
 
-# How to Send an HTTP Request in C++: Cpr and libcurl Explained
-
 Sending an HTTP request in C++ is famously verbose because the standard library doesn't include networking out of the box, forcing developers to rely on third-party libraries for web communication.
 
 ## What is an HTTP Request in C++?

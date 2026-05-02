@@ -20,8 +20,6 @@ template_id: lang-v1
 title: 'How to Write a Closure in Swift: A Modern Guide'
 ---
 
-# How to Write a Closure in Swift: A Modern Guide
-
 Writing closures in Swift is a fundamental stepping stone to mastering modern iOS and macOS development, shifting away from rigid delegate protocols into elegant, functional callback architectures.
 
 ## What is a Closure in Swift?

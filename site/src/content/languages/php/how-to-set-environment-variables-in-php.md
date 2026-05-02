@@ -20,8 +20,6 @@ template_id: lang-v1
 title: 'How to Set Environment Variables in PHP: Dotenv and Superglobals'
 ---
 
-# How to Set Environment Variables in PHP: Dotenv and Superglobals
-
 Handling secrets precisely is the cornerstone of backend web development. In PHP, securely setting and accessing [environment variables](/languages/java/environment-variables) abstracts sensitive data away from raw source code and commits.
 
 ## What are Environment Variables in PHP?

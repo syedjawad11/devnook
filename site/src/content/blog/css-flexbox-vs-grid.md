@@ -22,8 +22,6 @@ title: 'CSS Flexbox vs Grid: When to Use Each'
 word_count_target: 1500
 ---
 
-# CSS Flexbox vs Grid: When to Use Each
-
 CSS Flexbox and Grid are both layout systems built into modern browsers, but they solve different problems. Flexbox is a one-dimensional layout model — it handles a row or a column. Grid is two-dimensional — it handles rows and columns simultaneously. Choosing the right one isn't always obvious, so here's a direct comparison with real code.
 
 ## The Core Difference

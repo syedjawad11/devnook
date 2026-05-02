@@ -12,8 +12,6 @@ downloadable: true
 content_type: editorial
 ---
 
-# Docker Commands Cheat Sheet
-
 Docker's CLI gives you full control over containers, images, volumes, and networks from the terminal. This cheat sheet organizes the most-used commands by task so you can find what you need without digging through docs.
 
 ## Container Lifecycle Commands

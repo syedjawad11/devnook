@@ -21,8 +21,6 @@ title: How to Set Environment Variables in Java?
 word_count_target: 1500
 ---
 
-# How to Set Environment Variables in Java?
-
 ## The Problem
 
 When building a [Java](/languages/java) application, you often need to connect to a database or authenticate with a third-party API. A common mistake is hardcoding these secrets directly into the source code as static string variables. 
