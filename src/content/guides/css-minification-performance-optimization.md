@@ -22,8 +22,6 @@ title: 'CSS Minification: Reduce File Size and Improve Site Performance'
 word_count_target: 1800
 ---
 
-# CSS Minification: Reduce File Size and Improve Site Performance
-
 CSS minification removes every character that the browser doesn't need — whitespace, comments, redundant semicolons — without changing what the stylesheet does. The result is a smaller file that transfers faster and parses slightly quicker.
 
 ## What CSS Minification Actually Does

@@ -12,8 +12,6 @@ downloadable: true
 content_type: editorial
 ---
 
-# CSS Flexbox Cheat Sheet
-
 CSS Flexbox is a one-dimensional layout model that lets you distribute space and align items in a container along a single axis. This reference covers every property — for both the flex container and flex items — with values, defaults, and usage examples.
 
 ## Enabling Flexbox

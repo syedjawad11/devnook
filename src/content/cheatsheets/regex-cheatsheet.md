@@ -12,8 +12,6 @@ downloadable: true
 content_type: editorial
 ---
 
-# Regex Cheat Sheet
-
 Regular expressions are a universal pattern-matching language supported by every major programming language and many command-line tools. This reference covers the full syntax — from basic character classes to advanced lookaheads — so you can write and read regex confidently.
 
 ## Character Classes & Literals

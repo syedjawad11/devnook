@@ -22,8 +22,6 @@ title: 'HTML Minification: Reduce Markup Size for Faster Page Loads'
 word_count_target: 1800
 ---
 
-# HTML Minification: Reduce Markup Size for Faster Page Loads
-
 HTML minification strips whitespace, comments, and optional syntax from your markup without changing how the browser parses or renders it. The result is a smaller initial HTML payload — the first resource the browser fetches and parses before it can begin loading anything else on the page.
 
 ## Why HTML Minification Matters

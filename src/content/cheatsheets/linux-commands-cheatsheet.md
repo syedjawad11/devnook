@@ -12,8 +12,6 @@ downloadable: true
 content_type: editorial
 ---
 
-# Linux Commands Cheat Sheet
-
 The Linux command line gives you direct, scriptable control over every aspect of your system. This reference organises the most-used commands by task — from navigating the file system to diagnosing network issues — across beginner, intermediate, and advanced tiers.
 
 ## File System Navigation & Management

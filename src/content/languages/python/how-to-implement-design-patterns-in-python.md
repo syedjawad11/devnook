@@ -21,8 +21,6 @@ template_id: lang-v1
 title: 'How to Implement Design Patterns in Python: A Modern Guide'
 ---
 
-# How to Implement Design Patterns in Python: A Modern Guide
-
 Implementing design patterns in [Python](/languages/python) often looks fundamentally different from Java or C++, because Python's dynamic typing, first-class functions, and module system make many patterns far more concise — and some patterns unnecessary altogether.
 
 ## What are Design Patterns in Python?

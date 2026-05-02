@@ -20,8 +20,6 @@ title: 'URL Encoding and Query Parameters: Complete Developer Guide'
 word_count_target: 1800
 ---
 
-# URL Encoding and Query Parameters: Complete Developer Guide
-
 URL encoding (also called percent encoding) converts characters that are not allowed or carry special meaning in a URL into a safe representation using a `%` followed by two hexadecimal digits. Getting it wrong causes broken links, failed API calls, and security vulnerabilities.
 
 ## Why URL Encoding Exists

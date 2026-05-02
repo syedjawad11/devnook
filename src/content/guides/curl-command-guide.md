@@ -23,8 +23,6 @@ title: 'curl Command: The Complete Guide for Developers'
 word_count_target: 1800
 ---
 
-# curl Command: The Complete Guide for Developers
-
 `curl` is a command-line tool for transferring data using URLs. Developers use it to test HTTP APIs, download files, inspect headers, send form data, and debug network requests — all from the terminal without a GUI client.
 
 ## Basic GET Request

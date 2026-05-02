@@ -23,8 +23,6 @@ title: 'How to Call Lambda Functions in Java: A Complete Guide'
 word_count_target: 1500
 ---
 
-# How to Call Lambda Functions in Java: A Complete Guide
-
 Learning how to call lambda functions in [Java](/languages/java) is essential for writing concise, functional-style code after Java 8. Before Java 8 arrived in 2014, passing a block of behavior to a method required instantiating an anonymous inner class — a pattern so verbose it often hid the actual intent of the code beneath a wall of boilerplate.
 
 ## The Problem

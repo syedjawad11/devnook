@@ -24,8 +24,6 @@ title: Git Commands Cheat Sheet
 word_count_target: 800
 ---
 
-# Git Commands Cheat Sheet
-
 Git commands grouped by task — setup, daily workflow, branching, history, and recovery. Every command here is standard Git with no external dependencies.
 
 ## Setup and Configuration

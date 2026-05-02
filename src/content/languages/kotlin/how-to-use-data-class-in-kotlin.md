@@ -21,8 +21,6 @@ title: How to Use Data Classes in Kotlin?
 word_count_target: 1500
 ---
 
-# How to Use Data Classes in Kotlin?
-
 ## The Problem
 
 When building rigorous applications such as an Android App or Spring Boot microservice, developers frequently create classes whose sole purpose is strictly holding data state (POJOs in [Java](/languages/java)). If you use standard structures, you face an avalanche of required boilerplate generation just to ensure the objects behave efficiently.

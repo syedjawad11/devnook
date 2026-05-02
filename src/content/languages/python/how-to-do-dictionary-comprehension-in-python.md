@@ -21,8 +21,6 @@ title: 'How to Do Dictionary Comprehension in Python: A Complete Guide'
 word_count_target: 1500
 ---
 
-# How to Do Dictionary Comprehension in Python: A Complete Guide
-
 When you need to construct or transform a [Python](/languages/python) dictionary from an iterable, writing a traditional `for` loop is the instinctive first approach — but dictionary comprehensions express the same intent in a single line that reads closer to mathematical set notation.
 
 ## The Problem
