@@ -40,21 +40,24 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-04-27, #32)
+## Last Session (2026-05-02, #33)
 
-**Status:** ✅ In-body related post callouts — build-time rehype plugin shipped and live on Cloudflare Pages.
+**Status:** ✅ Inline cross-links added to all 17 tool pages — 51 new links, committed `7c8072c` and live on Cloudflare Pages.
 
 ### What was done
 
-- **Created `src/plugins/related-callouts/index.mjs`**: New build-time rehype plugin following the same pattern as `auto-internal-links`. Scans all content via fast-glob + gray-matter, scores related posts (language +3, category +2, tag +1), and splices up to 3 `<aside class="related-callout">` nodes at interior H2 boundaries (skips first + last H2). Skips articles under 500 words or with fewer than 3 H2s. Module-level cache; tools collection excluded.
-- **Updated `astro.config.mjs`**: Added import + plugin registration after `rehypeAutoInternalLinks` (order matters — auto-links runs first).
-- **Updated `public/styles/global.css`**: Appended `.related-callout` CSS block (left-border blue accent, `--color-accent-light` background). Must be global CSS — rehype-injected HTML bypasses Astro scoped styles.
-- **Build verified**: 76 pages built, 38 articles received 3 callouts each, 16 skipped (short/insufficient H2s), 18 tools untouched.
-- **Committed `5dd6c22`** and pushed to `main` → Cloudflare Pages deploy triggered.
+- **Added ≥3 inline body cross-links to all 17 tool pages** in `src/content/tools/`. Links point to related tools, guides, cheatsheets, and blog posts. Added inline within existing prose — no new sections, no frontmatter changes.
+- **51 total new links** across: `base64-encoder`, `colour-converter`, `cron-parser`, `csv-to-json`, `diff-viewer`, `hash-generator`, `html-formatter`, `json-formatter`, `jwt-decoder`, `markdown-to-html`, `meta-tag-generator`, `readme-generator`, `regex-tester`, `sitemap-generator-from-url`, `sql-formatter`, `url-encoder`, `uuid-generator`.
+- **Auto-internal-links plugin does NOT cover tool-to-tool links** — all tool page cross-links must be manually maintained in markdown prose (plugin handles guides/blog/cheatsheets/languages only).
+- **Build verified**: 88 pages, no errors. Committed and pushed to `main`.
 
-### Next session priorities (#33)
+### Previous session (#32) summary
 
-1. **Spot-check tomorrow's drip posts** — verify no broken links in newly staged content
+- Related callouts plugin (`src/plugins/related-callouts/index.mjs`) shipped — injects `<aside class="related-callout">` at H2 boundaries for non-tool content pages.
+
+### Next session priorities (#34)
+
+1. **Spot-check drip posts** — verify no broken links in recently staged content
 2. **Apply "never write /languages/ URL" rule** — add to `antigravity-qa.md` and `writer.md` in `../devnook_content_workspace/agents/subagent-prompts/`
 3. **Cloudflare dashboard** — disable Email Address Obfuscation (Scrape Shield → Off) to clear cdn-cgi 404s on 10 pages (carry-over from #29)
 4. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml`
