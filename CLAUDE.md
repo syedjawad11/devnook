@@ -40,22 +40,23 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-02, #33)
+## Last Session (2026-05-02, #34)
 
-**Status:** ✅ Inline cross-links added to all 17 tool pages — 51 new links, committed `7c8072c` and live on Cloudflare Pages.
+**Status:** ✅ Fixed duplicate H1 on 22 pages — committed `83ea829` and deploying to Cloudflare Pages.
 
 ### What was done
 
-- **Added ≥3 inline body cross-links to all 17 tool pages** in `src/content/tools/`. Links point to related tools, guides, cheatsheets, and blog posts. Added inline within existing prose — no new sections, no frontmatter changes.
-- **51 total new links** across: `base64-encoder`, `colour-converter`, `cron-parser`, `csv-to-json`, `diff-viewer`, `hash-generator`, `html-formatter`, `json-formatter`, `jwt-decoder`, `markdown-to-html`, `meta-tag-generator`, `readme-generator`, `regex-tester`, `sitemap-generator-from-url`, `sql-formatter`, `url-encoder`, `uuid-generator`.
-- **Auto-internal-links plugin does NOT cover tool-to-tool links** — all tool page cross-links must be manually maintained in markdown prose (plugin handles guides/blog/cheatsheets/languages only).
-- **Build verified**: 88 pages, no errors. Committed and pushed to `main`.
+- **Removed duplicate H1 from 22 markdown files** in `src/content/`. `PostLayout.astro:114` already auto-renders `<h1>{frontmatter.title}</h1>` — files that also opened with `# Title` in the body produced two H1s per page.
+- **Source of truth:** crawler report `devnook_02-may-2026_multiple-h1-tags_2026-05-02_23-35-24.csv` at repo root confirmed 22 affected URLs.
+- **Fix:** removed the `# Title` line (+ its trailing blank line) from the markdown body of each file. No layout changes, no frontmatter changes.
+- **Build verified**: 88 pages, 0 errors. Committed `83ea829`.
+- **Guardrail:** never write a `# H1` in markdown body for any content category — PostLayout injects it automatically. Content pipeline writers should follow the same rule.
 
-### Previous session (#32) summary
+### Previous session (#33) summary
 
-- Related callouts plugin (`src/plugins/related-callouts/index.mjs`) shipped — injects `<aside class="related-callout">` at H2 boundaries for non-tool content pages.
+- Added ≥3 inline body cross-links to all 17 tool pages (51 links total), committed `7c8072c`.
 
-### Next session priorities (#34)
+### Next session priorities (#35)
 
 1. **Spot-check drip posts** — verify no broken links in recently staged content
 2. **Apply "never write /languages/ URL" rule** — add to `antigravity-qa.md` and `writer.md` in `../devnook_content_workspace/agents/subagent-prompts/`
