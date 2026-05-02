@@ -197,6 +197,29 @@ Both workflows:
 
 ---
 
+## Last Session (2026-05-02, #36)
+
+**Status:** ✅ Complete. Ingested, QA'd, and staged 7 antigravity posts; drip cron reduced to 2/day.
+
+### What was done in #36
+- **Ingested 8 antigravity articles** from `../web_content/output/_ingested/2026-05-02/` directly via Python (Ingest subagent skips `_ingested/` subdirectory, so orchestrator bypassed it).
+- **QA'd all 8** via Antigravity QA subagent — all passed. Fixes: og_image format, category, published_date, invalid related_posts cleared, H1 added, internal links woven in, Related sections stripped.
+- **Rejected `how-to-file-handling-in-python`** — SEO cannibalization with already-published `python-file-handling-tutorial` (same language=python, concept=file-handling). Draft deleted.
+- **Staged 7 posts** to `content-staging/` via `staging.py`.
+- **Reduced drip cron to `count=2`** in `.github/workflows/drip-publish.yml` (was 3) — both schedule path and `workflow_dispatch` default.
+- **Committed and pushed** to `devnook-content` (`04b7b33`).
+
+### Current state after #36
+- Registry: **52 published / 7 staged / 11 rejected**, 0 queued
+- Drip schedule: May 3 (2) + May 4 (2) + May 5 (2) + May 6 (1) = 7 posts
+- Cron now runs at 2/day — remember to revert to 3/day once queue is refilled
+
+### Next session priorities
+- After May 6, run Planner → Writer to refill staging queue
+- Revert drip cron back to `count=3` when refilling queue
+
+---
+
 ## Last Session (2026-05-01, #35)
 
 **Status:** ✅ Complete. Diagnosed CI non-failures; cleared staging queue manually.
