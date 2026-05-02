@@ -44,9 +44,9 @@ The character count is shown for both the input and output, so you can immediate
 
 ## Common Use Cases
 
-- **Template cleanup** — Format HTML pasted from a CMS or design tool that comes without indentation
+- **Template cleanup** — Format HTML pasted from a CMS or design tool that comes without indentation, or clean up [Markdown-converted HTML](/tools/markdown-to-html)
 - **Email HTML** — Minify HTML email templates before embedding them in your email service provider
-- **Code review** — Beautify minified HTML from a live site to understand its structure
+- **Code review** — Beautify minified HTML from a live site to understand its structure, including embedded [JSON data](/tools/json-formatter) in script blocks
 - **Build pipelines** — Quickly test what your minified output will look like before running a build step
 
 ## Frequently Asked Questions
@@ -56,3 +56,5 @@ The formatter uses a token-based approach and will attempt to process the input 
 
 **Does minification affect JavaScript or CSS inside `<script>` or `<style>` tags?**  
 Only whitespace between HTML tags is removed. The content inside `<script>` and `<style>` blocks is preserved exactly as written. For full script/style minification, use a dedicated JavaScript or CSS minifier.
+
+For production optimization best practices, read our [HTML Minification Guide](/guides/html-minification-compression-guide).

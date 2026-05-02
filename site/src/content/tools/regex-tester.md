@@ -38,9 +38,9 @@ The Regex Tester is a free online tool for testing regular expressions against s
 
 This regex tester online is essential when you need to:
 
-- **Validate patterns before deployment** — test regex in form validation, API filters, or database queries before pushing to production
+- **Validate patterns before deployment** — test regex in form validation, API filters, database queries, or [cron expression fields](/tools/cron-parser) before pushing to production
 - **Debug complex expressions** — see exactly which parts of your pattern match and identify issues with capture groups or lookarounds
-- **Learn regex syntax** — experiment with different patterns and flags to understand how regular expressions work in practice
+- **Learn regex syntax** — experiment with different patterns and flags, or reference the [Regex Cheat Sheet](/cheatsheets/regex-cheatsheet) for common patterns
 - **Extract data** — test patterns for parsing log files, extracting URLs, or cleaning up text data
 
 ## Frequently Asked Questions
@@ -53,4 +53,4 @@ This tool uses JavaScript's native regex engine, which supports most common rege
 
 Your most recent pattern and test text persist in your browser's local storage, so they'll be there when you return. For long-term storage, bookmark the page or copy your pattern to a note-taking app.
 
-Test your regular expressions now with our [free regex tester online](/tools/regex-tester) — no sign-up required.
+Test your regular expressions now with our [free regex tester online](/tools/regex-tester) — also useful for validating [URL patterns](/tools/url-encoder). No sign-up required.

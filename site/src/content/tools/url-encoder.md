@@ -35,9 +35,9 @@ URL Encoder/Decoder is a free online tool that converts special characters in UR
 
 ## When Would You Use This Tool?
 
-- Building API requests with query parameters that contain spaces or special characters
+- Building API requests with query parameters — including [JWT tokens](/tools/jwt-decoder) passed as query string values
 - Debugging malformed URLs that fail to load properly
-- Preparing user-generated content for URL transmission
+- Preparing user-generated content for URL transmission — for binary data, [Base64 encoding](/tools/base64-encoder) is often a better choice
 - Converting search queries into URL-safe format
 - Decoding obfuscated URLs to inspect their actual destination
 
@@ -51,4 +51,4 @@ Encode URL encodes the entire string including protocol characters (`:`, `/`, `?
 
 URLs only support ASCII characters from a specific safe set. Spaces aren't in that set, so they're replaced with their hexadecimal representation (%20) to maintain URL validity across all systems.
 
-Ready to encode or decode your URLs? Use our [URL Encoder/Decoder](/tools/url-encoder) now — no installation required, fully client-side processing.
+Ready to encode or decode your URLs? Read our [URL Encoding Guide](/guides/url-encoding-query-parameters-guide) for deeper context, or use our [URL Encoder/Decoder](/tools/url-encoder) now — no installation required, fully client-side processing.

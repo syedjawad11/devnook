@@ -32,11 +32,11 @@ Unlike verification tools, JWT Decoder focuses solely on inspecting token conten
 
 1. Paste your JWT token into the input field
 2. The tool automatically parses the header and payload
-3. Review the decoded JSON output for both sections
+3. Review the decoded [JSON output](/tools/json-formatter) for both sections
 4. Check the expiration date (if present) — expired tokens are highlighted in red
 5. Copy the decoded JSON to your clipboard if needed
 
-The decoder handles standard JWT tokens with three base64-encoded sections separated by dots. Malformed tokens display an error message with details about what went wrong.
+The decoder handles standard JWT tokens with three [Base64url-encoded](/tools/base64-encoder) sections separated by dots. Malformed tokens display an error message with details about what went wrong.
 
 ## When to Use This Tool
 
@@ -56,4 +56,4 @@ No. This tool only decodes and displays token contents. It does not validate sig
 
 Never. This jwt decoder online runs entirely in your browser using client-side JavaScript. Your tokens remain private and are never transmitted over the network.
 
-[Try the JWT Decoder now](/tools/jwt-decoder) to inspect your tokens instantly with zero setup.
+[Try the JWT Decoder now](/tools/jwt-decoder) to inspect your tokens instantly with zero setup. For a deeper dive, see our [What is JWT guide](/guides/what-is-jwt).

@@ -35,7 +35,7 @@ A live Google Search Preview updates as you type so you can see exactly how your
 4. Add an **OG image URL** (used by Facebook, LinkedIn, and Twitter when your page is shared)
 5. Set the **OG type**, **Twitter card**, and **Robots** values as needed
 6. Click **Generate Tags**
-7. Copy the output and paste it inside `<head>` in your HTML
+7. Copy the output, paste it inside `<head>` in your HTML, and clean up your markup with the [HTML Formatter](/tools/html-formatter)
 
 ## What Tags Are Generated
 
@@ -58,3 +58,5 @@ A live Google Search Preview updates as you type so you can see exactly how your
 - Use your canonical URL consistently — it should match the URL in the browser address bar exactly
 - OG images should be at least 1200×630 pixels for best display across social platforms
 - Set `robots` to `noindex, nofollow` only for pages you explicitly do not want indexed (e.g. thank-you pages, admin dashboards)
+
+For complete search engine coverage, pair your meta tags with an [XML Sitemap](/tools/sitemap-generator-from-url). To understand how crawlers interpret your pages, see our [HTTP Status Codes Guide](/guides/http-status-codes-guide).

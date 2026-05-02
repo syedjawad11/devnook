@@ -37,9 +37,9 @@ The converter preserves all Markdown formatting including headings, lists, links
 
 ## When Would You Use This Tool?
 
-- **Publishing workflows**: Convert Markdown drafts to HTML for WordPress, Ghost, or custom CMS platforms
+- **Publishing workflows**: Convert Markdown drafts to HTML for WordPress, Ghost, or custom CMS platforms — then clean up the output with the [HTML Formatter](/tools/html-formatter)
 - **Email templates**: Transform Markdown notes into HTML for email newsletters
-- **Documentation**: Convert README files or technical docs into HTML for web hosting
+- **Documentation**: Convert [README files](/tools/readme-generator) or technical docs into HTML for web hosting
 - **Static sites**: Generate HTML snippets from Markdown for custom builds without a full SSG
 
 ## FAQ
@@ -58,4 +58,4 @@ This tool handles one Markdown document at a time. For batch conversion, you'll 
 
 ---
 
-**Ready to convert?** Try the [Markdown to HTML Converter](/tools/markdown-to-html) now — completely free, no sign-up required.
+**Ready to convert?** Use the [Diff Viewer](/tools/diff-viewer) to compare two Markdown versions before converting. Try the [Markdown to HTML Converter](/tools/markdown-to-html) now — completely free, no sign-up required.

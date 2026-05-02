@@ -43,9 +43,9 @@ All comparison happens locally in your browser using a Longest Common Subsequenc
 
 ## Common Use Cases
 
-- **Code review** — Compare a function before and after refactoring to spot unintended changes
+- **Code review** — Compare a function or [HTML template](/tools/html-formatter) before and after refactoring to spot unintended changes
 - **Config diffs** — Check what changed between two versions of a `.env` or YAML file
-- **Document revisions** — See what was changed between two drafts of a specification or README
+- **Document revisions** — See what was changed between two drafts of a specification, a README, or any [Markdown](/tools/markdown-to-html) file
 - **Debugging** — Compare two API responses to find unexpected differences in output
 
 ## Frequently Asked Questions
@@ -58,3 +58,5 @@ The tool runs in your browser's JavaScript engine. Very large inputs (tens of th
 
 **Can I diff JSON or code with syntax highlighting?**  
 Not currently — output is plain text with line-level colour coding. Syntax highlighting is not supported in this version.
+
+For tracking code changes over time, the [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet) covers the essential diff and log commands.

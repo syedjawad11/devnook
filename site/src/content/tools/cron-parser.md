@@ -33,7 +33,7 @@ Cron is the standard Unix job scheduler. Expressions like `0 9 * * 1-5` are ters
 2. Optionally select **UTC** or **Local** timezone
 3. Click **Parse** or press **Enter**
 4. Read the plain-English explanation and check the next 5 run times
-5. Use the **Presets** dropdown to load common schedules as a starting point
+5. Use the **Presets** dropdown to load common schedules as a starting point, or test field patterns with the [Regex Tester](/tools/regex-tester)
 
 ## Cron Expression Syntax
 
@@ -73,3 +73,5 @@ Yes — if you provide 6 fields, the first field is treated as seconds.
 
 **Why does the next run time look slightly off?**  
 The tool calculates runs by iterating forward minute-by-minute from the current time. Timezone offsets may affect results when switching between UTC and Local.
+
+For Linux scheduling commands, see the [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet) — or assign unique identifiers to each job with the [UUID Generator](/tools/uuid-generator).
