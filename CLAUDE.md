@@ -40,34 +40,42 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-03, #35)
+## Last Session (2026-05-03, #37)
 
-**Status:** ✅ Fixed publish pipeline FIFO bug — posts now publish in correct registry-insertion order.
+**Status:** ✅ Fixed 9 structural path issues — language files moved to correct subdirs. Build verified clean.
 
 ### What was done
 
-- **Diagnosed missing posts** — `languages/cpp/catch-error` and `languages/go/use-lambda-function` appeared missing but were actually published by the May 2 cron run. Local devnook was behind remote; `git pull` synced 4 posts (`how-to-catch-error-in-cpp`, `how-to-use-lambda-function-in-google-sheets`, `how-to-json-parse-in-java`, `how-to-write-lambda-function-in-typescript`).
-- **Pushed session 34 H1 fixes** — commits `83ea829`/`e5618ea` were local-only; pushed `b327bc0` merge to remote so Cloudflare deploys the H1 fix.
-- **Fixed FIFO ordering bug in `publish.py`** — `get_staged_files()` sorted by `st_mtime` which is non-deterministic on GitHub Actions (all files get checkout time as mtime). Replaced with registry `id` sort — stable, insertion-order FIFO. Committed `ad00dc2` to content workspace.
-- **Fixed GSC ping URL** — language posts were pinged at `/languages/{lang}/{filename-stem}` instead of `/languages/{lang}/{concept}`. Now uses `frontmatter.concept`.
-- **URL clarification** — language post URLs always use `frontmatter.concept`, not the filename. E.g. `how-to-catch-error-in-cpp.md` with `concept: "catch-error"` → `/languages/cpp/catch-error`.
+- **Moved 9 misplaced language files** — all `src/content/languages/*.md` root-level files moved to `src/content/languages/{language}/` subdirs via `git mv`. Created `ruby/` subdir (was missing). Commit `42ff5d2`.
+- **Build verified** — `npm run build` clean, 92 pages, 0 errors. URLs unchanged (frontmatter-derived).
+- **Audit re-run** — PASS count: 22 → 31 (57%), WARN: 25 → 16 (30%), path_issue count: 9 → 0. Updated `auditlog.md`.
+- **Manual tasks (do yourself):**
+  - Cloudflare dashboard → devnook.dev → Scrape Shield → Email Address Obfuscation → **Off** (clears cdn-cgi 404s on 10 pages)
+  - Google Search Console → Sitemaps → resubmit `https://devnook.dev/sitemap-index.xml`
 
-### Previous session (#34) summary
+### Previous session (#36) summary
 
-- Removed duplicate H1 from 22 markdown files — `PostLayout.astro` auto-injects `<h1>` so body `# Title` lines produced two H1s per page.
+Built `scripts/seo_audit.py` — 54 posts audited, issues logged in `auditlog.md`.
 
-### Next session priorities (#36)
+### Next session priorities (#38)
 
-1. **Apply "never write /languages/ URL" rule** — add to `antigravity-qa.md` and `writer.md` in `../devnook_content_workspace/agents/subagent-prompts/`
-2. **Cloudflare dashboard** — disable Email Address Obfuscation (Scrape Shield → Off) to clear cdn-cgi 404s on 10 pages (carry-over from #29)
-3. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml`
-4. **Repo-wide broken link audit** — sweep remaining published posts using `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root
+**Content workspace session.** Start by reading `auditlog.md` Issue 1. Then:
+
+1. **Expand 7 FAIL posts** (critical word count — all below target/2):
+   - `/cheatsheets/javascript-array-cheatsheet/` (145 words, target 800)
+   - `/cheatsheets/git-commands-cheatsheet/` (229 words, target 800)
+   - `/languages/kotlin/data-class/` (653 words, target 1500)
+   - `/languages/javascript/singleton-pattern/` (701 words, target 1500)
+   - `/languages/java/environment-variables/` (705 words, target 1500)
+   - `/guides/json-formatter-validator-best-practices/` (873 words, target 1800)
+   - `/guides/url-encoding-query-parameters-guide/` (885 words, target 1800)
 
 ### Deferred (do not do)
 
 - **AdSense integration** — revisit only at 50k visitors/month
 - Blog filter chips wiring (decorative only)
 - Search bar wiring (`SearchBar.astro` parked)
+- **Broken link audit remediation** — deferred to session #40 (use `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root)
 
 ---
 
@@ -83,6 +91,8 @@ Start each session from this file + MEMORY.md only.
 - Related callouts plugin: `src/plugins/related-callouts/index.mjs`
 - Dev subagent: `agents/subagent-prompts/builder.md`
 - Dev skills: `agents/skills/astro-conventions.md`, `agents/skills/tool-build-patterns.md`
+- SEO audit script: `scripts/seo_audit.py` — run with `D:\miniconda3\python.exe scripts/seo_audit.py`
+- SEO audit log: `auditlog.md` — issues, verdicts, session fix plan (read before #37+)
 
 ---
 
