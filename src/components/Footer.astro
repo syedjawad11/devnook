@@ -13,10 +13,10 @@ const currentYear = new Date().getFullYear();
         Free developer tools, guides, and cheat sheets for the modern web.
         A quiet corner of the internet, built to help you ship better code.
       </p>
-      <a href="mailto:admin@devnook.dev" class="email-link">
+      <span class="email-link">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-        admin@devnook.dev
-      </a>
+        <!--email_off-->admin@devnook.dev<!--/email_off-->
+      </span>
     </div>
 
     <div class="col">
@@ -153,8 +153,9 @@ const currentYear = new Date().getFullYear();
     transition: color var(--transition-fast);
   }
 
-  .email-link:hover {
-    color: var(--color-accent);
+  .email-link {
+    cursor: text;
+    user-select: all;
   }
 
   .bottom {
