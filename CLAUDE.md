@@ -40,29 +40,28 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-02, #34)
+## Last Session (2026-05-03, #35)
 
-**Status:** ✅ Fixed duplicate H1 on 22 pages — committed `83ea829` and deploying to Cloudflare Pages.
+**Status:** ✅ Fixed publish pipeline FIFO bug — posts now publish in correct registry-insertion order.
 
 ### What was done
 
-- **Removed duplicate H1 from 22 markdown files** in `src/content/`. `PostLayout.astro:114` already auto-renders `<h1>{frontmatter.title}</h1>` — files that also opened with `# Title` in the body produced two H1s per page.
-- **Source of truth:** crawler report `devnook_02-may-2026_multiple-h1-tags_2026-05-02_23-35-24.csv` at repo root confirmed 22 affected URLs.
-- **Fix:** removed the `# Title` line (+ its trailing blank line) from the markdown body of each file. No layout changes, no frontmatter changes.
-- **Build verified**: 88 pages, 0 errors. Committed `83ea829`.
-- **Guardrail:** never write a `# H1` in markdown body for any content category — PostLayout injects it automatically. Content pipeline writers should follow the same rule.
+- **Diagnosed missing posts** — `languages/cpp/catch-error` and `languages/go/use-lambda-function` appeared missing but were actually published by the May 2 cron run. Local devnook was behind remote; `git pull` synced 4 posts (`how-to-catch-error-in-cpp`, `how-to-use-lambda-function-in-google-sheets`, `how-to-json-parse-in-java`, `how-to-write-lambda-function-in-typescript`).
+- **Pushed session 34 H1 fixes** — commits `83ea829`/`e5618ea` were local-only; pushed `b327bc0` merge to remote so Cloudflare deploys the H1 fix.
+- **Fixed FIFO ordering bug in `publish.py`** — `get_staged_files()` sorted by `st_mtime` which is non-deterministic on GitHub Actions (all files get checkout time as mtime). Replaced with registry `id` sort — stable, insertion-order FIFO. Committed `ad00dc2` to content workspace.
+- **Fixed GSC ping URL** — language posts were pinged at `/languages/{lang}/{filename-stem}` instead of `/languages/{lang}/{concept}`. Now uses `frontmatter.concept`.
+- **URL clarification** — language post URLs always use `frontmatter.concept`, not the filename. E.g. `how-to-catch-error-in-cpp.md` with `concept: "catch-error"` → `/languages/cpp/catch-error`.
 
-### Previous session (#33) summary
+### Previous session (#34) summary
 
-- Added ≥3 inline body cross-links to all 17 tool pages (51 links total), committed `7c8072c`.
+- Removed duplicate H1 from 22 markdown files — `PostLayout.astro` auto-injects `<h1>` so body `# Title` lines produced two H1s per page.
 
-### Next session priorities (#35)
+### Next session priorities (#36)
 
-1. **Spot-check drip posts** — verify no broken links in recently staged content
-2. **Apply "never write /languages/ URL" rule** — add to `antigravity-qa.md` and `writer.md` in `../devnook_content_workspace/agents/subagent-prompts/`
-3. **Cloudflare dashboard** — disable Email Address Obfuscation (Scrape Shield → Off) to clear cdn-cgi 404s on 10 pages (carry-over from #29)
-4. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml`
-5. **Repo-wide broken link audit** — sweep remaining published posts using `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root
+1. **Apply "never write /languages/ URL" rule** — add to `antigravity-qa.md` and `writer.md` in `../devnook_content_workspace/agents/subagent-prompts/`
+2. **Cloudflare dashboard** — disable Email Address Obfuscation (Scrape Shield → Off) to clear cdn-cgi 404s on 10 pages (carry-over from #29)
+3. **Verify sitemap in GSC** — resubmit `https://devnook.dev/sitemap-index.xml`
+4. **Repo-wide broken link audit** — sweep remaining published posts using `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root
 
 ### Deferred (do not do)
 
