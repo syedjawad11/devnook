@@ -33,19 +33,24 @@ def get_category_url_prefix(category: str, slug: str, language: str = None) -> s
     return f"{BASE_URL}/{category}/{slug}"
 
 def get_staged_files(count: int, category_filter: str = "all") -> list:
-    """Get the oldest staged files from content-staging."""
-    all_files = []
-    
-    # Walk content-staging directory
-    for path in STAGING_DIR.rglob("*.md"):
-        all_files.append(path)
-    
-    # Sort by modification time (oldest first = FIFO queue)
-    all_files.sort(key=lambda p: p.stat().st_mtime)
-    
+    """Get the oldest staged files from content-staging in registry insertion order (FIFO).
+
+    st_mtime is unreliable on GitHub Actions — all files get checkout time as mtime,
+    making mtime-based sorting non-deterministic. Registry id is stable and correct.
+    """
+    all_files = list(STAGING_DIR.rglob("*.md"))
+
     if category_filter != "all":
         all_files = [f for f in all_files if category_filter in str(f)]
-    
+
+    conn = sqlite3.connect(DB_PATH)
+    def registry_order(p: Path) -> int:
+        row = conn.execute("SELECT id FROM posts WHERE slug=?", (p.stem,)).fetchone()
+        return row[0] if row else 999999
+
+    all_files.sort(key=registry_order)
+    conn.close()
+
     return all_files[:count]
 
 _RELATED_SECTION_RE = re.compile(
@@ -145,13 +150,14 @@ def update_registry(slug: str, file_path: str):
     conn.close()
 
 def get_post_meta(staging_path: Path) -> dict:
-    """Extract slug, category, language from file path and frontmatter."""
+    """Extract slug, category, language, and concept from file path and frontmatter."""
     import frontmatter
     post = frontmatter.load(str(staging_path))
     return {
         "slug": staging_path.stem,
         "category": post.metadata.get("category", ""),
         "language": post.metadata.get("language", ""),
+        "concept": post.metadata.get("concept", ""),
     }
 
 def publish(count: int, category_filter: str = "all"):
@@ -185,8 +191,9 @@ def publish(count: int, category_filter: str = "all"):
         # Update registry
         update_registry(slug, str(dest_path))
         
-        # Build URL for GSC ping
-        url = get_category_url_prefix(meta["category"], slug, meta.get("language"))
+        # Build URL for GSC ping — use concept for language posts (not filename slug)
+        url_slug = meta["concept"] if meta["category"] == "languages" and meta["concept"] else slug
+        url = get_category_url_prefix(meta["category"], url_slug, meta.get("language"))
         published_urls.append(url)
     
     # Ping GSC for all published URLs (skipped if GOOGLE_SERVICE_ACCOUNT_JSON not set)
