@@ -49,9 +49,9 @@ Start each session from this file + MEMORY.md only.
 - **Moved 9 misplaced language files** — all `src/content/languages/*.md` root-level files moved to `src/content/languages/{language}/` subdirs via `git mv`. Created `ruby/` subdir (was missing). Commit `42ff5d2`.
 - **Build verified** — `npm run build` clean, 92 pages, 0 errors. URLs unchanged (frontmatter-derived).
 - **Audit re-run** — PASS count: 22 → 31 (57%), WARN: 25 → 16 (30%), path_issue count: 9 → 0. Updated `auditlog.md`.
-- **Manual tasks (do yourself):**
-  - Cloudflare dashboard → devnook.dev → Scrape Shield → Email Address Obfuscation → **Off** (clears cdn-cgi 404s on 10 pages)
-  - Google Search Console → Sitemaps → resubmit `https://devnook.dev/sitemap-index.xml`
+- **Manual tasks (done):**
+  - Cloudflare Email Address Obfuscation → Off ✅ (cdn-cgi 404s cleared on 10 pages)
+  - GSC sitemap resubmitted: `https://devnook.dev/sitemap-index.xml` ✅
 
 ### Previous session (#36) summary
 

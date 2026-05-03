@@ -92,11 +92,9 @@ From CLAUDE.md pre-existing priorities:
 
 | Task | Action |
 |------|--------|
-| Disable Cloudflare Email Address Obfuscation | Dashboard: Scrape Shield → Off (clears cdn-cgi 404s on 10 pages) |
-| Resubmit sitemap in GSC | Submit `https://devnook.dev/sitemap-index.xml` |
-| Broken link audit | Use `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root |
-
-**Planned session:** #37 (handle alongside path_issue file moves)
+| Disable Cloudflare Email Address Obfuscation | ✅ Done (session #37) |
+| Resubmit sitemap in GSC | ✅ Done (session #37) |
+| Broken link audit | Use `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root — session #40 |
 
 ---
 
