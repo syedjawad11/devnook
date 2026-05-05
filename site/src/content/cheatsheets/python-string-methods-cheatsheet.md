@@ -29,7 +29,7 @@ template_id: cheatsheet-v2
 title: 'Python String Methods Cheat Sheet: split, join, replace, format & More'
 ---
 
-This [Python](/languages/python) string methods cheatsheet covers every built-in string operation you'll use regularly, organized by what you're trying to accomplish. Whether you're splitting CSV data, cleaning user input, or formatting output, the method you need is here.
+This [Python](/languages/python/) string methods cheatsheet covers every built-in string operation you'll use regularly, organized by what you're trying to accomplish. Whether you're splitting CSV data, cleaning user input, or formatting output, the method you need is here.
 
 ## Splitting & Joining Strings
 

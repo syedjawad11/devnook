@@ -233,4 +233,4 @@ main {
 | Space links evenly | `justify-content: space-between` |
 | Stack vertically | `flex-direction: column` |
 
-Flexbox handles the vast majority of one-dimensional layout needs. For grid-based two-dimensional layouts, pair this reference with a CSS Grid cheatsheet. Explore the full [DevNook cheatsheets hub](/cheatsheets/) for more quick references, including the [JavaScript Array Methods Cheat Sheet](/cheatsheets/javascript-array-cheatsheet) for front-end development. Check the [guides hub](/guides/) for deeper walkthroughs, and visit [DevNook tools](/tools/) for utilities to speed up your development workflow.
+Flexbox handles the vast majority of one-dimensional layout needs. For grid-based two-dimensional layouts, pair this reference with a CSS Grid cheatsheet. Explore the full [DevNook cheatsheets hub](/cheatsheets/) for more quick references, including the [JavaScript Array Methods Cheat Sheet](/cheatsheets/javascript-array-cheatsheet/) for front-end development. Check the [guides hub](/guides/) for deeper walkthroughs, and visit [DevNook tools](/tools/) for utilities to speed up your development workflow.

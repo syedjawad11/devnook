@@ -20,11 +20,11 @@ template_id: lang-v1
 title: 'How to Set Environment Variables in PHP: Dotenv and Superglobals'
 ---
 
-Handling secrets precisely is the cornerstone of backend web development. In PHP, securely setting and accessing [environment variables](/languages/java/environment-variables) abstracts sensitive data away from raw source code and commits.
+Handling secrets precisely is the cornerstone of backend web development. In PHP, securely setting and accessing [environment variables](/languages/java/environment-variables/) abstracts sensitive data away from raw source code and commits.
 
 ## What are Environment Variables in PHP?
 
-Environment variables in [PHP](/languages/php) are dynamic key-value pairs inherently provided by the hosting operating system, web server (like Nginx or Apache), or injected via configuration scripts heavily utilized during runtime execution. Rather than hardcoding a database password directly into a `config.php` file, developers request the value dynamically via PHP's built-in `$_ENV` superglobal or `getenv()` function. This mechanism ensures that different environments (local development, staging, production) can run the exact same programmatic source code with totally different injected contexts.
+Environment variables in [PHP](/languages/php/) are dynamic key-value pairs inherently provided by the hosting operating system, web server (like Nginx or Apache), or injected via configuration scripts heavily utilized during runtime execution. Rather than hardcoding a database password directly into a `config.php` file, developers request the value dynamically via PHP's built-in `$_ENV` superglobal or `getenv()` function. This mechanism ensures that different environments (local development, staging, production) can run the exact same programmatic source code with totally different injected contexts.
 
 ## Why PHP Developers Use Environment Variables
 

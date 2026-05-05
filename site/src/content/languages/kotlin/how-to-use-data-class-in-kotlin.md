@@ -23,7 +23,7 @@ word_count_target: 1500
 
 ## The Problem
 
-When building rigorous applications such as an Android App or Spring Boot microservice, developers frequently create classes whose sole purpose is strictly holding data state (POJOs in [Java](/languages/java)). If you use standard structures, you face an avalanche of required boilerplate generation just to ensure the objects behave efficiently.
+When building rigorous applications such as an Android App or Spring Boot microservice, developers frequently create classes whose sole purpose is strictly holding data state (POJOs in [Java](/languages/java/)). If you use standard structures, you face an avalanche of required boilerplate generation just to ensure the objects behave efficiently.
 
 ```kotlin
 // A standard class requires massive amounts of manual method overriding
@@ -46,7 +46,7 @@ class User(val name: String, val age: Int) {
 
 Creating basic identity, logging outputs (`toString()`), and equality rules (`equals()`) necessitates manually wiring decades-old architecture. The problem compounds as attributes change—if you add an `email` field to the object above, you must meticulously remember to update equality structures or risk catastrophic bugs related to sets and copying.
 
-The maintenance burden compounds in team environments. When a junior developer adds a new field and forgets to update `equals()`, two `User` objects that should be considered identical silently fail equality checks. Sets and Maps built on that class start producing wrong results — bugs that are notoriously hard to trace because the faulty logic is buried in manually written boilerplate, not in the business logic where developers look first. [Java](/languages/java) developers who have worked through this pain tend to reach for libraries like Lombok's `@Data` annotation; Kotlin solves it at the language level instead.
+The maintenance burden compounds in team environments. When a junior developer adds a new field and forgets to update `equals()`, two `User` objects that should be considered identical silently fail equality checks. Sets and Maps built on that class start producing wrong results — bugs that are notoriously hard to trace because the faulty logic is buried in manually written boilerplate, not in the business logic where developers look first. [Java](/languages/java/) developers who have worked through this pain tend to reach for libraries like Lombok's `@Data` annotation; Kotlin solves it at the language level instead.
 
 ## The Kotlin Solution: Data Classes
 

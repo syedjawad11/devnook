@@ -179,7 +179,7 @@ When debugging HTTP issues, start by identifying which class the status code bel
 
 Modern browser developer tools show status codes in the Network tab. For API development, tools like our HTTP request tester let you inspect full request-response cycles including headers and timing information.
 
-Here's a basic example of checking status codes in [JavaScript](/languages/javascript):
+Here's a basic example of checking status codes in [JavaScript](/languages/javascript/):
 
 ```javascript
 async function fetchWithErrorHandling(url) {
@@ -206,7 +206,7 @@ async function fetchWithErrorHandling(url) {
 }
 ```
 
-And in [Python](/languages/python) with requests:
+And in [Python](/languages/python/) with requests:
 
 ```python
 import requests

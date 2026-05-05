@@ -38,7 +38,7 @@ Common breakage points:
 
 ## Parsing and Validating JSON in Python
 
-[Python](/languages/python)'s `json` module raises a `json.JSONDecodeError` with line and column information when it encounters invalid input.
+[Python](/languages/python/)'s `json` module raises a `json.JSONDecodeError` with line and column information when it encounters invalid input.
 
 ```python
 import json
@@ -132,7 +132,7 @@ if (result.error) {
 }
 ```
 
-For schema validation in [JavaScript](/languages/javascript), use [Ajv](https://ajv.js.org/), the most widely used JSON Schema validator:
+For schema validation in [JavaScript](/languages/javascript/), use [Ajv](https://ajv.js.org/), the most widely used JSON Schema validator:
 
 ```javascript
 import Ajv from "ajv";
@@ -356,7 +356,7 @@ Every language has at least one standard library method for JSON serialization, 
 
 ### Go
 
-[Go](/languages/go)'s `encoding/json` package formats JSON with `json.MarshalIndent`:
+[Go](/languages/go/)'s `encoding/json` package formats JSON with `json.MarshalIndent`:
 
 ```go
 import (
@@ -406,7 +406,7 @@ if (!result.success) {
 }
 ```
 
-Zod schema validation gives you both runtime type checking and [TypeScript](/languages/typescript) type inference from a single schema definition, eliminating the gap between your type definitions and your actual validation logic.
+Zod schema validation gives you both runtime type checking and [TypeScript](/languages/typescript/) type inference from a single schema definition, eliminating the gap between your type definitions and your actual validation logic.
 
 ## Handling Large JSON: Streaming Parsers
 
@@ -439,8 +439,8 @@ Use streaming parsers when: loading JSON files larger than 10 MB, processing NDJ
 
 ## Format and Validate Instantly with DevNook
 
-The [DevNook JSON Formatter and Validator](/tools/json-formatter) formats, validates, and highlights errors in JSON directly in your browser. No data leaves your machine. Paste in raw JSON from an API response or configuration file and get immediate feedback on structure and validity.
+The [DevNook JSON Formatter and Validator](/tools/json-formatter/) formats, validates, and highlights errors in JSON directly in your browser. No data leaves your machine. Paste in raw JSON from an API response or configuration file and get immediate feedback on structure and validity.
 
-For JSON that contains Base64-encoded binary fields, see the [Base64 Encoding and Decoding guide](/guides/base64-encoding-decoding-guide). When debugging URLs with JSON payloads, the [URL Encoding guide](/guides/url-encoding-query-parameters-guide) covers how to safely encode JSON strings in query parameters.
+For JSON that contains Base64-encoded binary fields, see the [Base64 Encoding and Decoding guide](/guides/base64-encoding-decoding-guide/). When debugging URLs with JSON payloads, the [URL Encoding guide](/guides/url-encoding-query-parameters-guide/) covers how to safely encode JSON strings in query parameters.
 
 Consistent JSON formatting and schema validation eliminate an entire class of integration bugs. Adding a validator to your CI pipeline takes under ten minutes and prevents hard-to-debug errors from reaching production.

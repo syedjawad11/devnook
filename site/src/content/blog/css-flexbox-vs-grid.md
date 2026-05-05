@@ -143,7 +143,7 @@ Grid's `auto-fill` and `minmax()` create responsive grids without media queries:
 }
 ```
 
-This creates as many columns as fit at minimum 200px width. On a 1200px container that's 6 columns; on 600px it's 3 columns. No [JavaScript](/languages/javascript), no media queries.
+This creates as many columns as fit at minimum 200px width. On a 1200px container that's 6 columns; on 600px it's 3 columns. No [JavaScript](/languages/javascript/), no media queries.
 
 ### Overlapping Layers
 
@@ -263,7 +263,7 @@ The only Grid feature with limited support is `masonry` layout, which is still i
 
 **Not using `fr` units in Grid**: `fr` (fractional unit) is the key to responsive grids. `grid-template-columns: repeat(3, 1fr)` creates three equal columns that scale with the container. Hard-coding pixel values kills the responsiveness.
 
-For keeping your CSS clean and performant after building your layout, see the [CSS Minification guide](/guides/css-minification-performance-optimization). To check and clean your markup, use the [HTML Formatter tool](/tools/html-formatter).
+For keeping your CSS clean and performant after building your layout, see the [CSS Minification guide](/guides/css-minification-performance-optimization/). To check and clean your markup, use the [HTML Formatter tool](/tools/html-formatter/).
 
 ## Responsive Design Patterns
 
@@ -363,4 +363,4 @@ Without subgrid, achieving cross-card alignment required JavaScript to equalize 
 - Use **both together** — Grid for macro layout, Flexbox for micro components
 - Neither is universally better; the right choice depends on whether you need one axis or two
 
-For a complete look at encoding URLs in your CSS (background images, `url()` values), see the [URL Encoding guide](/guides/url-encoding-query-parameters-guide).
+For a complete look at encoding URLs in your CSS (background images, `url()` values), see the [URL Encoding guide](/guides/url-encoding-query-parameters-guide/).

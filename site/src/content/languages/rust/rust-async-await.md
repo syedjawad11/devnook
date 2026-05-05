@@ -59,7 +59,7 @@ This blocking approach forces requests to wait on each other. Each `fetch_user` 
 
 ## The Rust Solution: Async/Await
 
-Understanding how [async/await](/languages/typescript/async-await) works in Rust requires recognizing that it's a zero-cost abstraction for cooperative multitasking. Rust's async/await transforms your code into state machines called futures that can pause execution and resume later without blocking threads.
+Understanding how [async/await](/languages/typescript/async-await/) works in Rust requires recognizing that it's a zero-cost abstraction for cooperative multitasking. Rust's async/await transforms your code into state machines called futures that can pause execution and resume later without blocking threads.
 
 ```rust
 use tokio::time::{sleep, Duration};

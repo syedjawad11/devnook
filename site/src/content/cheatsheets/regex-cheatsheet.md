@@ -240,4 +240,4 @@ re.findall(r'#(?:[0-9a-fA-F]{3}){1,2}\b', css)
 | `\|` | `\\\|` | Literal pipe |
 | `\\` | `\\\\` | Literal backslash |
 
-This cheat sheet covers the full regex syntax you'll encounter in any language or tool. For scripting scenarios where regex is combined with file operations, see the [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet) — `grep`, `sed`, and `awk` all support regex. Explore more quick references on the [DevNook cheatsheets hub](/cheatsheets/), or visit the [guides hub](/guides/) for in-depth tutorials. The [DevNook tools hub](/tools/) also has utilities for testing and debugging your patterns interactively.
+This cheat sheet covers the full regex syntax you'll encounter in any language or tool. For scripting scenarios where regex is combined with file operations, see the [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet/) — `grep`, `sed`, and `awk` all support regex. Explore more quick references on the [DevNook cheatsheets hub](/cheatsheets/), or visit the [guides hub](/guides/) for in-depth tutorials. The [DevNook tools hub](/tools/) also has utilities for testing and debugging your patterns interactively.

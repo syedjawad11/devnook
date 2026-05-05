@@ -109,7 +109,7 @@ This example shows the core transformation — binary data represented as readab
 ## Frequently Asked Questions
 
 **Can I decode Base64 without installing anything?**
-Yes. Use an online Base64 decoder like DevNook's tool. It runs entirely in your browser with [JavaScript](/languages/javascript) — no server uploads, no privacy concerns. Paste the encoded string, click decode, get your result instantly.
+Yes. Use an online Base64 decoder like DevNook's tool. It runs entirely in your browser with [JavaScript](/languages/javascript/) — no server uploads, no privacy concerns. Paste the encoded string, click decode, get your result instantly.
 
 **Is Base64 the same as encryption?**
 No. Base64 is encoding for compatibility, not security. Encryption scrambles data with a key so only authorized parties can read it. Base64 just changes the format. Anyone can decode Base64 with no password or key. Never rely on Base64 to protect sensitive information.
@@ -142,7 +142,7 @@ const base64 = buffer.toString('base64');
 const original = Buffer.from(base64, 'base64');
 ```
 
-**[Python](/languages/python)**
+**[Python](/languages/python/)**
 
 ```python
 import base64
@@ -189,7 +189,7 @@ Don't store sensitive data as Base64 in databases thinking it's obfuscated. Atta
 
 **Tools**:
 - Base64 Decoder Tool — decode or encode Base64 strings in your browser
-- [JSON Formatter](/tools/json-formatter) — format and validate JSON that might contain Base64-encoded data
+- [JSON Formatter](/tools/json-formatter/) — format and validate JSON that might contain Base64-encoded data
 
 **Guides**:
 - What is URL Encoding? — understand percent-encoding for URLs

@@ -216,6 +216,6 @@ docker system prune -a --volumes
 | `--memory` | `-m` | Memory limit (e.g. `512m`) |
 | `--cpus` | | CPU limit (e.g. `1.5`) |
 
-For a deeper look at container orchestration patterns, check the [DevNook guides hub](/guides/). If you work with version control alongside Docker, the [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet) pairs well with this reference. Browse all quick-reference cards on the [cheatsheets hub](/cheatsheets/).
+For a deeper look at container orchestration patterns, check the [DevNook guides hub](/guides/). If you work with version control alongside Docker, the [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet/) pairs well with this reference. Browse all quick-reference cards on the [cheatsheets hub](/cheatsheets/).
 
 Docker commands become second nature with regular use. The table above covers the full lifecycle — from `docker run` to `docker system prune` — so keep it bookmarked for your daily containerized development workflow. For tools that complement your Docker setup, visit [DevNook tools](/tools/).

@@ -179,4 +179,4 @@ This dependency injection approach avoids standing up a local Express server jus
 
 ## Next Steps
 
-After mastering external communication, the logical next step is processing the response data efficiently in memory. You should explore How to Parse JSON in C++ to digest the payloads cleanly. Additionally, handling network delays gracefully without locking your main execution context is critical; look into [Async/Await](/languages/rust/async-await) Patterns in C++ to optimize your application architecture.
+After mastering external communication, the logical next step is processing the response data efficiently in memory. You should explore How to Parse JSON in C++ to digest the payloads cleanly. Additionally, handling network delays gracefully without locking your main execution context is critical; look into [Async/Await](/languages/rust/async-await/) Patterns in C++ to optimize your application architecture.

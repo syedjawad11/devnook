@@ -31,7 +31,7 @@ template_id: lang-v1
 title: 'JavaScript Closures: What They Are and Why They Matter'
 ---
 
-[JavaScript](/languages/javascript) closures are functions that retain access to variables from their outer scope even after that scope has finished executing. Every JavaScript developer encounters closures whether they realize it or not — they're the mechanism behind callbacks, event handlers, and most modern JavaScript patterns.
+[JavaScript](/languages/javascript/) closures are functions that retain access to variables from their outer scope even after that scope has finished executing. Every JavaScript developer encounters closures whether they realize it or not — they're the mechanism behind callbacks, event handlers, and most modern JavaScript patterns.
 
 ## What is a Closure in JavaScript?
 
@@ -168,4 +168,4 @@ Think of scope as the rulebook for variable access, and closures as the memory s
 
 ## Next Steps
 
-After understanding closures, explore arrow functions to learn how they handle `this` differently in closures. Then study [promises](/languages/javascript/promises) and async/await, which rely heavily on closures for managing asynchronous state. For more JavaScript fundamentals, visit our [JavaScript language hub](/languages/javascript).
+After understanding closures, explore arrow functions to learn how they handle `this` differently in closures. Then study [promises](/languages/javascript/promises/) and async/await, which rely heavily on closures for managing asynchronous state. For more JavaScript fundamentals, visit our [JavaScript language hub](/languages/javascript/).

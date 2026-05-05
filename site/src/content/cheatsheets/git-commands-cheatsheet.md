@@ -83,7 +83,7 @@ git diff branch1..branch2  # diff between two branches
 git diff --stat            # summarize changes (files + line counts)
 ```
 
-Use the [Diff Viewer tool](/tools/diff-viewer) for a side-by-side visual comparison when reviewing changes between files.
+Use the [Diff Viewer tool](/tools/diff-viewer/) for a side-by-side visual comparison when reviewing changes between files.
 
 ## Branching
 
@@ -265,9 +265,9 @@ git rev-parse HEAD                   # get current commit SHA
 git ls-files --others --exclude-standard  # list untracked files
 ```
 
-The [Hash Generator tool](/tools/hash-generator) can verify file integrity by generating SHA checksums — useful when comparing artifact hashes in CI pipelines.
+The [Hash Generator tool](/tools/hash-generator/) can verify file integrity by generating SHA checksums — useful when comparing artifact hashes in CI pipelines.
 
-For more on interacting with remote servers programmatically, see the [curl Command guide](/guides/curl-command-guide).
+For more on interacting with remote servers programmatically, see the [curl Command guide](/guides/curl-command-guide/).
 
 ## When Things Go Wrong: Recovery Order
 

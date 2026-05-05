@@ -29,7 +29,7 @@ template_id: lang-v3
 title: 'JavaScript Array Methods: map(), filter(), reduce() and More'
 ---
 
-[JavaScript](/languages/javascript) array methods transform how you process collections. Instead of writing loops, these functional methods let you express data transformations declaratively in a single line.
+[JavaScript](/languages/javascript/) array methods transform how you process collections. Instead of writing loops, these functional methods let you express data transformations declaratively in a single line.
 
 ## Syntax at a Glance
 
@@ -199,7 +199,7 @@ For async operations, use `for await...of` or `Promise.all()` with `map()`, not 
 
 ## Quick Comparison: JavaScript vs Python
 
-| | JavaScript | [Python](/languages/python) |
+| | JavaScript | [Python](/languages/python/) |
 |---|---|---|
 | Transform | `arr.map(x => x * 2)` | `[x * 2 for x in arr]` |
 | Filter | `arr.filter(x => x > 0)` | `[x for x in arr if x > 0]` |

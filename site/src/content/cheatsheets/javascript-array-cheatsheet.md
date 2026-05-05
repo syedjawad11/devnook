@@ -30,7 +30,7 @@ template_id: cheatsheet-v1
 title: 'JavaScript Array Methods Cheat Sheet: Quick Reference Guide'
 ---
 
-This [JavaScript](/languages/javascript) array cheatsheet covers every array method from ES5 through ES2023, organized by use case with syntax, parameters, and return values. Navigate it by use case: transform, search, aggregate, or mutate. Built-in array methods beat hand-rolled `for` loops on every axis — they're more readable, better optimized by the JS engine, and eliminate the off-by-one errors that plague manual index arithmetic. Scan the section headers below to jump directly to what you need.
+This [JavaScript](/languages/javascript/) array cheatsheet covers every array method from ES5 through ES2023, organized by use case with syntax, parameters, and return values. Navigate it by use case: transform, search, aggregate, or mutate. Built-in array methods beat hand-rolled `for` loops on every axis — they're more readable, better optimized by the JS engine, and eliminate the off-by-one errors that plague manual index arithmetic. Scan the section headers below to jump directly to what you need.
 
 ## Creating & Converting Arrays
 
@@ -257,4 +257,4 @@ arr.fill(9, 1, 3);                // [1, 9, 9] (from index 1 to 3)
 
 Choosing the right array method cuts down on unnecessary iterations and makes intent obvious to whoever reads the code next. When you need a new array with every element transformed, `map()` is the answer. When you only want items that satisfy a condition, reach for `filter()`. When you need to collapse the array down to a single output — a sum, a max, a grouped object — `reduce()` handles it. For stopping at the first match, `find()` returns the element and `some()` returns a boolean; both short-circuit as soon as a match is found, so they're more efficient than filtering and checking length. When every element must satisfy a condition, `every()` makes that intent explicit. When you need the position rather than the value, `indexOf()` works for primitives and `findIndex()` works for complex conditions. When your pipeline involves both filtering and transforming, `filter().map()` chains cleanly, or use `flatMap()` when the transform itself produces arrays that you want flattened into a single result.
 
-For deep dives into specific [array methods](/languages/javascript/array-methods), see our guide on JavaScript map vs forEach and array destructuring patterns. Test array methods interactively with our JavaScript REPL.
+For deep dives into specific [array methods](/languages/javascript/array-methods/), see our guide on JavaScript map vs forEach and array destructuring patterns. Test array methods interactively with our JavaScript REPL.

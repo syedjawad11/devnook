@@ -171,4 +171,4 @@ Start with SQL unless you have a specific reason not to. PostgreSQL handles most
 This comparison focused on general characteristics. Specific databases blur these lines: PostgreSQL supports JSONB columns for flexible data, MongoDB offers ACID transactions within a document. Your team's expertise and existing infrastructure matter as much as technical tradeoffs.
 
 
-For hands-on practice with both approaches, try our [SQL Formatter](/tools/sql-formatter) to write cleaner queries and [JSON Formatter](/tools/json-formatter) for NoSQL document work. Learn more about structuring relational data in our database normalization guide, or explore how APIs typically expose this data in REST API design patterns.
+For hands-on practice with both approaches, try our [SQL Formatter](/tools/sql-formatter/) to write cleaner queries and [JSON Formatter](/tools/json-formatter/) for NoSQL document work. Learn more about structuring relational data in our database normalization guide, or explore how APIs typically expose this data in REST API design patterns.
