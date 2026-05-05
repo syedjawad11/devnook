@@ -29,7 +29,7 @@ template_id: lang-v1
 title: 'TypeScript: interface vs type — What''s the Difference?'
 ---
 
-[TypeScript](/languages/typescript) offers two ways to define object shapes: `interface` and `type`. Both work for describing the structure of objects, but they have different capabilities and use cases that affect which one you should choose.
+[TypeScript](/languages/typescript/) offers two ways to define object shapes: `interface` and `type`. Both work for describing the structure of objects, but they have different capabilities and use cases that affect which one you should choose.
 
 ## What are interfaces and types in TypeScript?
 

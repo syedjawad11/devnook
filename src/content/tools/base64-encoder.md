@@ -40,7 +40,7 @@ The tool validates your input and displays error messages if the Base64 string i
 
 - Embedding images directly in CSS or HTML (`data:` URIs)
 - Transmitting binary data in JSON payloads
-- Encoding [authentication credentials](/guides/base64-encoding-decoding-guide) in HTTP headers
+- Encoding [authentication credentials](/guides/base64-encoding-decoding-guide/) in HTTP headers
 - Storing binary data in text-based configuration files
 - URL-safe encoding for passing data in query parameters
 
@@ -58,4 +58,4 @@ Standard Base64 uses `+` and `/` characters which have special meaning in URLs. 
 
 Base64 increases data size by approximately 33% because it represents 3 bytes of input with 4 bytes of output. This trade-off allows binary data to be safely transmitted as text.
 
-Need to work with other encoding formats? Try our [URL Encoder/Decoder](/tools/url-encoder) for percent-encoding or [Hash Generator](/tools/hash-generator) for one-way hashing.
+Need to work with other encoding formats? Try our [URL Encoder/Decoder](/tools/url-encoder/) for percent-encoding or [Hash Generator](/tools/hash-generator/) for one-way hashing.

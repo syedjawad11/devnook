@@ -42,7 +42,7 @@ When you receive JSON from an API response, a database export, or a minified bui
 
 ## How It Actually Works
 
-A JSON formatter parses the input string using a JSON parser (typically built into the browser's [JavaScript](/languages/javascript) engine via `JSON.parse()`). The parser validates syntax — checking for proper quotes, balanced brackets, correct comma placement, and valid data types. If parsing succeeds, the tool serializes the data structure back to a string using `JSON.stringify()` with formatting parameters: indentation level (usually 2 or 4 spaces) and optional line breaks.
+A JSON formatter parses the input string using a JSON parser (typically built into the browser's [JavaScript](/languages/javascript/) engine via `JSON.parse()`). The parser validates syntax — checking for proper quotes, balanced brackets, correct comma placement, and valid data types. If parsing succeeds, the tool serializes the data structure back to a string using `JSON.stringify()` with formatting parameters: indentation level (usually 2 or 4 spaces) and optional line breaks.
 
 For minification, the process reverses: parse the JSON, then stringify with no whitespace. For error detection, the formatter catches the parser's exception and reports the line number and character position where syntax breaks. Advanced formatters add color-coding (syntax highlighting), collapsible tree views for nested objects, and schema validation against JSON Schema definitions.
 
@@ -159,7 +159,7 @@ user:
 }
 ```
 
-Use our [JSON formatter tool](/tools/json-formatter) for quick conversions between JSON, YAML, and XML. Each format has different rules — YAML allows unquoted strings and indentation-based nesting, while XML uses tags and attributes.
+Use our [JSON formatter tool](/tools/json-formatter/) for quick conversions between JSON, YAML, and XML. Each format has different rules — YAML allows unquoted strings and indentation-based nesting, while XML uses tags and attributes.
 
 ## Advanced Features in Modern Formatters
 
@@ -185,7 +185,7 @@ Use our [JSON formatter tool](/tools/json-formatter) for quick conversions betwe
 
 **Can I format JSON without an internet connection?**
 
-Yes. Browser-based JSON formatters work entirely offline once the page loads. The JavaScript runs locally — no server needed. For true offline use, install a CLI tool like `jq` or use [Python](/languages/python)'s built-in formatter: `python -m json.tool input.json`. Both work without network access.
+Yes. Browser-based JSON formatters work entirely offline once the page loads. The JavaScript runs locally — no server needed. For true offline use, install a CLI tool like `jq` or use [Python](/languages/python/)'s built-in formatter: `python -m json.tool input.json`. Both work without network access.
 
 **What's the difference between formatting and validating?**
 
@@ -197,11 +197,11 @@ Indentation settings vary. You might use 2 spaces, they might use 4 spaces or ta
 
 **Can I automate JSON formatting in my build process?**
 
-Yes. Use Prettier with the JSON parser enabled. Add it to your `package.json` scripts or a pre-commit Git hook. For backend projects, most languages have JSON formatter libraries — Python's `json` module, Go's `encoding/json`, [Rust](/languages/rust)'s `serde_json`. Configure your IDE to format on save for instant cleanup.
+Yes. Use Prettier with the JSON parser enabled. Add it to your `package.json` scripts or a pre-commit Git hook. For backend projects, most languages have JSON formatter libraries — Python's `json` module, Go's `encoding/json`, [Rust](/languages/rust/)'s `serde_json`. Configure your IDE to format on save for instant cleanup.
 
 ## Choosing the Right Formatter
 
-**For quick browser tasks**: Use our [JSON formatter tool](/tools/json-formatter) — no signup, instant formatting, syntax highlighting, and minify/expand in one click.
+**For quick browser tasks**: Use our [JSON formatter tool](/tools/json-formatter/) — no signup, instant formatting, syntax highlighting, and minify/expand in one click.
 
 **For command-line workflows**: Install `jq` for powerful filtering and transformation. It's faster than browser tools for large files and integrates into shell scripts.
 

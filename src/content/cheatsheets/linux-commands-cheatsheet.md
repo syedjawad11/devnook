@@ -222,4 +222,4 @@ systemctl is-active nginx || systemctl restart nginx
 tar -xzf archive.tar.gz path/to/specific/file.txt
 ```
 
-This cheat sheet covers the Linux commands every developer and sysadmin reaches for daily. The [DevNook guides hub](/guides/) has deeper walkthroughs on shell scripting and system administration. For version control alongside your terminal work, the [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet) is a natural companion. Browse the full collection of quick-reference cards at the [cheatsheets hub](/cheatsheets/), or explore [DevNook tools](/tools/) to complement your command-line workflow.
+This cheat sheet covers the Linux commands every developer and sysadmin reaches for daily. The [DevNook guides hub](/guides/) has deeper walkthroughs on shell scripting and system administration. For version control alongside your terminal work, the [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet/) is a natural companion. Browse the full collection of quick-reference cards at the [cheatsheets hub](/cheatsheets/), or explore [DevNook tools](/tools/) to complement your command-line workflow.

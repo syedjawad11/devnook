@@ -30,7 +30,7 @@ template_id: lang-v3
 title: 'JavaScript Promises Explained: then(), catch(), and async/await'
 ---
 
-JavaScript Promises are objects representing the eventual completion or failure of an asynchronous operation. They provide a cleaner alternative to callback-based async code and form the foundation of modern [async/await](/languages/rust/async-await) syntax.
+JavaScript Promises are objects representing the eventual completion or failure of an asynchronous operation. They provide a cleaner alternative to callback-based async code and form the foundation of modern [async/await](/languages/rust/async-await/) syntax.
 
 ## Syntax at a Glance
 
@@ -182,14 +182,14 @@ Avoid Promises for synchronous operations — wrapping `Math.random()` in a Prom
 
 ## Quick Comparison: JavaScript vs Python
 
-| | [JavaScript](/languages/javascript) | Python |
+| | [JavaScript](/languages/javascript/) | Python |
 |---|---|---|
 | **Syntax** | `new Promise((resolve, reject) => {})` | `asyncio.Future()` or `asyncio.create_task()` |
 | **Async keyword** | `async function foo() {}` | `async def foo():` |
 | **Await keyword** | `await promise` | `await coroutine` |
 | **Error handling** | `.catch()` or `try/catch` | `try/except` with `await` |
 | **Parallel execution** | `Promise.all([p1, p2])` | `asyncio.gather(t1, t2)` |
-| **Built-in support** | Native since ES6 (2015) | Native since [Python](/languages/python) 3.5 (2015) |
+| **Built-in support** | Native since ES6 (2015) | Native since [Python](/languages/python/) 3.5 (2015) |
 
 JavaScript Promises are first-class language features, while Python's equivalent uses the `asyncio` library. JavaScript's `.then()` chaining has no direct Python equivalent — Python relies entirely on `async/await` syntax.
 

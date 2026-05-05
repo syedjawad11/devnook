@@ -242,7 +242,7 @@ print(safe_decode("SGVsbG8"))  # b'Hello'  — missing padding handled
 
 ### Encoding Strings vs Bytes
 
-[Python](/languages/python) 3 requires explicit encoding before calling `b64encode`:
+[Python](/languages/python/) 3 requires explicit encoding before calling `b64encode`:
 
 ```python
 import base64
@@ -343,7 +343,7 @@ Base64 is CPU-cheap and appropriate for most use cases. Watch for these patterns
 - **Large files**: Do not load the entire file into memory before encoding. Use streaming in multiples of 3-byte chunks as shown above.
 - **Repeated encoding in hot paths**: Cache encoded results when the source data is immutable.
 - **JSON payload size**: Base64 adds 33% overhead. If bandwidth is a concern, binary protocols (MessagePack, Protocol Buffers) or multipart form uploads are more efficient alternatives.
-- **Browser memory**: When handling user-uploaded files in [JavaScript](/languages/javascript), use the `FileReader` API with `readAsDataURL()` which performs Base64 encoding natively without manual string manipulation.
+- **Browser memory**: When handling user-uploaded files in [JavaScript](/languages/javascript/), use the `FileReader` API with `readAsDataURL()` which performs Base64 encoding natively without manual string manipulation.
 
 ## Base64 vs Other Encoding Approaches
 
@@ -360,6 +360,6 @@ Hex encoding is easier to read during debugging but doubles the data size. Base6
 
 The DevNook Base64 Encoder/Decoder tool lets you encode and decode Base64 instantly in your browser without sending data to any server. Paste in any text or binary string, select standard or URL-safe mode, and get the result immediately.
 
-For working with URL-encoded strings, see the [URL Encoding and Query Parameters guide](/guides/url-encoding-query-parameters-guide). To validate JSON payloads that contain Base64-encoded fields, the [JSON Formatter and Validator](/tools/json-formatter) helps catch structural errors before they reach production.
+For working with URL-encoded strings, see the [URL Encoding and Query Parameters guide](/guides/url-encoding-query-parameters-guide/). To validate JSON payloads that contain Base64-encoded fields, the [JSON Formatter and Validator](/tools/json-formatter/) helps catch structural errors before they reach production.
 
 Base64 is a reliable, well-understood standard. Understanding its mechanics—the 3-byte grouping, the 64-character alphabet, the padding rules—removes the mystery and makes debugging encoding problems straightforward.

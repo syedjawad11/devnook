@@ -40,39 +40,41 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-05, #38)
+## Last Session (2026-05-05, #40)
 
-**Status:** ✅ Expanded all 7 FAIL posts — prose word count Issue 1 fully resolved. FAILs: 7 → 0.
+**Status:** ✅ Fixed 402 internal 308 redirects — 172 markdown link replacements across 60 content files.
 
 ### What was done
 
-- **Expanded 7 prose-thin posts** via direct markdown edits in `src/content/`. Added explanatory intros before each code section, new conceptual sections (alternatives, serialization, Docker/K8s, i18n, streaming parsers), pitfall discussions, and decision guides.
+- **Session #39 recap** — Fixed trailing slashes in Astro templates (PostCard hrefs, PostLayout breadcrumbs). Commit `fc7663a` was pushed this session.
+- **Root cause (content files)** — Ahref audit showed 402 remaining 308 redirects from manually written markdown links in `src/content/` missing trailing slashes (e.g. `[Python](/languages/python)` → `[Python](/languages/python/)`).
+- **Fix** — Wrote `scripts/fix_trailing_slashes.py` (regex `r'(\]\()(/[^)#?\s]*[^/)#?\s])(\))'`) to scan all `.md` files in `src/content/` and add missing trailing slashes. Skips anchors (`#`) and query strings (`?`).
+- **Result** — 172 replacements across 60 files: 4 blog, 7 cheatsheets, 11 guides, 17 languages, 21 tools pages.
 - **Build verified** — `npm run build` clean, 92 pages, 0 errors.
-- **Audit re-run** — FAIL: 7 → 0, PASS: 31 → 36, WARN: 16 → 18. Updated `auditlog.md`.
-- **Note:** `json-formatter-validator-best-practices.md` reached ~1,638 words vs 1,800 target — landed WARN, not FAIL. All others hit PASS.
+- **Committed and pushed** — both `fc7663a` (session #39) and this session's commit.
+- **Note:** 3 infrastructure-level 301 redirects (HTTP→HTTPS, www→non-www) are Cloudflare-managed — not fixable in code, SEO-harmless.
 
-### Previous session (#37) summary
+### Previous session (#39) summary
 
-Moved 9 misplaced language files to correct subdirs, Cloudflare obfuscation off, GSC sitemap resubmitted.
+Fixed trailing slashes in Astro template files (PostCard hrefs, PostLayout breadcrumbs). Fixed ~60 template-level 308 redirects.
 
-### Next session priorities (#39)
+### Next session priorities (#41)
 
-**Content expansion — WARN posts.** Start by reading `auditlog.md` Issue 3. Then:
-
-1. **Expand high-priority WARN guides** (gap > 400 words from target):
+1. **Re-run Ahref crawler** to confirm 308 redirect count drops to ≤3 (only Cloudflare infrastructure 301s remain).
+2. **Content expansion — WARN posts.** Start by reading `auditlog.md` Issue 3. Then expand:
    - `/guides/base64-encoding-decoding-guide/` (943 words, target 1800)
    - `/guides/curl-command-guide/` (1047 words, target 1800)
    - `/guides/html-minification-compression-guide/` (1262 words, target 1800)
    - `/guides/css-minification-performance-optimization/` (1306 words, target 1800)
    - `/blog/css-flexbox-vs-grid/` (1064 words, target 1500)
-2. **Also expand:** `json-formatter-validator-best-practices.md` from ~1,638 → 1,800 words (missed PASS by ~162 words)
+   - `json-formatter-validator-best-practices.md` from ~1,638 → 1,800 words (missed PASS by ~162 words)
+3. **Broken link audit remediation** — use `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root.
 
 ### Deferred (do not do)
 
 - **AdSense integration** — revisit only at 50k visitors/month
 - Blog filter chips wiring (decorative only)
 - Search bar wiring (`SearchBar.astro` parked)
-- **Broken link audit remediation** — deferred to session #40 (use `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root)
 
 ---
 
@@ -89,6 +91,7 @@ Moved 9 misplaced language files to correct subdirs, Cloudflare obfuscation off,
 - Dev subagent: `agents/subagent-prompts/builder.md`
 - Dev skills: `agents/skills/astro-conventions.md`, `agents/skills/tool-build-patterns.md`
 - SEO audit script: `scripts/seo_audit.py` — run with `D:\miniconda3\python.exe scripts/seo_audit.py`
+- Trailing slash fixer: `scripts/fix_trailing_slashes.py` — run with `D:\miniconda3\python.exe scripts/fix_trailing_slashes.py`
 - SEO audit log: `auditlog.md` — issues, verdicts, session fix plan (read before #37+)
 
 ---

@@ -157,7 +157,7 @@ module.exports = {
 
 For one-off minification tasks (checking output, testing a single file), browser-based minifiers work well. Most accept paste input and return the minified output immediately. For production workflows, always use CLI or build-tool integration to keep minification reproducible and version-controlled.
 
-Our [HTML Formatter tool](/tools/html-formatter) handles markup cleanup; for CSS, the CLI tools above give you the most control over the output.
+Our [HTML Formatter tool](/tools/html-formatter/) handles markup cleanup; for CSS, the CLI tools above give you the most control over the output.
 
 ## Source Maps
 
@@ -179,7 +179,7 @@ npx postcss src/main.css --output dist/main.min.css --map
 
 This produces `dist/main.min.css.map`. The browser DevTools will use it automatically when the map file is in the same directory.
 
-For more on how URLs and paths work in CSS, see our [URL Encoding and Query Parameters guide](/guides/url-encoding-query-parameters-guide).
+For more on how URLs and paths work in CSS, see our [URL Encoding and Query Parameters guide](/guides/url-encoding-query-parameters-guide/).
 
 ## Minification in CI/CD Pipelines
 
@@ -195,7 +195,7 @@ CSS minification belongs in your build step, not as a manual task. A typical Nod
   # Your package.json "build" script runs PostCSS or your bundler
 ```
 
-The key requirement: minified files [go](/languages/go) into `dist/` or `build/`, and your deployment step deploys only the built output. Never commit minified CSS to your source repository alongside the original source — it creates merge conflicts and makes diffs unreadable.
+The key requirement: minified files [go](/languages/go/) into `dist/` or `build/`, and your deployment step deploys only the built output. Never commit minified CSS to your source repository alongside the original source — it creates merge conflicts and makes diffs unreadable.
 
 ## Minification vs Compression: What's the Difference
 
@@ -215,7 +215,7 @@ Check your server's `Content-Encoding` response header to confirm compression is
 curl -I -H "Accept-Encoding: br,gzip" https://yoursite.com/styles/main.min.css
 ```
 
-Look for `content-encoding: br` or `content-encoding: gzip` in the response. For a deep dive on HTTP headers, see the [HTTP Status Codes complete reference](/guides/http-status-codes-guide).
+Look for `content-encoding: br` or `content-encoding: gzip` in the response. For a deep dive on HTTP headers, see the [HTTP Status Codes complete reference](/guides/http-status-codes-guide/).
 
 ## Common Pitfalls
 
@@ -238,7 +238,7 @@ CSS minification is one piece of a larger performance strategy. The full stack i
 
 CSS minification is low-effort, high-reward, and should be a default step in every production build. If your bundler isn't doing it automatically, add it today.
 
-For related performance improvements on the markup side, see our guide to [HTML minification](/guides/html-minification-compression-guide).
+For related performance improvements on the markup side, see our guide to [HTML minification](/guides/html-minification-compression-guide/).
 
 ## Measuring the Impact
 
@@ -291,4 +291,4 @@ Before considering CSS minification complete for a production deploy, verify:
 - [ ] Lighthouse Performance score checked
 - [ ] Third-party CSS (frameworks, icon fonts) served in minified form
 
-For a complete picture of HTTP-level optimizations beyond minification, the [HTTP Status Codes guide](/guides/http-status-codes-guide) covers caching headers and response codes that affect how browsers handle your static assets.
+For a complete picture of HTTP-level optimizations beyond minification, the [HTTP Status Codes guide](/guides/http-status-codes-guide/) covers caching headers and response codes that affect how browsers handle your static assets.

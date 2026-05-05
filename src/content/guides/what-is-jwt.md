@@ -216,4 +216,4 @@ HMAC algorithms (HS256, HS384, HS512) use the same secret for signing and verifi
 
 For authentication workflows that use JWTs, see our guide on OAuth 2.0 Explained. Compare token-based authentication with session-based approaches in Session vs Token Authentication. To understand the APIs that commonly use JWTs, read What is a REST API?
 
-Use our JWT Debugger to decode and inspect tokens during development, and [Base64 Encoder](/tools/base64-encoder) to understand how header and payload encoding works.
+Use our JWT Debugger to decode and inspect tokens during development, and [Base64 Encoder](/tools/base64-encoder/) to understand how header and payload encoding works.

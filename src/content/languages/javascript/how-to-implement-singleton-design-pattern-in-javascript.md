@@ -23,7 +23,7 @@ word_count_target: 1500
 
 ## The Problem
 
-In a complex [JavaScript](/languages/javascript) application, you frequently need to manage shared state or coordinate a central resource, such as a database connection pool, a global configuration object, or an orchestration manager. When multiple developers instantiate the same utility class independently, the application creates duplicate, disjointed instances that lose synchronization.
+In a complex [JavaScript](/languages/javascript/) application, you frequently need to manage shared state or coordinate a central resource, such as a database connection pool, a global configuration object, or an orchestration manager. When multiple developers instantiate the same utility class independently, the application creates duplicate, disjointed instances that lose synchronization.
 
 ```javascript
 // A naive Database class that creates multiple uncoordinated connections

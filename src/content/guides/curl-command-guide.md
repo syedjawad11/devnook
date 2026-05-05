@@ -93,7 +93,7 @@ curl -X POST https://api.example.com/users \
   -d @user.json
 ```
 
-The `@` prefix tells curl to read the body from a file. Use the [JSON Formatter tool](/tools/json-formatter) to format and validate your JSON payload before sending.
+The `@` prefix tells curl to read the body from a file. Use the [JSON Formatter tool](/tools/json-formatter/) to format and validate your JSON payload before sending.
 
 ## Viewing Response Headers
 
@@ -120,7 +120,7 @@ To see only headers (HEAD request), use `-I`:
 curl -I https://api.example.com/users
 ```
 
-For a reference on what status codes mean, see the [HTTP Status Codes guide](/guides/http-status-codes-guide).
+For a reference on what status codes mean, see the [HTTP Status Codes guide](/guides/http-status-codes-guide/).
 
 ## Authentication
 
@@ -152,7 +152,7 @@ curl -H "X-API-Key: your-api-key-here" \
 curl "https://api.example.com/data?api_key=your-api-key"
 ```
 
-Note the quotes around the URL when it contains special characters like `&` or `?`. For proper URL encoding of query parameters, see the [URL Encoding guide](/guides/url-encoding-query-parameters-guide).
+Note the quotes around the URL when it contains special characters like `&` or `?`. For proper URL encoding of query parameters, see the [URL Encoding guide](/guides/url-encoding-query-parameters-guide/).
 
 ## Downloading Files
 
@@ -373,9 +373,9 @@ fi
 | HTTPie | Human-readable output, interactive terminal use |
 | Postman | GUI-based API exploration, collections |
 | wget | Recursive downloads, mirroring |
-| fetch (browser) | Client-side JavaScript [HTTP requests](/languages/cpp/http-requests) |
+| fetch (browser) | Client-side JavaScript [HTTP requests](/languages/cpp/http-requests/) |
 
-curl's advantage is ubiquity — it's available on every Unix-like system, Windows 10+, and most CI runners without installation. The [Git Commands cheat sheet](/cheatsheets/git-commands-cheatsheet) covers another essential developer CLI tool with a similar depth of flags and options. For encoding URLs correctly before passing them to curl, use the [URL Encoder tool](/tools/url-encoder).
+curl's advantage is ubiquity — it's available on every Unix-like system, Windows 10+, and most CI runners without installation. The [Git Commands cheat sheet](/cheatsheets/git-commands-cheatsheet/) covers another essential developer CLI tool with a similar depth of flags and options. For encoding URLs correctly before passing them to curl, use the [URL Encoder tool](/tools/url-encoder/).
 
 ## Debugging Connection Issues
 
@@ -455,7 +455,7 @@ For interactive WebSocket testing, `websocat` or browser DevTools are more pract
 
 ## Environment Variables for curl Configuration
 
-When automating curl in scripts, use [environment variables](/languages/java/environment-variables) for secrets to avoid exposing credentials in process lists or shell history:
+When automating curl in scripts, use [environment variables](/languages/java/environment-variables/) for secrets to avoid exposing credentials in process lists or shell history:
 
 ```bash
 export API_TOKEN="your-secret-token"
@@ -465,7 +465,7 @@ curl -H "Authorization: Bearer $API_TOKEN" \
      "$BASE_URL/users"
 ```
 
-In CI systems (GitHub Actions, GitLab CI), inject secrets via the platform's secret management rather than hardcoding them in workflow files. For reference on how HTTP authentication works at the protocol level, see the [HTTP Status Codes guide](/guides/http-status-codes-guide).
+In CI systems (GitHub Actions, GitLab CI), inject secrets via the platform's secret management rather than hardcoding them in workflow files. For reference on how HTTP authentication works at the protocol level, see the [HTTP Status Codes guide](/guides/http-status-codes-guide/).
 
 ## curl on Windows
 

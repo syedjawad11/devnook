@@ -93,7 +93,7 @@ const newTimestamp = Math.floor(newDate.getTime() / 1000);
 console.log(newTimestamp);  // 1713000000
 ```
 
-These examples show the round-trip conversion: timestamp to date, and date back to timestamp. Note that [JavaScript](/languages/javascript)'s `Date.now()` returns milliseconds, so you divide by 1000 to get seconds.
+These examples show the round-trip conversion: timestamp to date, and date back to timestamp. Note that [JavaScript](/languages/javascript/)'s `Date.now()` returns milliseconds, so you divide by 1000 to get seconds.
 
 ## The Details That Matter
 
@@ -130,7 +130,7 @@ Yes, using negative timestamps. The timestamp `-86400` represents December 31, 1
 These terms are interchangeable. "Unix timestamp", "Unix time", "epoch time", and "POSIX time" all refer to the same system: seconds since January 1, 1970, at 00:00:00 UTC.
 
 **How do I convert a timestamp to a specific time zone?**
-First convert the timestamp to a date object in your programming language, then apply the time zone offset. Most languages provide built-in functions: [Python](/languages/python)'s `datetime.fromtimestamp()` with `tz` parameter, JavaScript's `toLocaleString()` with `timeZone` option, or dedicated libraries like [Moment.js](https://momentjs.com/) or Luxon for complex time zone handling.
+First convert the timestamp to a date object in your programming language, then apply the time zone offset. Most languages provide built-in functions: [Python](/languages/python/)'s `datetime.fromtimestamp()` with `tz` parameter, JavaScript's `toLocaleString()` with `timeZone` option, or dedicated libraries like [Moment.js](https://momentjs.com/) or Luxon for complex time zone handling.
 
 ## Converting Timestamps in Practice
 

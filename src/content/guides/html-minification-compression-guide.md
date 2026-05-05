@@ -26,7 +26,7 @@ HTML minification strips whitespace, comments, and optional syntax from your mar
 
 ## Why HTML Minification Matters
 
-Unlike CSS and [JavaScript](/languages/javascript), HTML is not cached aggressively. Browsers typically revalidate HTML on every navigation. That means every page visit incurs the cost of downloading the full HTML document. Even on sites with server-side rendering, where HTML is dynamically generated, serving a smaller document reduces time-to-first-byte (TTFB) processing and network transfer time.
+Unlike CSS and [JavaScript](/languages/javascript/), HTML is not cached aggressively. Browsers typically revalidate HTML on every navigation. That means every page visit incurs the cost of downloading the full HTML document. Even on sites with server-side rendering, where HTML is dynamically generated, serving a smaller document reduces time-to-first-byte (TTFB) processing and network transfer time.
 
 A typical production application generates HTML with dozens of lines of indentation, blank lines between elements, and developer comments. None of this reaches the user's screen — but it all travels over the wire.
 
@@ -198,7 +198,7 @@ app.use(async (req, res, next) => {
 });
 ```
 
-For formatting and inspecting HTML during development, our [HTML Formatter tool](/tools/html-formatter) is a quick way to validate structure and readability before minification.
+For formatting and inspecting HTML during development, our [HTML Formatter tool](/tools/html-formatter/) is a quick way to validate structure and readability before minification.
 
 ## How Much Does HTML Minification Save?
 
@@ -219,7 +219,7 @@ To verify your server is applying compression, check the response headers with c
 curl -I -H "Accept-Encoding: gzip,br" https://yoursite.com/
 ```
 
-Look for `content-encoding: gzip` or `content-encoding: br`. If neither appears, configure compression at the server or CDN level — it's free performance. For a full reference on HTTP headers and status codes, see the [HTTP Status Codes guide](/guides/http-status-codes-guide).
+Look for `content-encoding: gzip` or `content-encoding: br`. If neither appears, configure compression at the server or CDN level — it's free performance. For a full reference on HTTP headers and status codes, see the [HTTP Status Codes guide](/guides/http-status-codes-guide/).
 
 ## HTML Minification vs CSS/JS Minification: Priority
 
@@ -233,7 +233,7 @@ If you're choosing where to spend effort, CSS and JavaScript minification delive
 
 CSS and JS files can be aggressively cached with content-hash filenames. HTML files typically cannot — they must be revalidated on every visit to pick up structure changes. That makes HTML minification particularly relevant for high-traffic sites where cumulative bandwidth reduction adds up across millions of requests.
 
-For details on CSS minification strategies, see our [CSS Minification guide](/guides/css-minification-performance-optimization).
+For details on CSS minification strategies, see our [CSS Minification guide](/guides/css-minification-performance-optimization/).
 
 ## Inline CSS and JavaScript
 
@@ -340,4 +340,4 @@ module.exports = function(eleventyConfig) {
 };
 ```
 
-Both patterns integrate cleanly with CI/CD — the minification happens automatically during the build step. Use the [HTML Formatter tool](/tools/html-formatter) during development to keep your source templates readable, then let the minifier handle production output.
+Both patterns integrate cleanly with CI/CD — the minification happens automatically during the build step. Use the [HTML Formatter tool](/tools/html-formatter/) during development to keep your source templates readable, then let the minifier handle production output.

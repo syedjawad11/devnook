@@ -15,7 +15,7 @@ og_image: "/og/languages/go/use-lambda-function.png"
 
 # How to Use Lambda Functions in Go — Anonymous Functions and Closures Explained
 
-You need to sort a slice of structs by a custom field, pass a one-off comparator to an HTTP middleware, or launch a goroutine with some captured state — but Go has no `lambda` keyword. If you are coming from Python or JavaScript, the syntax for how to use lambda functions in Go feels unfamiliar at first. Pair this guide with [Go Goroutines Explained](/languages/go/goroutines) to see how anonymous functions power concurrent patterns in Go.
+You need to sort a slice of structs by a custom field, pass a one-off comparator to an HTTP middleware, or launch a goroutine with some captured state — but Go has no `lambda` keyword. If you are coming from Python or JavaScript, the syntax for how to use lambda functions in Go feels unfamiliar at first. Pair this guide with [Go Goroutines Explained](/languages/go/goroutines/) to see how anonymous functions power concurrent patterns in Go.
 
 ## The Problem
 

@@ -164,7 +164,7 @@ console.log(params.toString());
 // q=python+url+encoding&page=2&redirect=https%3A%2F%2Fexample.com%2Fpath%3Fkey%3Dvalue
 ```
 
-`URLSearchParams` is the right tool for building query strings in modern [JavaScript](/languages/javascript). It handles encoding, serialization, and appending parameters without manual string concatenation. Prefer `URLSearchParams` over manual string concatenation for any query string with two or more parameters — it handles encoding, joining with `&`, arrays, and special characters correctly without requiring you to remember which function encodes which characters.
+`URLSearchParams` is the right tool for building query strings in modern [JavaScript](/languages/javascript/). It handles encoding, serialization, and appending parameters without manual string concatenation. Prefer `URLSearchParams` over manual string concatenation for any query string with two or more parameters — it handles encoding, joining with `&`, arrays, and special characters correctly without requiring you to remember which function encodes which characters.
 
 ```javascript
 // Decoding
@@ -199,7 +199,7 @@ print(safe_url)
 # https://example.com/query?q=search%3Fredirect%3Dhttps%3A%2F%2Fevil.com — correct
 ```
 
-For full URL construction in [Python](/languages/python), `urllib.parse.urlencode()` plus `urllib.parse.urlunparse()` gives you precise control over each URL component:
+For full URL construction in [Python](/languages/python/), `urllib.parse.urlencode()` plus `urllib.parse.urlunparse()` gives you precise control over each URL component:
 
 ```python
 import urllib.parse
@@ -420,6 +420,6 @@ For multilingual slug generation (converting "Ärger mit Übergröße" to a URL-
 
 The DevNook URL Encoder/Decoder tool handles percent encoding, query string parsing, and full URL analysis directly in your browser. Paste in a raw URL to decode all components, or enter plain text to get the encoded form instantly.
 
-Related reading: the [Base64 Encoding guide](/guides/base64-encoding-decoding-guide) covers a different encoding scheme used for binary data in APIs and HTTP headers. For JSON payloads delivered over HTTP with encoded parameters, see the [JSON Formatter and Validator guide](/guides/json-formatter-validator-best-practices).
+Related reading: the [Base64 Encoding guide](/guides/base64-encoding-decoding-guide/) covers a different encoding scheme used for binary data in APIs and HTTP headers. For JSON payloads delivered over HTTP with encoded parameters, see the [JSON Formatter and Validator guide](/guides/json-formatter-validator-best-practices/).
 
 URL encoding is a small but critical detail. Using the right function for the right context—`encodeURIComponent` in JavaScript, `quote` vs `quote_plus` in Python—prevents a category of bugs that are difficult to trace once they reach a production system.
