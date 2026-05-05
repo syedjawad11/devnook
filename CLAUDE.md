@@ -40,35 +40,32 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-03, #37)
+## Last Session (2026-05-05, #38)
 
-**Status:** ✅ Fixed 9 structural path issues — language files moved to correct subdirs. Build verified clean.
+**Status:** ✅ Expanded all 7 FAIL posts — prose word count Issue 1 fully resolved. FAILs: 7 → 0.
 
 ### What was done
 
-- **Moved 9 misplaced language files** — all `src/content/languages/*.md` root-level files moved to `src/content/languages/{language}/` subdirs via `git mv`. Created `ruby/` subdir (was missing). Commit `42ff5d2`.
-- **Build verified** — `npm run build` clean, 92 pages, 0 errors. URLs unchanged (frontmatter-derived).
-- **Audit re-run** — PASS count: 22 → 31 (57%), WARN: 25 → 16 (30%), path_issue count: 9 → 0. Updated `auditlog.md`.
-- **Manual tasks (done):**
-  - Cloudflare Email Address Obfuscation → Off ✅ (cdn-cgi 404s cleared on 10 pages)
-  - GSC sitemap resubmitted: `https://devnook.dev/sitemap-index.xml` ✅
+- **Expanded 7 prose-thin posts** via direct markdown edits in `src/content/`. Added explanatory intros before each code section, new conceptual sections (alternatives, serialization, Docker/K8s, i18n, streaming parsers), pitfall discussions, and decision guides.
+- **Build verified** — `npm run build` clean, 92 pages, 0 errors.
+- **Audit re-run** — FAIL: 7 → 0, PASS: 31 → 36, WARN: 16 → 18. Updated `auditlog.md`.
+- **Note:** `json-formatter-validator-best-practices.md` reached ~1,638 words vs 1,800 target — landed WARN, not FAIL. All others hit PASS.
 
-### Previous session (#36) summary
+### Previous session (#37) summary
 
-Built `scripts/seo_audit.py` — 54 posts audited, issues logged in `auditlog.md`.
+Moved 9 misplaced language files to correct subdirs, Cloudflare obfuscation off, GSC sitemap resubmitted.
 
-### Next session priorities (#38)
+### Next session priorities (#39)
 
-**Content workspace session.** Start by reading `auditlog.md` Issue 1. Then:
+**Content expansion — WARN posts.** Start by reading `auditlog.md` Issue 3. Then:
 
-1. **Expand 7 FAIL posts** (critical word count — all below target/2):
-   - `/cheatsheets/javascript-array-cheatsheet/` (145 words, target 800)
-   - `/cheatsheets/git-commands-cheatsheet/` (229 words, target 800)
-   - `/languages/kotlin/data-class/` (653 words, target 1500)
-   - `/languages/javascript/singleton-pattern/` (701 words, target 1500)
-   - `/languages/java/environment-variables/` (705 words, target 1500)
-   - `/guides/json-formatter-validator-best-practices/` (873 words, target 1800)
-   - `/guides/url-encoding-query-parameters-guide/` (885 words, target 1800)
+1. **Expand high-priority WARN guides** (gap > 400 words from target):
+   - `/guides/base64-encoding-decoding-guide/` (943 words, target 1800)
+   - `/guides/curl-command-guide/` (1047 words, target 1800)
+   - `/guides/html-minification-compression-guide/` (1262 words, target 1800)
+   - `/guides/css-minification-performance-optimization/` (1306 words, target 1800)
+   - `/blog/css-flexbox-vs-grid/` (1064 words, target 1500)
+2. **Also expand:** `json-formatter-validator-best-practices.md` from ~1,638 → 1,800 words (missed PASS by ~162 words)
 
 ### Deferred (do not do)
 

@@ -36,6 +36,8 @@ public class DatabaseConfig {
 
 This approach presents a catastrophic security vulnerability when your code is pushed to a version control system like Git. Additionally, adapting this application for different environments (local, staging, production) means you have to constantly edit and recompile the code, removing agility and completely breaking twelve-factor app methodology.
 
+This is where the twelve-factor app methodology becomes relevant. Factor III of the twelve-factor spec states that configuration — anything that varies between deployment environments — must be stored in the environment, not in the code. Environment variables satisfy this requirement perfectly: the same compiled JAR runs in local, staging, and production environments without modification, with only the runtime environment differing. This separation also enables a clean security posture: secrets never enter your version control history, they are never bundled into Docker images accidentally, and they can be rotated without touching or redeploying application code.
+
 ## The Java Solution: Environment Variables
 
 An environment variable is a dynamic value passed from the operating system to your Java application at runtime. The solution to hardcoded credentials is to strip configurations from the code entirely and instruct Java to read them directly from the system environment.
@@ -54,6 +56,8 @@ By relying on `System.getenv()`, your code remains identical across all stages o
 ## How Environment Variables Work in Java
 
 The primary mechanism for accessing system variables in Java is the `System.getenv(String name)` method. This triggers a native call to the host OS (Linux, Windows, macOS) and fetches the value bound to the specified key. The mapping is case-sensitive on most UNIX systems but generally case-insensitive on Windows, though best practice universally dictates `UPPER_SNAKE_CASE` for variable keys.
+
+Case sensitivity creates real portability issues in cross-platform Java projects. A variable defined as `Database_Host` on a developer's Windows machine will resolve correctly on Windows (case-insensitive) but silently return `null` on a Linux CI server where `DATABASE_HOST` and `Database_Host` are distinct keys. The universal convention of `UPPER_SNAKE_CASE` for all environment variable names sidesteps this problem entirely. Enforce it as a project standard rather than relying on the OS to compensate, and your deployment scripts will behave identically across Windows, macOS, and Linux.
 
 Importantly, Java does perfectly allow you to *read* environment variables via `System.getenv()`, but you cannot dynamically *set* or alter OS environment variables from within a running JVM using standard API methods. The environment map provided to the JVM is read-only. 
 
@@ -90,13 +94,39 @@ String apiKey = dotenv.get("STRIPE_API_KEY");
 **System Properties vs. Env Variables:** 
 It's very common to confuse Java System Properties (`System.getProperty("foo")`, passed with `java -Dfoo=bar`) with Environment Variables (`System.getenv("FOO")`, passed from the OS). Properties are strictly internal to the JVM execution command; environment variables are broader OS-level context. Choose environment variables for secrets.
 
-**Unexpected Nulls:** Passing the result of `System.getenv()` directly into methods that don't gracefully handle `null` will crash the application immediately if the deploy environment is missing a configuration key. 
+**Unexpected Nulls:** Passing the result of `System.getenv()` directly into methods that don't gracefully handle `null` will crash the application immediately if the deploy environment is missing a configuration key.
+
+**Secrets Leaking Into Logs:**
+A subtle but serious mistake is logging environment variable values during application startup for debugging purposes. Code like `logger.info("Connecting with key: " + System.getenv("STRIPE_API_KEY"))` writes your production secret to log files, log aggregation systems (Datadog, Splunk, CloudWatch), and potentially audit trails — all of which are far more accessible than the secret management system you carefully configured. Log the presence or absence of a key (`apiKey != null ? "set" : "missing"`) rather than its value. If you need to verify a key's format, log a masked version showing only the first and last four characters.
 
 ## Under the Hood: Performance & Mechanics
 
 When the JVM starts up, it captures a snapshot of the operating system's environment map and caches it in memory as an immutable `Collections.unmodifiableMap`. Because of this cache, calling `System.getenv()` repeatedly does not incur native system call overhead, rendering it a very fast, O(1) map lookup.
 
 However, because it is an immutable snapshot, if an external bash script modifies the host OS environment *while* the JVM is actively running, the Java application will not detect the change. You must restart the Java process to re-hydrate the environment variables cache.
+
+The immutable snapshot model also has security implications. Because the environment map is captured once at JVM startup, an attacker who gains code execution within a running JVM cannot inject new environment variables that the application will subsequently read via `System.getenv()` — the snapshot is already fixed. This is a defense-in-depth property worth understanding, even though it is a secondary concern in most threat models. The more relevant implication is operational: blue-green deployments and rolling restarts are necessary to pick up rotated secrets, since in-place environment variable updates have no effect on running JVM processes.
+
+## Environment Variables in Docker and Kubernetes
+
+Container orchestration platforms treat environment variables as the primary configuration mechanism, making Java's `System.getenv()` approach a natural fit.
+
+In Docker, pass variables using the `-e` flag at runtime: `docker run -e DB_HOST=postgres -e DB_PASSWORD=secret myapp:latest`. For multiple variables, use an `--env-file` flag pointing to a local `.env` file — the file is read by Docker at container startup and never baked into the image. This keeps secrets out of `docker build` context and image layers.
+
+In Kubernetes, environment variables are configured in the Pod spec under `env:`:
+
+```yaml
+env:
+  - name: DB_HOST
+    value: "postgres-service"
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: db-secret
+        key: password
+```
+
+The `secretKeyRef` form pulls the value from a Kubernetes Secret object rather than embedding it inline — secrets are base64-encoded in etcd and can be access-controlled with RBAC. The Java application reads them identically via `System.getenv("DB_PASSWORD")`, completely unaware of whether the value came from a `-e` Docker flag or a Kubernetes Secret injection. This portability is the practical payoff of using standard environment variable access throughout your codebase.
 
 ## Advanced Edge Cases
 
@@ -125,9 +155,40 @@ Map<String, String> env = System.getenv();
 env.put("NEW_KEY", "VALUE"); 
 ```
 
+## Spring Boot: @Value and the Environment Abstraction
+
+Spring Boot builds a unified property resolution layer on top of raw environment variables, offering more flexibility than calling `System.getenv()` directly.
+
+The `@Value` annotation injects a property value directly into a field or constructor parameter at application startup:
+
+```java
+@Component
+public class PaymentConfig {
+    @Value("${STRIPE_API_KEY}")
+    private String stripeApiKey;
+}
+```
+
+Spring resolves `${STRIPE_API_KEY}` by searching a priority-ordered list of property sources: first system properties (`-D` flags), then OS environment variables, then `application.properties` or `application.yml` files, then defaults. This layering means the same property name works across all environments — a developer's local `application.properties` provides a dev key, while production relies on an OS environment variable, and neither requires code changes.
+
+For programmatic access, the `Environment` bean gives you the same resolution chain without `@Value`:
+
+```java
+@Autowired
+private Environment env;
+
+String host = env.getRequiredProperty("DB_HOST"); // throws if missing
+```
+
+`getRequiredProperty()` is preferable to `getProperty()` for mandatory config because it throws a clear `IllegalStateException` at startup rather than surfacing a `NullPointerException` deep inside application logic at runtime.
+
 ## Testing Environment Variables in Java
 
-Unit testing methods that depend heavily on environment variables is notably difficult because the environment map in the JVM is immutable and cannot be tweaked per-test easily. The best approach is to structure your application to not rely directly on `System.getenv` within core logic, but rather pass configurations in via dependency injection. Alternatively, libraries exist to hack the map structure reflectively, though usually discouraged.
+Unit testing methods that depend heavily on environment variables is notably difficult because the environment map in the JVM is immutable and cannot be tweaked per-test easily.
+
+The JVM's immutable environment map means you cannot call `System.putenv()` between test runs — the method does not exist in the standard API. Libraries like System Lambda or JUnit Pioneer's `@SetEnvironmentVariable` extension use reflection to temporarily mutate the map during tests, but these approaches are fragile, JVM-version-dependent, and break on newer Java versions that restrict reflective access to internal classes. The cleanest solution is architectural: keep `System.getenv()` calls at the application boundary, extract the values once at startup, and pass them down as constructor parameters. This makes every class below the boundary trivially testable with plain strings.
+
+The best approach is to structure your application to not rely directly on `System.getenv` within core logic, but rather pass configurations in via dependency injection. Alternatively, libraries exist to hack the map structure reflectively, though usually discouraged.
 
 ```java
 // Good testing pattern: inject via constructor
