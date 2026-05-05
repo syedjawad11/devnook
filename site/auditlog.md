@@ -6,6 +6,21 @@ Full CSV: `audits/seo_audit_2026-05-03.csv` (gitignored — run script to regene
 
 ---
 
+## Audit Summary — Post Session #38 (2026-05-05)
+
+| Metric | Value |
+|--------|-------|
+| Posts audited | 54 |
+| Pass | 36 (67%) ✅ was 31 |
+| Warn | 18 (33%) was 16 |
+| Fail | 0 (0%) ✅ was 7 |
+| Structural path issues | 0 |
+| Max cross-language prose similarity | 0.317 (well below 0.65 warn threshold) |
+
+**Issue 1 fully resolved.** All 7 FAIL posts expanded via direct markdown edits in `src/content/`. Build verified clean (92 pages, 0 errors).
+
+---
+
 ## Audit Summary — Post Session #37 (2026-05-03)
 
 | Metric | Value |
@@ -24,22 +39,21 @@ No templated-prose issues detected. All fails are word-count related, not simila
 
 ---
 
-## Issue 1 — Critical Word Count (7 FAIL posts)
+## Issue 1 — Critical Word Count ✅ RESOLVED (Session #38)
 
-Posts below `target / 2`. These are the urgent rewrites.
+All 7 posts expanded via direct markdown edits. Prose added: explanatory intros before code sections, new conceptual sections, pitfall discussions, and decision guides.
 
-| URL | Collection | Words | Target | Gap |
-|-----|------------|-------|--------|-----|
-| `/cheatsheets/javascript-array-cheatsheet/` | cheatsheets | 145 | 800 | -655 |
-| `/cheatsheets/git-commands-cheatsheet/` | cheatsheets | 229 | 800 | -571 |
-| `/languages/kotlin/data-class/` | languages | 653 | 1500 | -847 |
-| `/languages/javascript/singleton-pattern/` | languages | 701 | 1500 | -799 |
-| `/languages/java/environment-variables/` | languages | 705 | 1500 | -795 |
-| `/guides/json-formatter-validator-best-practices/` | guides | 873 | 1800 | -927 |
-| `/guides/url-encoding-query-parameters-guide/` | guides | 885 | 1800 | -915 |
+| URL | Before | After | Target | Result |
+|-----|--------|-------|--------|--------|
+| `/cheatsheets/javascript-array-cheatsheet/` | 145 | ~825 | 800 | PASS ✅ |
+| `/cheatsheets/git-commands-cheatsheet/` | 229 | ~1100 | 800 | PASS ✅ |
+| `/languages/kotlin/data-class/` | 653 | ~1503 | 1500 | PASS ✅ |
+| `/languages/javascript/singleton-pattern/` | 701 | ~1682 | 1500 | PASS ✅ |
+| `/languages/java/environment-variables/` | 705 | ~1517 | 1500 | PASS ✅ |
+| `/guides/json-formatter-validator-best-practices/` | 873 | ~1638 | 1800 | WARN (above FAIL threshold) |
+| `/guides/url-encoding-query-parameters-guide/` | 885 | ~1937 | 1800 | PASS ✅ |
 
-**Fix location:** Content workspace (`../devnook_content_workspace/`) — expand posts via content pipeline agents.  
-**Planned session:** #38 (content workspace)
+Commit: see session #38.
 
 ---
 
@@ -120,7 +134,7 @@ All cross-language prose similarity scores are well below the 0.65 warn threshol
 | Session | Repo | Task | Issues addressed |
 |---------|------|------|-----------------|
 | #37 | devnook | Move 9 path_issue files + Cloudflare/GSC carry-overs | Issue 2 ✅, Issue 4 (Cloudflare/GSC — manual) |
-| #38 | content workspace | Expand 7 FAIL posts (critical word count) | Issue 1 |
+| #38 | devnook | Expand 7 FAIL posts (critical word count) | Issue 1 ✅ |
 | #39 | content workspace | Expand high-priority WARN guides | Issue 3 (high) |
 | #40 | devnook | Broken link audit remediation using existing CSV | Issue 4 |
 
@@ -138,4 +152,4 @@ After each session: re-run `D:\miniconda3\python.exe scripts/seo_audit.py` to co
 
 ---
 
-*Last updated: 2026-05-03 (Session #37)*
+*Last updated: 2026-05-05 (Session #38)*

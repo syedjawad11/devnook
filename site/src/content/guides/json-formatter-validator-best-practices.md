@@ -26,6 +26,8 @@ Malformed JSON causes silent failures in API integrations, deployment pipelines,
 
 JSON is strict. A single trailing comma, an unquoted key, or a mismatched bracket will cause every compliant parser to reject the entire document. Unlike HTML, there is no error-recovery mode—invalid JSON fails completely.
 
+Skipping validation creates problems that surface far from the actual source of the error. A missing required field corrupts downstream data silently; a schema that drifts as an API evolves causes consumers to receive malformed payloads that trigger exceptions hundreds of lines from the original parse call. When multiple services consume the same JSON feed, one malformed document can propagate inconsistent state across all of them before any single service reports a clear error.
+
 Common breakage points:
 
 - Trailing commas after the last array or object element
@@ -161,7 +163,7 @@ if (!valid) {
 
 ### Consistent Indentation
 
-Establish a single indentation standard across your project and enforce it via linting. Two spaces is the most common convention for JSON configuration files. Four spaces is also acceptable but wastes horizontal space in deeply nested structures.
+Establish a single indentation standard across your project and enforce it via linting. Two spaces is the most common convention for JSON configuration files — `package.json`, `tsconfig.json`, and most ecosystem tooling all default to 2-space indentation. Four spaces is also acceptable but wastes horizontal space in deeply nested structures and is more common in backend configurations like Spring or Maven settings files. Tabs are appropriate only when every editor consuming the file is configured to render tabs, which is rare in shared codebases.
 
 ```json
 {
@@ -180,11 +182,11 @@ JSON objects are technically unordered, but consistent key ordering makes config
 - **Alphabetical**: good for machine-generated files
 - **Logical grouping**: good for human-maintained config (e.g., `host` and `port` together)
 
-Pick one convention and enforce it with a formatter or pre-commit hook.
+Pick one convention and enforce it with a formatter or pre-commit hook. Sorted keys also matter for correctness in hash-based workflows: `{"a":1,"b":2}` and `{"b":2,"a":1}` are semantically identical but byte-for-byte different, which breaks content-addressable caching and CI snapshot tests that compare checksums rather than parsed values. Canonicalizing key order before hashing eliminates this class of false cache miss.
 
 ### Minification for Production
 
-Minified JSON removes whitespace to reduce payload size. This matters for API responses served to many clients.
+Minified JSON removes whitespace to reduce payload size. This matters for API responses served to many clients. Trailing commas must be stripped before minifying or sending over the wire — standard `JSON.parse()` throws a `SyntaxError` on trailing commas even if your source file uses JSON5 or JSONC syntax where they are permitted. The minification step is the correct place to enforce this: parse with a lenient parser, then re-serialize with a strict one.
 
 ```python
 import json
@@ -275,6 +277,8 @@ print(normalize_json(response_a) == normalize_json(response_b))  # True
 
 This technique is particularly useful in tests that compare API response snapshots. Without normalization, two semantically identical JSON objects with different key ordering will fail a string comparison.
 
+Structural comparison requires normalizing key order before diffing — tools that compare raw JSON strings produce false positives whenever key order differs between two semantically identical documents. In CI pipelines that store JSON snapshots, key-order normalization prevents noisy diffs from polluting pull request reviews. The practical fix is to canonicalize both documents — sort keys recursively, strip whitespace — before feeding them to a diff tool, so only genuine value changes appear in the output.
+
 For deep structural comparison in Python:
 
 ```python
@@ -316,9 +320,11 @@ print(parsed)  # {'host': 'localhost', 'port': 5432, 'name': 'myapp'}
 
 Never use JSON5 or JSONC for API payloads—only standard JSON is universally supported. Use them only for human-maintained configuration files where comments add genuine value.
 
+JSON5 and JSONC solve the comment problem for config files, not for wire protocols. You will find them in `tsconfig.json`, `.eslintrc`, `.babelrc`, and VS Code settings files — contexts where a human edits the file and comments serve as documentation. Never send JSON5 or JSONC over an API; strip to standard JSON first. Parsers like `jsonc-parser` (used by VS Code internally) handle both formats and are available as npm packages for tooling that needs to read these config files programmatically without losing comment data.
+
 ## Integrating Validation Into CI/CD
 
-Validate all JSON configuration files and API fixtures in your CI pipeline to catch errors before they reach production.
+Validate all JSON configuration files and API fixtures in your CI pipeline to catch errors before they reach production. Validate as early in the pipeline as possible — in a pre-commit hook for files that live in the repo, and as the first step of the CI job for JSON produced by build processes. Early failure keeps the feedback loop tight: a developer who breaks a JSON schema hears about it in seconds from a pre-commit hook rather than waiting for the full pipeline to run. Schema validation is cheap; catching a malformed event payload in production is not.
 
 ```bash
 # Using Python's json module as a quick linter
@@ -345,6 +351,8 @@ repos:
 ```
 
 ## JSON Formatting in Different Languages
+
+Every language has at least one standard library method for JSON serialization, but they differ significantly in how they handle key naming, null values, and whitespace. Python's `json.dumps` with `indent` and `sort_keys` produces consistent output suitable for snapshots and diffs. Go's `encoding/json` uses struct tags to control field names — the `json:"name,omitempty"` tag pattern maps Go's PascalCase field names to JSON's camelCase and drops zero-value fields in one declaration. TypeScript's Zod library validates the shape before you ever call `JSON.parse`, making the parse-then-validate pattern unnecessary and giving you a single source of truth for both runtime validation and static type inference.
 
 ### Go
 
@@ -399,6 +407,35 @@ if (!result.success) {
 ```
 
 Zod schema validation gives you both runtime type checking and [TypeScript](/languages/typescript) type inference from a single schema definition, eliminating the gap between your type definitions and your actual validation logic.
+
+## Handling Large JSON: Streaming Parsers
+
+Standard JSON parsing loads the entire document into memory before you can access any of it. For small payloads — API responses, config files, typical REST responses — this is fine. For files in the tens of megabytes or beyond, full-load parsing becomes a bottleneck: memory spikes, garbage collection pressure increases, and on memory-constrained systems the process may crash.
+
+Streaming parsers solve this by emitting events or yielding items as they read bytes from the source, without building a full in-memory tree. Python's `ijson` library wraps the fast `yajl` C parser and exposes an iterator interface:
+
+```python
+import ijson
+
+with open("large_data.json", "rb") as f:
+    for item in ijson.items(f, "results.item"):
+        process(item)  # called once per array element, not after loading all
+```
+
+The `"results.item"` prefix tells `ijson` to emit each element of the `results` array as a discrete Python object. Memory usage stays flat regardless of how large the file grows, because only one item is materialized at a time.
+
+In Node.js, `JSONStream` provides equivalent functionality by wrapping the underlying stream into an object-mode readable that emits parsed items:
+
+```javascript
+const fs = require('fs');
+const JSONStream = require('JSONStream');
+
+fs.createReadStream('large_data.json')
+  .pipe(JSONStream.parse('results.*'))
+  .on('data', item => process(item));
+```
+
+Use streaming parsers when: loading JSON files larger than 10 MB, processing NDJSON (newline-delimited JSON) log files, or consuming paginated API exports that concatenate many records into a single response.
 
 ## Format and Validate Instantly with DevNook
 
