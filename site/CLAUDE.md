@@ -40,35 +40,36 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-06, #41)
+## Last Session (2026-05-06, #42)
 
-**Status:** ✅ Task #40 complete — all 308 redirects from April 25 Ahrefs audit resolved.
+**Status:** ✅ Duplicate H1 tags fixed across 7 posts + content pipeline patched to prevent recurrence.
 
 ### What was done
 
-- **Task #39 skipped** — word-count WARN benchmarks are acceptable as-is; no action needed.
-- **Task #40 completed** — re-ran `scripts/fix_trailing_slashes.py`; fixed 5 remaining links across 3 files:
-  - `src/content/languages/java/what-is-rest-api-in-java.md` (2 links)
-  - `src/content/languages/javascript/how-to-async-await-in-javascript.md` (1 link)
-  - `src/content/languages/rust/how-to-close-console-in-rust.md` (2 links)
+- **Task #41a — Fixed 7 posts with duplicate H1 tags** (Ahrefs "Multiple H1" audit flag):
+  - Removed the `# {title}` body line from each file — `PostLayout.astro` already renders `frontmatter.title` as `<h1>`
+  - Files fixed: `javascript/how-to-async-await-in-javascript.md`, `go/how-to-use-lambda-function-in-google-sheets.md`, `java/how-to-json-parse-in-java.md`, `java/what-is-rest-api-in-java.md`, `rust/how-to-close-console-in-rust.md`, `cpp/how-to-catch-error-in-cpp.md`, `typescript/how-to-write-lambda-function-in-typescript.md`
+- **Task #41b — Patched content pipeline to prevent recurrence** (3 files in `devnook_content_workspace/`):
+  - `agents/subagent-prompts/writer.md` — removed "H1 matching title" instruction; replaced with "no H1 in body" rule
+  - `agents/subagent-prompts/antigravity-qa.md` — flipped H1 body check from "inject if missing" → "remove if present"
+  - `agents/skills/seo-writing-rules.md` — updated Heading Structure rule to explicitly ban body H1
 - **Build verified** — `npm run build` clean, 95 pages, 0 errors.
-- **Committed and pushed** — commit `30b17b0`.
-- **Ahrefs baseline** — After deploy, re-crawl should show 0 internal 308 redirects (only Cloudflare infrastructure 301s: HTTP→HTTPS, www→non-www remain — SEO-harmless).
+- **Committed and pushed** — commit `06392f1`.
 
-### Previous session (#40) summary
+### Previous session (#41) summary
 
-Ran `scripts/fix_trailing_slashes.py` for the first time — 172 replacements across 60 content files. Cleared the bulk of 308 redirects from the April 25 Ahrefs audit.
+Fixed all 308 redirects from April 25 Ahrefs audit — 172 replacements across 60 content files + 5 remaining links in 3 files.
 
-### Next session priorities (#42)
+### Next session priorities (#43)
 
-1. **Re-run Ahrefs crawler** to confirm 0 internal 308 redirects remain.
+1. **Re-run Ahrefs crawler** to confirm 0 "Multiple H1" results remain.
 2. **Content expansion — WARN posts.** Start by reading `auditlog.md` Issue 3. Then expand:
    - `/guides/base64-encoding-decoding-guide/` (943 words, target 1800)
    - `/guides/curl-command-guide/` (1047 words, target 1800)
    - `/guides/html-minification-compression-guide/` (1262 words, target 1800)
    - `/guides/css-minification-performance-optimization/` (1306 words, target 1800)
    - `/blog/css-flexbox-vs-grid/` (1064 words, target 1500)
-   - `json-formatter-validator-best-practices.md` from ~1,638 → 1,800 words (missed PASS by ~162 words)
+   - `json-formatter-validator-best-practices.md` from ~1,638 → 1,800 words
 
 ### Deferred (do not do)
 
@@ -132,6 +133,7 @@ Spawn with: `Agent(prompt=open('agents/subagent-prompts/builder.md').read(), ...
 | Language post URLs must use `concept`, not filename | Content pipeline agents historically guessed `/languages/{lang}/{filename-slug}` in body prose. Correct path is always `/languages/{lang}/{concept}` from registry. `publish.py` now has `validate_language_links()` guard that skips files with filename-based links at publish time. `link_utility.py._url_for_row()` is already correct — the bug is agents bypassing it. |
 | Auto-internal-links plugin covers all categories | `src/plugins/auto-internal-links/index.mjs` scans the full `contentDir` via `fast-glob` — all of `guides`, `blog`, `cheatsheets`, `languages`. Not language-only. `devnookUrlBuilder` note only describes URL *generation* for language posts. |
 | Related callouts plugin (session 32) | `src/plugins/related-callouts/index.mjs` — build-time rehype plugin injects up to 3 `<aside class="related-callout">` nodes at interior H2 boundaries. Scoring mirrors PostLayout.astro. CSS in `public/styles/global.css` (not scoped). Per-post opt-out: `excludeRelatedCallouts: true` in frontmatter. |
+| No H1 in markdown body (session 42) | `PostLayout.astro` renders `frontmatter.title` as the page `<h1>`. Any `# Title` line in the body creates a second `<h1>` — Ahrefs flags as "Multiple H1 tags". Content pipeline files patched: `writer.md`, `antigravity-qa.md`, `seo-writing-rules.md`. Never write or instruct agents to write a body H1. |
 
 ---
 
