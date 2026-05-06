@@ -13,8 +13,6 @@ related_tools: []
 og_image: "/og/languages/rust/close-console.png"
 ---
 
-# Closing the Console in Rust — Syntax, Examples & Usage
-
 Every method for closing, hiding, or terminating a console window from a Rust application — from `process::exit()` to Windows-specific API calls and cross-platform daemon patterns. For broader Rust error handling strategies that complement controlled process exit, see [How Async/Await Works in Rust](/languages/rust/async-await/) and [Pattern Matching in Rust](/languages/rust/pattern-matching/).
 
 ## Syntax at a Glance

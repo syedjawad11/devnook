@@ -13,8 +13,6 @@ related_tools: []
 og_image: "/og/languages/typescript/write-lambda-function.png"
 ---
 
-# What is a Lambda Function in TypeScript? Arrow Functions Explained with Examples
-
 Lambda functions in TypeScript give you a concise way to define inline, anonymous functions with full type safety — a pattern every TypeScript developer reaches for daily when writing callbacks, array transformations, and event handlers. For async lambda patterns, see [How to Use Async Await in TypeScript](/languages/typescript/async-await/) and [TypeScript: interface vs type](/languages/typescript/interfaces-vs-types/) for typing callback signatures.
 
 ## What is a Lambda Function in TypeScript?

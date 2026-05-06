@@ -14,8 +14,6 @@ published_date: "2026-05-02"
 og_image: "/og/languages/cpp/catch-error.png"
 ---
 
-# How to Catch Errors in C++: Exception Handling with try, catch, and throw
-
 C++ provides structured exception handling through `try`, `catch`, and `throw` — the mechanism that separates error-handling logic from normal program flow and prevents silent state corruption on failure. For sending HTTP requests in C++ without crashing on failure, see [How to Send an HTTP Request in C++](/languages/cpp/http-requests/).
 
 ## What is Error Catching in C++?
