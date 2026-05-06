@@ -40,27 +40,28 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-05, #40)
+## Last Session (2026-05-06, #41)
 
-**Status:** ✅ Fixed 402 internal 308 redirects — 172 markdown link replacements across 60 content files.
+**Status:** ✅ Task #40 complete — all 308 redirects from April 25 Ahrefs audit resolved.
 
 ### What was done
 
-- **Session #39 recap** — Fixed trailing slashes in Astro templates (PostCard hrefs, PostLayout breadcrumbs). Commit `fc7663a` was pushed this session.
-- **Root cause (content files)** — Ahref audit showed 402 remaining 308 redirects from manually written markdown links in `src/content/` missing trailing slashes (e.g. `[Python](/languages/python)` → `[Python](/languages/python/)`).
-- **Fix** — Wrote `scripts/fix_trailing_slashes.py` (regex `r'(\]\()(/[^)#?\s]*[^/)#?\s])(\))'`) to scan all `.md` files in `src/content/` and add missing trailing slashes. Skips anchors (`#`) and query strings (`?`).
-- **Result** — 172 replacements across 60 files: 4 blog, 7 cheatsheets, 11 guides, 17 languages, 21 tools pages.
-- **Build verified** — `npm run build` clean, 92 pages, 0 errors.
-- **Committed and pushed** — both `fc7663a` (session #39) and this session's commit.
-- **Note:** 3 infrastructure-level 301 redirects (HTTP→HTTPS, www→non-www) are Cloudflare-managed — not fixable in code, SEO-harmless.
+- **Task #39 skipped** — word-count WARN benchmarks are acceptable as-is; no action needed.
+- **Task #40 completed** — re-ran `scripts/fix_trailing_slashes.py`; fixed 5 remaining links across 3 files:
+  - `src/content/languages/java/what-is-rest-api-in-java.md` (2 links)
+  - `src/content/languages/javascript/how-to-async-await-in-javascript.md` (1 link)
+  - `src/content/languages/rust/how-to-close-console-in-rust.md` (2 links)
+- **Build verified** — `npm run build` clean, 95 pages, 0 errors.
+- **Committed and pushed** — commit `30b17b0`.
+- **Ahrefs baseline** — After deploy, re-crawl should show 0 internal 308 redirects (only Cloudflare infrastructure 301s: HTTP→HTTPS, www→non-www remain — SEO-harmless).
 
-### Previous session (#39) summary
+### Previous session (#40) summary
 
-Fixed trailing slashes in Astro template files (PostCard hrefs, PostLayout breadcrumbs). Fixed ~60 template-level 308 redirects.
+Ran `scripts/fix_trailing_slashes.py` for the first time — 172 replacements across 60 content files. Cleared the bulk of 308 redirects from the April 25 Ahrefs audit.
 
-### Next session priorities (#41)
+### Next session priorities (#42)
 
-1. **Re-run Ahref crawler** to confirm 308 redirect count drops to ≤3 (only Cloudflare infrastructure 301s remain).
+1. **Re-run Ahrefs crawler** to confirm 0 internal 308 redirects remain.
 2. **Content expansion — WARN posts.** Start by reading `auditlog.md` Issue 3. Then expand:
    - `/guides/base64-encoding-decoding-guide/` (943 words, target 1800)
    - `/guides/curl-command-guide/` (1047 words, target 1800)
@@ -68,7 +69,6 @@ Fixed trailing slashes in Astro template files (PostCard hrefs, PostLayout bread
    - `/guides/css-minification-performance-optimization/` (1306 words, target 1800)
    - `/blog/css-flexbox-vs-grid/` (1064 words, target 1500)
    - `json-formatter-validator-best-practices.md` from ~1,638 → 1,800 words (missed PASS by ~162 words)
-3. **Broken link audit remediation** — use `devnook_25-apr-2026_page-has-links-to-broken_2026-04-25_17-46-11.csv` at repo root.
 
 ### Deferred (do not do)
 
