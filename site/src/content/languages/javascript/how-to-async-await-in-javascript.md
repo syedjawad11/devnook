@@ -16,7 +16,7 @@ og_image: "/og/languages/javascript/async-await.png"
 
 # What is Async Await in JavaScript? A Complete Guide
 
-Understanding how to async await in javascript is a fundamental requirement for modern developers aiming to build responsive, non-blocking applications. This paradigm fundamentally transforms the way developers orchestrate asynchronous tasks, shifting from complex callback chains into highly readable, linear control flows. If you are working with JavaScript Promises, the [JavaScript Promises Explained](/languages/javascript/promises) guide covers the underlying mechanism that async/await builds upon.
+Understanding how to async await in javascript is a fundamental requirement for modern developers aiming to build responsive, non-blocking applications. This paradigm fundamentally transforms the way developers orchestrate asynchronous tasks, shifting from complex callback chains into highly readable, linear control flows. If you are working with JavaScript Promises, the [JavaScript Promises Explained](/languages/javascript/promises/) guide covers the underlying mechanism that async/await builds upon.
 
 ## What is Async Await in JavaScript?
 
