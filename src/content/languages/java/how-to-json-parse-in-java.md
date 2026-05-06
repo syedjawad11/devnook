@@ -13,8 +13,6 @@ related_tools: []
 og_image: "/og/languages/java/json-parse.png"
 ---
 
-# JSON Parsing in Java — A Step-by-Step Tutorial with Jackson
-
 By the end of this tutorial, you will have a fully working JSON configuration loader in Java that reads a JSON file, deserializes it into typed Java objects, validates required fields, and handles malformed input gracefully. Learning how to JSON parse in Java is foundational for any backend developer working with REST APIs, configuration files, or data interchange. Use the [JSON Formatter Online](/guides/json-formatter-guide/) tool to validate your JSON structures before parsing, and see the [JSON Formatter and Validator Best Practices](/guides/json-formatter-validator-best-practices/) guide for schema validation tips.
 
 ## What You'll Build

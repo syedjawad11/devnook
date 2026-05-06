@@ -13,8 +13,6 @@ related_tools: []
 og_image: "/og/languages/java/rest-api.png"
 ---
 
-# What is a REST API in Java? A Complete Guide with Examples
-
 A REST API in Java is the backbone of virtually every modern backend service — from mobile app backends to enterprise microservices — and understanding how to build one correctly is essential for any Java developer working in the web space. For related foundational topics, see [HTTP Status Codes: Complete Reference](/guides/http-status-codes-guide/) and [What is JWT?](/guides/what-is-jwt/) for securing your REST endpoints.
 
 ## What is a REST API in Java?
