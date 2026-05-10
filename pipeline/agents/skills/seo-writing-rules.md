@@ -12,7 +12,7 @@
 Tables, code blocks, and lists count toward word count.
 
 ## Heading Structure
-- H1: Title (only one, matches `title` frontmatter exactly or closely)
+- H1: **Do not write an H1 in the markdown body.** The Astro layout renders `frontmatter.title` as the page `<h1>`. A `# heading` line in the body creates a duplicate H1 (SEO penalty).
 - H2: Major sections (3–6 per post)
 - H3: Subsections under H2 (use for FAQ answers, sub-topics)
 - H4: Only if truly needed. Never use H5/H6.

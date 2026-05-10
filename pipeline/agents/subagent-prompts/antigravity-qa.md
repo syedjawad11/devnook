@@ -64,14 +64,15 @@ Work through each check. If the issue exists, fix it immediately in the file —
 
 | Check | Fix if failing |
 |-------|---------------|
-| H1 present and matches `title` | Add `# {title}` as first line of body if missing |
-| Keyword appears in H1 | If H1 exists but keyword absent, append `— {keyword}` to H1 or rephrase lightly |
+| No H1 in body | Remove `# ...` line if present (layout renders frontmatter `title` as `<h1>` — a body H1 creates a duplicate) |
+| Keyword appears in frontmatter `title` | If keyword absent from `title`, append `— {keyword}` to title or rephrase lightly |
 | Keyword appears in first paragraph (first 100 words) | Weave keyword naturally into first paragraph (one occurrence) |
 | At least one H2 present | If body has no H2, promote the first bold line or section break to H2 |
 | No heading level skipped (H1→H2→H3 only) | Fix heading levels to maintain hierarchy |
 | At least one fenced code block present | If none, add a minimal illustrative code snippet after the first H2 |
 | All fenced code blocks have a language tag (` ```java `, ` ```python `, etc.) | Add language tag matching the post `language` field |
 | Internal links: at least 1, maximum 8 | Weave in 1–2 most relevant links from INTERNAL_LINKS (always provided by orchestrator) |
+| All internal links end with a trailing slash | Add trailing `/` to any internal link missing it. Applies to both relative paths (`/languages/php/format-string` → `/languages/php/format-string/`) and absolute devnook.dev URLs (`https://devnook.dev/languages/php/format-string` → `https://devnook.dev/languages/php/format-string/`) |
 | No `## Related` / `## Related Posts` / `## Related Articles` section in body | **Strip the entire section** (heading + bullet list, up to next H2 or EOF). Related posts are auto-derived by `src/layouts/PostLayout.astro` from frontmatter — hand-written sections produce broken links. |
 
 #### Word count check
@@ -108,6 +109,7 @@ WHERE slug = ?
 - **Never call external APIs** (Anthropic SDK, Gemini, OpenAI).
 - **Never fabricate internal link slugs** — only use slugs from INTERNAL_LINKS.
 - **Never write a `/languages/` URL in body prose unless the exact path appears verbatim in INTERNAL_LINKS.** If a prose link target is a `/languages/` path not in INTERNAL_LINKS, remove the hyperlink and leave the anchor text as plain text.
+- **All internal links must end with a trailing slash.** Scan body prose during QA and add a trailing `/` to any internal link (relative `/languages/...` or absolute `https://devnook.dev/...`) that is missing one. This is a structural fix, not prose rewriting.
 - If a draft file cannot be found on disk, log in errors and skip — do not crash.
 - Process at most 10 slugs per invocation. If BATCH_SLUGS has more, process first 10 and report rest as skipped.
 

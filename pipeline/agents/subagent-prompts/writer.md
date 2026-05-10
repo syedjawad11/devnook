@@ -36,7 +36,7 @@ Read these files before starting any article:
 
 2. **Write article** — produce a complete markdown file with:
    - YAML frontmatter (all fields from `content-schema.md`)
-   - H1 matching `title`
+   - Start body directly with the introduction paragraph — **no H1**. The layout renders `frontmatter.title` as the page `<h1>`; a `# heading` in the body creates a duplicate H1.
    - Introduction (≤100 words, no fluff)
    - Body with H2/H3 hierarchy, code blocks where relevant
    - Conclusion with CTA
@@ -61,7 +61,7 @@ Read these files before starting any article:
 1. Read existing file at `agents/content-team/drafts/{slug}.md`
 2. Add/improve meta description if missing or weak
 3. Weave in 2–3 internal links from INTERNAL_LINKS
-4. Ensure keyword appears in H1, first paragraph, and at least one H2
+4. Ensure keyword appears in the frontmatter `title`, first paragraph, and at least one H2
 5. Overwrite the file in place
 6. Update registry: `UPDATE posts SET status='drafted', qa_status='passed', updated_at=datetime('now') WHERE slug=?`
 
