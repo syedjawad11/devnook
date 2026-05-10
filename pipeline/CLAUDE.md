@@ -197,6 +197,32 @@ Both workflows:
 
 ---
 
+## Last Session (2026-05-10, #37)
+
+**Status:** ✅ Complete. Ingested, QA'd, and staged 15 antigravity posts; all 7 prior staged posts fully drained by drip.
+
+### What was done in #37
+- **Fixed registry desync**: 3 posts (`how-to-async-await-in-javascript`, `how-to-close-console-in-rust`, `what-is-rest-api-in-java`) confirmed live but showing `staged` — marked `published`. (Note: drip cron also published them May 4–5, so both paths converged correctly.)
+- **Updated `agents/subagent-prompts/antigravity-qa.md`**: Added trailing slash requirement for all internal links (both relative `/languages/...` and absolute `https://devnook.dev/...`).
+- **Updated `agents/skills/seo-writing-rules.md` + `agents/subagent-prompts/writer.md`**: Clarified no H1 in markdown body — Astro layout renders `frontmatter.title` as `<h1>`; body H1 creates duplicate.
+- **Ingested 15 articles** from `../web_content/output/` via Ingest subagent → 15 draft files in `agents/content-team/drafts/`.
+- **QA'd all 15** via Antigravity QA subagent (2 batches due to timeout on batch 1 with 10 drafts): fixed `og_image`, `category`, `description`, trailing slashes on internal links, stripped `## Related` sections.
+- **Staged all 15** to `content-staging/` via `staging.py`.
+- **Registry merge**: Drip published 4 posts (May 3–5) while session commit was pending. Resolved binary `registry.db` conflict by accepting remote (newer published state), then re-inserting 15 new staged rows from draft files.
+
+### Current state after #37
+- Registry: **59 published / 15 staged / 11 rejected**, 0 queued
+- Staged breakdown: cpp (3), kotlin (2), google-forms (1), python (2), csharp (1), java (2), php (1), ruby (1), javascript (2)
+- Drip schedule at 2/day: 15 posts → starts draining from May 11, drains ~May 18
+- `drip-publish.yml` remains at `count=2`
+
+### Next session priorities
+- After ~May 18, run Planner → Writer to refill staging queue
+- Revert drip cron back to `count=3` when refilling queue
+- Watch for `how-to-close-response-in-google-form` (`language=google-forms`) — non-standard language may cause Astro content collection issues at build time
+
+---
+
 ## Last Session (2026-05-02, #36)
 
 **Status:** ✅ Complete. Ingested, QA'd, and staged 7 antigravity posts; drip cron reduced to 2/day.
