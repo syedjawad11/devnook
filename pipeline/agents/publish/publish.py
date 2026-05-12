@@ -213,7 +213,7 @@ def publish(count: int, category_filter: str = "all"):
     today = date.today().isoformat()
     subprocess.run(["git", "add", "src/content/"], cwd=devnook)
     result = subprocess.run(
-        ["git", "commit", "-m", f"chore: publish {today} drip posts [skip ci]"],
+        ["git", "commit", "-m", f"chore: publish {today} drip posts"],
         cwd=devnook,
         capture_output=True,
         text=True,
