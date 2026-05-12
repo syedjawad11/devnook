@@ -40,29 +40,33 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-06, #42)
+## Last Session (2026-05-12, #43)
 
-**Status:** ✅ Duplicate H1 tags fixed across 7 posts + content pipeline patched to prevent recurrence.
+**Status:** ✅ Critical pipeline bug fixed — `[skip ci]` in devnook commit message was silently blocking every Cloudflare deploy after drip publish. 4 stalled posts unblocked and confirmed live. Two SOP.md patches applied and committed.
 
 ### What was done
 
-- **Task #41a — Fixed 7 posts with duplicate H1 tags** (Ahrefs "Multiple H1" audit flag):
-  - Removed the `# {title}` body line from each file — `PostLayout.astro` already renders `frontmatter.title` as `<h1>`
-  - Files fixed: `javascript/how-to-async-await-in-javascript.md`, `go/how-to-use-lambda-function-in-google-sheets.md`, `java/how-to-json-parse-in-java.md`, `java/what-is-rest-api-in-java.md`, `rust/how-to-close-console-in-rust.md`, `cpp/how-to-catch-error-in-cpp.md`, `typescript/how-to-write-lambda-function-in-typescript.md`
-- **Task #41b — Patched content pipeline to prevent recurrence** (3 files in `devnook_content_workspace/`):
-  - `agents/subagent-prompts/writer.md` — removed "H1 matching title" instruction; replaced with "no H1 in body" rule
-  - `agents/subagent-prompts/antigravity-qa.md` — flipped H1 body check from "inject if missing" → "remove if present"
-  - `agents/skills/seo-writing-rules.md` — updated Heading Structure rule to explicitly ban body H1
-- **Build verified** — `npm run build` clean, 95 pages, 0 errors.
-- **Committed and pushed** — commit `06392f1`.
+- **Bug found and fixed — `publish.py` was including `[skip ci]` in the devnook commit message** (`devnook_content_workspace/agents/publish/publish.py` line 216). Cloudflare Pages honors `[skip ci]` and skips the build entirely — so every post-publish CI commit since launch produced zero deploys. Posts existed in the git repo but were never served from the CDN.
+  - Fix: removed `[skip ci]` from the devnook side commit message. Committed as `bc79e86` on content workspace `master`.
+  - The `[skip ci]` on line 78 of `drip-publish.yml` (content-workspace side) is intentional and correct — it prevents the content-workspace workflow from retriggering itself.
+- **Force-deploy empty commit** — pushed `git commit --allow-empty` to devnook (`fdce6fd`) with message `"chore: trigger deploy for stalled May 11-12 posts"` to immediately unblock the 4 posts that had already been committed but never deployed.
+- **4 stalled posts confirmed live (HTTP 200):**
+  - `https://devnook.dev/languages/cpp/c-handle-exception/`
+  - `https://devnook.dev/languages/cpp/close-file/`
+  - `https://devnook.dev/languages/cpp/class-inheritance/`
+  - `https://devnook.dev/languages/kotlin/catch-exception/`
+- **SOP.md committed to devnook for the first time** — was previously untracked. Committed alongside the two patches below (`7c88694`).
+- **SOP.md Patch 1 — Playbook Q step 2:** Updated the "check cross-repo push" instruction to use `git fetch origin main && git log origin/main -5 --oneline` instead of local `git log -1 --oneline`. Added note that local clone is always potentially stale because the publisher pushes from CI.
+- **SOP.md Patch 2 — Playbook A staging-cutoff note:** Added `**Staging cutoff:** Stage approved posts before 08:00 UTC. If you stage later than that, the next cron tick is tomorrow — that day's slot is missed and cannot be recovered without a manual on-demand publish (Playbook B).`
+- **Registry state:** 63 published, 11 staged remaining — pipeline healthy.
 
-### Previous session (#41) summary
+### Previous session (#42) summary
 
-Fixed all 308 redirects from April 25 Ahrefs audit — 172 replacements across 60 content files + 5 remaining links in 3 files.
+Fixed 7 posts with duplicate H1 tags (Ahrefs "Multiple H1" flag) + patched content pipeline (`writer.md`, `antigravity-qa.md`, `seo-writing-rules.md`) to prevent recurrence.
 
-### Next session priorities (#43)
+### Next session priorities (#44)
 
-1. **Re-run Ahrefs crawler** to confirm 0 "Multiple H1" results remain.
+1. **Re-run Ahrefs crawler** to confirm 0 "Multiple H1" results remain (carried over from #43).
 2. **Content expansion — WARN posts.** Start by reading `auditlog.md` Issue 3. Then expand:
    - `/guides/base64-encoding-decoding-guide/` (943 words, target 1800)
    - `/guides/curl-command-guide/` (1047 words, target 1800)
@@ -74,6 +78,7 @@ Fixed all 308 redirects from April 25 Ahrefs audit — 172 replacements across 6
 ### Deferred (do not do)
 
 - **AdSense integration** — revisit only at 50k visitors/month
+- **GSC ping** — `GOOGLE_SERVICE_ACCOUNT_JSON` secret never set in content workspace repo; every cron run prints "Skipping GSC ping". Non-blocking config gap — defer to a dedicated session.
 - Blog filter chips wiring (decorative only)
 - Search bar wiring (`SearchBar.astro` parked)
 
@@ -134,6 +139,7 @@ Spawn with: `Agent(prompt=open('agents/subagent-prompts/builder.md').read(), ...
 | Auto-internal-links plugin covers all categories | `src/plugins/auto-internal-links/index.mjs` scans the full `contentDir` via `fast-glob` — all of `guides`, `blog`, `cheatsheets`, `languages`. Not language-only. `devnookUrlBuilder` note only describes URL *generation* for language posts. |
 | Related callouts plugin (session 32) | `src/plugins/related-callouts/index.mjs` — build-time rehype plugin injects up to 3 `<aside class="related-callout">` nodes at interior H2 boundaries. Scoring mirrors PostLayout.astro. CSS in `public/styles/global.css` (not scoped). Per-post opt-out: `excludeRelatedCallouts: true` in frontmatter. |
 | No H1 in markdown body (session 42) | `PostLayout.astro` renders `frontmatter.title` as the page `<h1>`. Any `# Title` line in the body creates a second `<h1>` — Ahrefs flags as "Multiple H1 tags". Content pipeline files patched: `writer.md`, `antigravity-qa.md`, `seo-writing-rules.md`. Never write or instruct agents to write a body H1. |
+| Never use `[skip ci]` in devnook commit messages (session 43) | Cloudflare Pages honors `[skip ci]` and skips the build — so drip-publish commits would never deploy. The `[skip ci]` in `drip-publish.yml` line 78 is intentional (content-workspace side, prevents workflow retriggering itself). The devnook-side commit in `publish.py` must NOT include it. |
 
 ---
 
