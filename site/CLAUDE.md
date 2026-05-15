@@ -40,9 +40,21 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-12, #43)
+## Last Session (2026-05-15, #44)
 
-**Status:** ✅ Critical pipeline bug fixed — `[skip ci]` in devnook commit message was silently blocking every Cloudflare deploy after drip publish. 4 stalled posts unblocked and confirmed live. Two SOP.md patches applied and committed.
+**Status:** ✅ FAQPage JSON-LD added to all 14 tool pages that have visible FAQs. Two commits pushed to `main`, Cloudflare Pages auto-deploy triggered.
+
+### What was done
+
+- **Added `faqs` optional field to Zod schema** — `src/content/config.ts`: `faqs: z.array(z.object({ question, answer })).optional()` in `toolsCollection`.
+- **Updated `src/pages/tools/[slug].astro` schema logic** — When `tool.data.faqs` is present, emits `@graph` with SoftwareApplication (`@id: /tools/{slug}/#tool`) + FAQPage (`@id: /tools/{slug}/#faq`). Without FAQs, keeps existing flat SoftwareApplication. Single `<script type="application/ld+json">` always (no sibling tag).
+- **Added `faqs` frontmatter to 14 tool markdown files** — exact plain-text mirror of visible FAQ Q&A (backtick code and markdown links stripped). 3 tools intentionally skipped — no visible FAQs: `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`.
+- **Build verified clean** — 99 pages, 0 errors. JSON-LD spot-checked in built HTML: correct `@graph` structure, single script tag on FAQ tools; flat SoftwareApplication on no-FAQ tools.
+- **Commits:** `4907a22` (infrastructure), `f74f21f` (14 markdown files).
+
+### Previous session (#43) summary
+
+Critical pipeline bug fixed — `[skip ci]` in devnook commit message was silently blocking every Cloudflare deploy after drip publish. 4 stalled posts unblocked and confirmed live. Two SOP.md patches applied and committed.
 
 ### What was done
 
@@ -64,10 +76,12 @@ Start each session from this file + MEMORY.md only.
 
 Fixed 7 posts with duplicate H1 tags (Ahrefs "Multiple H1" flag) + patched content pipeline (`writer.md`, `antigravity-qa.md`, `seo-writing-rules.md`) to prevent recurrence.
 
-### Next session priorities (#44)
+### Next session priorities (#45)
 
 1. **Re-run Ahrefs crawler** to confirm 0 "Multiple H1" results remain (carried over from #43).
-2. **Content expansion — WARN posts.** Start by reading `auditlog.md` Issue 3. Then expand:
+2. **Validate FAQPage schema in Google Rich Results Test** — test a few tool URLs (e.g. `https://devnook.dev/tools/json-formatter/`) to confirm FAQ rich result eligibility.
+3. **Add FAQs to the 3 skipped tools** — `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url` have no FAQ sections. Add visible FAQ sections to these pages first, then add `faqs` frontmatter.
+4. **Content expansion — WARN posts.** Start by reading `auditlog.md` Issue 3. Then expand:
    - `/guides/base64-encoding-decoding-guide/` (943 words, target 1800)
    - `/guides/curl-command-guide/` (1047 words, target 1800)
    - `/guides/html-minification-compression-guide/` (1262 words, target 1800)
