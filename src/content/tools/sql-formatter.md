@@ -20,6 +20,13 @@ tags:
 template_id: tool-exp-v1
 title: SQL Formatter — Free Online Tool
 tool_slug: sql-formatter
+faqs:
+  - question: "Does the formatter validate SQL syntax?"
+    answer: "No, this sql formatter online focuses on formatting only. It will format invalid SQL, but won't catch syntax errors. Use your database client for validation."
+  - question: "Can I format stored procedures and triggers?"
+    answer: "Yes, the formatter supports CREATE PROCEDURE, CREATE TRIGGER, and other DDL statements with proper indentation for BEGIN/END blocks."
+  - question: "Will it modify my table or column names?"
+    answer: "Never. The formatter only capitalizes SQL keywords. Your identifiers, string literals, and comments remain unchanged."
 ---
 
 ## What is SQL Formatter?

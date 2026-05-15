@@ -21,6 +21,13 @@ tags:
 template_id: tool-exp-v1
 title: Hash Generator — Free Online Tool
 tool_slug: hash-generator
+faqs:
+  - question: "Is MD5 secure for passwords?"
+    answer: "No. MD5 is cryptographically broken and should never be used for password hashing in production. Use bcrypt, Argon2, or PBKDF2 instead. This tool includes MD5 only for legacy system compatibility and testing."
+  - question: "What's the difference between SHA-256 and SHA-512?"
+    answer: "SHA-512 produces a 128-character hash (512 bits) compared to SHA-256's 64-character hash (256 bits). SHA-512 offers stronger collision resistance but both are secure for modern applications. SHA-256 is more common in web development."
+  - question: "Can I hash files with this tool?"
+    answer: "This hash generator online is text-based only. For file hashing, use command-line tools like sha256sum or browser-based file hash tools that read file buffers directly."
 ---
 
 ## What is the Hash Generator?

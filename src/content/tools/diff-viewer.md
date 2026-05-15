@@ -18,6 +18,13 @@ related_content:
 - code-review-best-practices
 published_date: '2026-04-18'
 og_image: /og/tools/diff-viewer.png
+faqs:
+  - question: "Is this tool useful for binary files or images?"
+    answer: "No. The Diff Checker is designed for plain text. Binary content will produce unreadable or misleading output."
+  - question: "How large can the input text be?"
+    answer: "The tool runs in your browser's JavaScript engine. Very large inputs (tens of thousands of lines) may be slow because LCS computation is O(n×m) in the worst case. For very large diffs, a command-line tool like git diff or diff will be faster."
+  - question: "Can I diff JSON or code with syntax highlighting?"
+    answer: "Not currently — output is plain text with line-level colour coding. Syntax highlighting is not supported in this version."
 ---
 
 ## What is the Diff Checker?

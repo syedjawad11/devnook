@@ -20,6 +20,13 @@ tags:
 template_id: tool-exp-v1
 title: JSON Formatter & Validator — Free Online Tool
 tool_slug: json-formatter
+faqs:
+  - question: "Does this json formatter online store my data?"
+    answer: "No. All formatting, validation, and minification happens entirely in your browser. Your JSON never leaves your device."
+  - question: "Can I format large JSON files?"
+    answer: "Yes. The tool handles JSON files up to several megabytes. Performance depends on your browser, but most typical API responses and config files process instantly."
+  - question: "What's the difference between Format and Minify?"
+    answer: "Format adds indentation and line breaks for readability. Minify removes all whitespace to create the smallest possible valid JSON, ideal for production environments or network transmission."
 ---
 
 ## What is JSON Formatter & Validator?

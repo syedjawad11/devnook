@@ -19,6 +19,11 @@ related_content:
 - linux-scheduling-explained
 published_date: '2026-04-18'
 og_image: /og/tools/cron-parser.png
+faqs:
+  - question: "Does this tool support 6-field cron expressions (with seconds)?"
+    answer: "Yes — if you provide 6 fields, the first field is treated as seconds."
+  - question: "Why does the next run time look slightly off?"
+    answer: "The tool calculates runs by iterating forward minute-by-minute from the current time. Timezone offsets may affect results when switching between UTC and Local."
 ---
 
 ## What is the Cron Expression Builder?

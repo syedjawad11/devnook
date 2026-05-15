@@ -19,6 +19,11 @@ tags:
 template_id: tool-exp-v1
 title: Regex Tester — Free Online Tool
 tool_slug: regex-tester
+faqs:
+  - question: "What regex flavours does this tester support?"
+    answer: "This tool uses JavaScript's native regex engine, which supports most common regex features including lookaheads, lookbehinds, named capture groups, and Unicode property escapes. The syntax is compatible with ECMAScript 2018+ and works in all modern browsers."
+  - question: "Can I save my regex patterns?"
+    answer: "Your most recent pattern and test text persist in your browser's local storage, so they'll be there when you return. For long-term storage, bookmark the page or copy your pattern to a note-taking app."
 ---
 
 ## What is the Regex Tester?

@@ -19,6 +19,13 @@ tags:
 template_id: tool-exp-v1
 title: Base64 Encoder/Decoder — Free Online Tool
 tool_slug: base64-encoder
+faqs:
+  - question: "Is Base64 encoding secure?"
+    answer: "No. Base64 is an encoding format, not encryption. Anyone can decode Base64 strings instantly. Never use this base64 encoder online for sensitive data that requires security — use proper encryption instead."
+  - question: "What's the difference between standard and URL-safe Base64?"
+    answer: "Standard Base64 uses + and / characters which have special meaning in URLs. URL-safe Base64 replaces them with - and _ to safely pass encoded data in URLs without escaping."
+  - question: "Why does Base64 make data larger?"
+    answer: "Base64 increases data size by approximately 33% because it represents 3 bytes of input with 4 bytes of output. This trade-off allows binary data to be safely transmitted as text."
 ---
 
 ## What is Base64 Encoding?

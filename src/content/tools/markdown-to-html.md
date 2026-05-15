@@ -19,6 +19,13 @@ tags:
 template_id: tool-exp-v1
 title: Markdown to HTML Converter — Free Online Tool
 tool_slug: markdown-to-html
+faqs:
+  - question: "Does this support GitHub Flavored Markdown?"
+    answer: "Yes. This markdown to html converter includes full GFM support: tables, task lists, strikethrough, and autolinked URLs."
+  - question: "Is my Markdown content uploaded to a server?"
+    answer: "No. All conversion happens in your browser using client-side JavaScript. Your content never leaves your device."
+  - question: "Can I convert multiple files at once?"
+    answer: "This tool handles one Markdown document at a time. For batch conversion, you'll need a command-line tool like Pandoc or a build script."
 ---
 
 ## What is a Markdown to HTML Converter?
