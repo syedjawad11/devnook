@@ -19,6 +19,11 @@ tags:
 template_id: tool-exp-v1
 title: URL Encoder/Decoder — Free Online Tool
 tool_slug: url-encoder
+faqs:
+  - question: "What's the difference between Encode URL and Encode URI Component?"
+    answer: "Encode URL encodes the entire string including protocol characters (:, /, ?). Encode URI Component only encodes query parameter values, preserving URL structure characters. Use URI Component when encoding individual parameter values."
+  - question: "Why do spaces become %20 in URLs?"
+    answer: "URLs only support ASCII characters from a specific safe set. Spaces aren't in that set, so they're replaced with their hexadecimal representation (%20) to maintain URL validity across all systems."
 ---
 
 ## What is URL Encoder/Decoder?

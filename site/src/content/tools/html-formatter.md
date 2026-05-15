@@ -18,6 +18,11 @@ related_content:
 - html-minification-guide
 published_date: '2026-04-18'
 og_image: /og/tools/html-formatter.png
+faqs:
+  - question: "Does the formatter handle malformed HTML?"
+    answer: "The formatter uses a token-based approach and will attempt to process the input even if it is not perfectly valid. Severely malformed HTML may produce unexpected indentation but will not throw an error."
+  - question: "Does minification affect JavaScript or CSS inside script or style tags?"
+    answer: "Only whitespace between HTML tags is removed. The content inside script and style blocks is preserved exactly as written. For full script/style minification, use a dedicated JavaScript or CSS minifier."
 ---
 
 ## What is the HTML Formatter & Minifier?

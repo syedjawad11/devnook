@@ -20,6 +20,11 @@ related_content:
 - css-variables-explained
 published_date: '2026-04-18'
 og_image: /og/tools/colour-converter.png
+faqs:
+  - question: "Why does HSL not round-trip perfectly back to the same HEX?"
+    answer: "Rounding to whole-number HSL values loses fractional precision, so converting HEX to HSL to HEX may produce a one-digit difference. For exact colour preservation, use HEX or RGB."
+  - question: "Does this tool support alpha/transparency?"
+    answer: "Not currently. Transparent colours (rgba, hsla) are not supported — use the HEX, RGB, or HSL formats only."
 ---
 
 ## What is the Colour Converter?

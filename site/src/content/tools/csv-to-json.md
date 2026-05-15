@@ -19,6 +19,13 @@ tags:
 template_id: tool-exp-v1
 title: CSV ↔ JSON Converter — Free Online Tool
 tool_slug: csv-to-json
+faqs:
+  - question: "Does this tool support large CSV files?"
+    answer: "Yes, but processing happens in your browser. Files under 5MB convert instantly. Larger files may take a few seconds depending on your device performance."
+  - question: "Can I use custom delimiters beyond comma, tab, and semicolon?"
+    answer: "Absolutely. Select \"Custom\" from the delimiter dropdown and enter any single character (pipe |, tilde ~, etc.) as your separator."
+  - question: "What happens if my CSV has inconsistent column counts?"
+    answer: "The converter fills missing values with empty strings and displays a warning. JSON output will include all detected columns with null or empty values where data is absent."
 ---
 
 ## What is CSV ↔ JSON Converter?

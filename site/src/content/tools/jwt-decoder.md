@@ -20,6 +20,11 @@ tags:
 template_id: tool-exp-v1
 title: JWT Decoder — Free Online Tool
 tool_slug: jwt-decoder
+faqs:
+  - question: "Does JWT Decoder verify token signatures?"
+    answer: "No. This tool only decodes and displays token contents. It does not validate signatures or authenticate tokens against a secret key."
+  - question: "Is my JWT token sent to a server?"
+    answer: "Never. This jwt decoder online runs entirely in your browser using client-side JavaScript. Your tokens remain private and are never transmitted over the network."
 ---
 
 ## What is JWT Decoder?
