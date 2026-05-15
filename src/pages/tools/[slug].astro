@@ -45,9 +45,12 @@ const breadcrumbs = [
   { label: tool.data.title, href: `/tools/${tool.slug}` },
 ];
 
-const jsonLd = {
-  '@context': 'https://schema.org',
+const toolSlug = tool.data.tool_slug ?? tool.slug;
+const toolUrl = `https://devnook.dev/tools/${toolSlug}/`;
+
+const softwareApp = {
   '@type': 'SoftwareApplication',
+  '@id': `${toolUrl}#tool`,
   name: tool.data.title,
   description: tool.data.description,
   applicationCategory: 'WebApplication',
@@ -66,6 +69,31 @@ const jsonLd = {
         }
       : undefined,
 };
+
+const toolFaqs = tool.data.faqs;
+const jsonLd = toolFaqs && toolFaqs.length > 0
+  ? {
+      '@context': 'https://schema.org',
+      '@graph': [
+        softwareApp,
+        {
+          '@type': 'FAQPage',
+          '@id': `${toolUrl}#faq`,
+          mainEntity: toolFaqs.map((faq) => ({
+            '@type': 'Question',
+            name: faq.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: faq.answer,
+            },
+          })),
+        },
+      ],
+    }
+  : {
+      '@context': 'https://schema.org',
+      ...softwareApp,
+    };
 
 const cheatsheetLink = tool.data.related_content?.find((c: string) =>
   c.startsWith('/cheatsheets/')
