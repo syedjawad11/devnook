@@ -81,6 +81,10 @@ const toolsCollection = defineCollection({
     published_date: z.string(),
     og_image: z.string(),
     word_count_target: z.number().optional(),
+    faqs: z.array(z.object({
+      question: z.string(),
+      answer: z.string(),
+    })).optional(),
   }),
 });
 
