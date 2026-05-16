@@ -1,8 +1,8 @@
 name: Drip Publish
 
 on:
-  schedule:
-    - cron: '0 8 * * *'   # Daily at 08:00 UTC
+  # schedule:
+  #   - cron: '0 8 * * *'   # PAUSED — content quality recovery in progress
   workflow_dispatch:
     inputs:
       count:
