@@ -24,6 +24,12 @@ faqs:
     answer: "This tool uses JavaScript's native regex engine, which supports most common regex features including lookaheads, lookbehinds, named capture groups, and Unicode property escapes. The syntax is compatible with ECMAScript 2018+ and works in all modern browsers."
   - question: "Can I save my regex patterns?"
     answer: "Your most recent pattern and test text persist in your browser's local storage, so they'll be there when you return. For long-term storage, bookmark the page or copy your pattern to a note-taking app."
+  - question: "Can I use this tool as a regex generator?"
+    answer: "The Regex Tester is built for validating and debugging patterns rather than generating them from plain English. To use it as part of a regex generator workflow, write or generate your pattern using an AI tool or a pattern reference, then paste it here to verify it matches exactly the text you expect. Real-time highlighting makes it easy to catch edge cases before the pattern reaches your code."
+  - question: "What is regular expression testing and why does it matter?"
+    answer: "Regular expression testing means running a regex pattern against real sample text to confirm it matches only the intended strings — not too much, not too little. Skipping this step is a common source of production bugs: a pattern that looks correct can silently fail on edge cases like empty strings, Unicode characters, or unexpected whitespace. This tool shows every match in real time so you can stress-test patterns before they reach your application."
+  - question: "Does this tool work for testing regex in Python, Java, or other languages?"
+    answer: "This tool runs JavaScript's regex engine (ECMAScript 2018+), which shares most syntax with other languages but has a few differences. Python's re module and PCRE (used by PHP, Ruby, and Perl) support named groups with the (?P<name>...) syntax, while JavaScript uses (?<name>...). Java uses double backslashes in string literals where other languages use one. Use this tool for rapid pattern iteration, then verify in your target language's runtime before deploying."
 ---
 
 ## What is the Regex Tester?
@@ -57,5 +63,17 @@ This tool uses JavaScript's native regex engine, which supports most common rege
 ### Can I save my regex patterns?
 
 Your most recent pattern and test text persist in your browser's local storage, so they'll be there when you return. For long-term storage, bookmark the page or copy your pattern to a note-taking app.
+
+### Can I use this tool as a regex generator?
+
+The Regex Tester is built for validating and debugging patterns rather than generating them from plain English. To use it as part of a regex generator workflow, write or generate your pattern using an AI tool or the [Regex Cheat Sheet](/cheatsheets/regex-cheatsheet/), then paste it here to verify it matches exactly the text you expect. Real-time highlighting makes it easy to catch edge cases before the pattern reaches your code.
+
+### What is regular expression testing and why does it matter?
+
+Regular expression testing means running a regex pattern against real sample text to confirm it matches only the intended strings — not too much, not too little. Skipping this step is a common source of production bugs: a pattern that looks correct can silently fail on edge cases like empty strings, Unicode characters, or unexpected whitespace. This tool shows every match in real time so you can stress-test patterns before they reach your application.
+
+### Does this tool work for testing regex in Python, Java, or other languages?
+
+This tool runs JavaScript's regex engine (ECMAScript 2018+), which shares most syntax with other languages but has a few differences. Python's `re` module and PCRE (used by PHP, Ruby, and Perl) support named groups with `(?P<name>...)` syntax, while JavaScript uses `(?<name>...)`. Java uses `\\` in string literals where other languages use `\`. Use this tool for rapid pattern iteration, then verify in your target language's runtime before deploying.
 
 Test your regular expressions now with our [free regex tester online](/tools/regex-tester/) — also useful for validating [URL patterns](/tools/url-encoder/). No sign-up required.
