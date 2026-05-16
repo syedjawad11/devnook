@@ -40,54 +40,44 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-15, #44)
+## Last Session (2026-05-16, #45)
 
-**Status:** ✅ FAQPage JSON-LD added to all 14 tool pages that have visible FAQs. Two commits pushed to `main`, Cloudflare Pages auto-deploy triggered.
-
-### What was done
-
-- **Added `faqs` optional field to Zod schema** — `src/content/config.ts`: `faqs: z.array(z.object({ question, answer })).optional()` in `toolsCollection`.
-- **Updated `src/pages/tools/[slug].astro` schema logic** — When `tool.data.faqs` is present, emits `@graph` with SoftwareApplication (`@id: /tools/{slug}/#tool`) + FAQPage (`@id: /tools/{slug}/#faq`). Without FAQs, keeps existing flat SoftwareApplication. Single `<script type="application/ld+json">` always (no sibling tag).
-- **Added `faqs` frontmatter to 14 tool markdown files** — exact plain-text mirror of visible FAQ Q&A (backtick code and markdown links stripped). 3 tools intentionally skipped — no visible FAQs: `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`.
-- **Build verified clean** — 99 pages, 0 errors. JSON-LD spot-checked in built HTML: correct `@graph` structure, single script tag on FAQ tools; flat SoftwareApplication on no-FAQ tools.
-- **Commits:** `4907a22` (infrastructure), `f74f21f` (14 markdown files).
-
-### Previous session (#43) summary
-
-Critical pipeline bug fixed — `[skip ci]` in devnook commit message was silently blocking every Cloudflare deploy after drip publish. 4 stalled posts unblocked and confirmed live. Two SOP.md patches applied and committed.
+**Status:** ✅ Language article rewrite system fully set up. Infrastructure committed, session 1 manually completed (1 article), test Claude Routine created for tonight.
 
 ### What was done
 
-- **Bug found and fixed — `publish.py` was including `[skip ci]` in the devnook commit message** (`devnook_content_workspace/agents/publish/publish.py` line 216). Cloudflare Pages honors `[skip ci]` and skips the build entirely — so every post-publish CI commit since launch produced zero deploys. Posts existed in the git repo but were never served from the CDN.
-  - Fix: removed `[skip ci]` from the devnook side commit message. Committed as `bc79e86` on content workspace `master`.
-  - The `[skip ci]` on line 78 of `drip-publish.yml` (content-workspace side) is intentional and correct — it prevents the content-workspace workflow from retriggering itself.
-- **Force-deploy empty commit** — pushed `git commit --allow-empty` to devnook (`fdce6fd`) with message `"chore: trigger deploy for stalled May 11-12 posts"` to immediately unblock the 4 posts that had already been committed but never deployed.
-- **4 stalled posts confirmed live (HTTP 200):**
-  - `https://devnook.dev/languages/cpp/c-handle-exception/`
-  - `https://devnook.dev/languages/cpp/close-file/`
-  - `https://devnook.dev/languages/cpp/class-inheritance/`
-  - `https://devnook.dev/languages/kotlin/catch-exception/`
-- **SOP.md committed to devnook for the first time** — was previously untracked. Committed alongside the two patches below (`7c88694`).
-- **SOP.md Patch 1 — Playbook Q step 2:** Updated the "check cross-repo push" instruction to use `git fetch origin main && git log origin/main -5 --oneline` instead of local `git log -1 --oneline`. Added note that local clone is always potentially stale because the publisher pushes from CI.
-- **SOP.md Patch 2 — Playbook A staging-cutoff note:** Added `**Staging cutoff:** Stage approved posts before 08:00 UTC. If you stage later than that, the next cron tick is tomorrow — that day's slot is missed and cannot be recovered without a manual on-demand publish (Playbook B).`
-- **Registry state:** 63 published, 11 staged remaining — pipeline healthy.
+- **Created `New_ContentStrategy/` rewrite infrastructure** — committed in `4b30e89`:
+  - `REWRITE-WORKFLOW.md` — master self-contained instruction set for the Claude Routine
+  - `SELECTION-GUIDE.md` — 9-step section selection algorithm in Claude-readable natural language (replaces deleted `select_sections.py`)
+  - `rewrite-queue.json` — 47 articles ordered by `published_date` asc, all `"status": "pending"` except order 1
+  - `rewrite-tracker.json` — per-language section history for diversity enforcement (seeds typescript from session 1)
+  - Deleted: `migration.sql`, `INSTALL.md`, `select_sections.py` (Python/SQLite pipeline incompatible with remote Claude Routines)
+- **Session 1 manual rewrite complete** — `src/content/languages/typescript/async-await-typescript.md` rewritten:
+  - Voice: `thoughtful-explainer`, Sections: `[open-problem, core-design-decision, code-side-by-side, comp-cross-language, prac-gotchas, close-one-thing]`, ~1,680 words
+  - Queue updated: `sessions_completed: 1`, `done_count: 1`, `pending_count: 46`
+- **Test Claude Routine created** — fires tonight at 2026-05-17T01:00:00Z (3:00 AM Malta):
+  - Routine ID: `trig_01FZHoRx5tsnS6WCyrCk7DfV`
+  - URL: `https://claude.ai/code/routines/trig_01FZHoRx5tsnS6WCyrCk7DfV`
+  - Rewrites orders 2, 3, 4: `php/json-decode`, `python/file-handling`, `rust/async-await`
+  - Commits + pushes to `main` — fires once then auto-disables
+- **GitHub App installed** on `syedjawad11/devnook` — required for remote routines to push code.
 
-### Previous session (#42) summary
+### Previous session (#44) summary
 
-Fixed 7 posts with duplicate H1 tags (Ahrefs "Multiple H1" flag) + patched content pipeline (`writer.md`, `antigravity-qa.md`, `seo-writing-rules.md`) to prevent recurrence.
+FAQPage JSON-LD added to all 14 tool pages that have visible FAQs. Commits: `4907a22` (infrastructure), `f74f21f` (14 markdown files).
 
-### Next session priorities (#45)
+### Next session priorities (#46)
 
-1. **Re-run Ahrefs crawler** to confirm 0 "Multiple H1" results remain (carried over from #43).
-2. **Validate FAQPage schema in Google Rich Results Test** — test a few tool URLs (e.g. `https://devnook.dev/tools/json-formatter/`) to confirm FAQ rich result eligibility.
-3. **Add FAQs to the 3 skipped tools** — `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url` have no FAQ sections. Add visible FAQ sections to these pages first, then add `faqs` frontmatter.
-4. **Content expansion — WARN posts.** Start by reading `auditlog.md` Issue 3. Then expand:
-   - `/guides/base64-encoding-decoding-guide/` (943 words, target 1800)
-   - `/guides/curl-command-guide/` (1047 words, target 1800)
-   - `/guides/html-minification-compression-guide/` (1262 words, target 1800)
-   - `/guides/css-minification-performance-optimization/` (1306 words, target 1800)
-   - `/blog/css-flexbox-vs-grid/` (1064 words, target 1500)
-   - `json-formatter-validator-best-practices.md` from ~1,638 → 1,800 words
+1. **Morning review (do first)** — check the 3 articles rewritten by the test routine:
+   - `src/content/languages/php/php-json-decode.md`
+   - `src/content/languages/python/python-file-handling-tutorial.md`
+   - `src/content/languages/rust/rust-async-await.md`
+   - Verify: fresh body prose, frontmatter preserved, no `# H1`, `template_id: modular-v1`, word counts in range, `rewrite-queue.json` shows orders 2/3/4 `"done"`, `pending_count: 43`.
+2. **If test passes — set up two recurring routines** (4 articles each, 8/day, ~6 days to finish):
+   - Routine A: `0 23 * * *` UTC (= 1:00 AM Malta CEST)
+   - Routine B: `0 5 * * *` UTC (= 7:00 AM Malta CEST)
+3. **After all 47 rewrites done** — re-enable drip-publish cron manually (do NOT auto-enable — the rewrite routine's stop condition does not re-enable it).
+4. **Deferred from #45** — Re-run Ahrefs crawler, validate FAQPage schema in Google Rich Results Test, add FAQs to 3 skipped tools (`meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`), content expansion for WARN posts.
 
 ### Deferred (do not do)
 
