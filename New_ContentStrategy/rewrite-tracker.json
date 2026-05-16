@@ -1,0 +1,8 @@
+{
+  "typescript": {
+    "last_sections": [
+      ["open-problem", "core-design-decision", "code-side-by-side", "comp-cross-language", "prac-gotchas", "close-one-thing"]
+    ],
+    "last_voice": "thoughtful-explainer"
+  }
+}
