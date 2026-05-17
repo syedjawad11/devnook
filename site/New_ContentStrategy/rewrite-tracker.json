@@ -13,9 +13,10 @@
   },
   "python": {
     "last_sections": [
-      ["open-quick", "core-syntax-detail", "code-before-after", "code-realistic", "prac-common-mistakes", "close-checklist"]
+      ["open-quick", "core-syntax-detail", "code-before-after", "code-realistic", "prac-common-mistakes", "close-checklist"],
+      ["open-scenario", "core-how-it-works", "code-walkthrough", "prac-gotchas", "prac-production-patterns", "close-next"]
     ],
-    "last_voice": "terse-senior"
+    "last_voice": "tutorial-guide"
   },
   "rust": {
     "last_sections": [
