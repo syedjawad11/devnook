@@ -1,7 +1,7 @@
 ---
 category: tools
-description: Encode and decode URLs and query strings instantly in your browser. Handles
-  percent-encoding for safe URL transmission.
+description: Free online URL encoder and decoder — encode and decode URLs, query strings,
+  and percent-encoded characters instantly in your browser. No install needed.
 og_image: /og/tools/url-encoder.png
 published_date: '2026-04-13'
 related_content:
@@ -24,6 +24,12 @@ faqs:
     answer: "Encode URL encodes the entire string including protocol characters (:, /, ?). Encode URI Component only encodes query parameter values, preserving URL structure characters. Use URI Component when encoding individual parameter values."
   - question: "Why do spaces become %20 in URLs?"
     answer: "URLs only support ASCII characters from a specific safe set. Spaces aren't in that set, so they're replaced with their hexadecimal representation (%20) to maintain URL validity across all systems."
+  - question: "Is URL decoding the same as URL decryption?"
+    answer: "No — URL decoding (sometimes called 'URL decryption' by mistake) simply reverses percent encoding. %20 becomes a space, %40 becomes @. It is not cryptographic; there is no key and no secret. Anyone can decode a percent-encoded URL by reversing the substitution."
+  - question: "What characters does a URL encoder convert?"
+    answer: "A URL encoder converts spaces, special characters (!, #, $, &, ', (, ), *, +, ,, ;, =), reserved characters (/, :, ?, @, [, ]), and all non-ASCII characters (Unicode, emoji, accented letters) into %XX percent-encoded sequences. Unreserved characters (A–Z, a–z, 0–9, -, _, ., ~) pass through unchanged."
+  - question: "Can I decode any URL online with this tool?"
+    answer: "Yes — paste any percent-encoded URL or query string and click Decode to get the readable version instantly. The tool runs entirely in your browser, so nothing is sent to a server. It handles both full URLs and individual parameter values."
 ---
 
 ## What is URL Encoder/Decoder?
@@ -55,5 +61,17 @@ Encode URL encodes the entire string including protocol characters (`:`, `/`, `?
 ### Why do spaces become %20 in URLs?
 
 URLs only support ASCII characters from a specific safe set. Spaces aren't in that set, so they're replaced with their hexadecimal representation (%20) to maintain URL validity across all systems.
+
+### Is URL decoding the same as URL decryption?
+
+No — URL decoding (sometimes called "URL decryption" by mistake) simply reverses percent encoding. `%20` becomes a space, `%40` becomes `@`. It is not cryptographic; there is no key and no secret. Anyone can decode a percent-encoded URL by reversing the substitution.
+
+### What characters does a URL encoder convert?
+
+A URL encoder converts spaces, special characters (`!`, `#`, `$`, `&`, `'`, `(`, `)`, `*`, `+`, `,`, `;`, `=`), reserved characters (`/`, `:`, `?`, `@`, `[`, `]`), and all non-ASCII characters (Unicode, emoji, accented letters) into `%XX` percent-encoded sequences. Unreserved characters (`A–Z`, `a–z`, `0–9`, `-`, `_`, `.`, `~`) pass through unchanged.
+
+### Can I decode any URL online with this tool?
+
+Yes — paste any percent-encoded URL or query string and click Decode to get the readable version instantly. The tool runs entirely in your browser, so nothing is sent to a server. It handles both full URLs and individual parameter values.
 
 Ready to encode or decode your URLs? Read our [URL Encoding Guide](/guides/url-encoding-query-parameters-guide/) for deeper context, or use our [URL Encoder/Decoder](/tools/url-encoder/) now — no installation required, fully client-side processing.
