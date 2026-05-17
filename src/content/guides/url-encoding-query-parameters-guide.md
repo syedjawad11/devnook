@@ -418,7 +418,7 @@ For multilingual slug generation (converting "Ärger mit Übergröße" to a URL-
 
 ## Encode and Decode URLs in Your Browser
 
-The DevNook URL Encoder/Decoder tool handles percent encoding, query string parsing, and full URL analysis directly in your browser. Paste in a raw URL to decode all components, or enter plain text to get the encoded form instantly.
+The [DevNook URL Encoder/Decoder](/tools/url-encoder/) handles percent encoding, query string parsing, and full URL analysis directly in your browser. Paste in a raw URL to decode all components, or enter plain text to get the encoded form instantly — no install required.
 
 Related reading: the [Base64 Encoding guide](/guides/base64-encoding-decoding-guide/) covers a different encoding scheme used for binary data in APIs and HTTP headers. For JSON payloads delivered over HTTP with encoded parameters, see the [JSON Formatter and Validator guide](/guides/json-formatter-validator-best-practices/).
 
