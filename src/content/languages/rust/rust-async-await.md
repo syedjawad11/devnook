@@ -1,5 +1,5 @@
 ---
-actual_word_count: 1291
+actual_word_count: 1720
 category: languages
 concept: async-await
 description: Learn how async/await works in Rust with futures and executors. Master
@@ -20,194 +20,151 @@ schema_org: "<script type=\"application/ld+json\">\n{\n  \"@context\": \"https:/
   : {\"@type\": \"Organization\", \"name\": \"DevNook\"},\n  \"publisher\": {\"@type\"\
   : \"Organization\", \"name\": \"DevNook\", \"url\": \"https://devnook.dev\"},\n\
   \  \"url\": \"https://devnook.dev/languages/\"\n}\n</script>"
+sections_used:
+- open-mental-model
+- core-design-decision
+- core-how-it-works
+- code-before-after
+- prac-when-not-to
+- comp-cross-language
+- close-one-thing
 tags:
 - rust
 - async-await
 - concurrency
 - futures
 - tokio
-template_id: lang-v2
+template_id: modular-v1
 title: How Async/Await Works in Rust — Complete Guide
+voice: opinionated-commentator
 ---
 
-## The Problem
+Think of an async function as a contractor who, instead of standing idle while waiting for a delivery, uses a paging system: "I'm waiting, route other jobs to me when I'm ready." The executor — Tokio, async-std — is the dispatcher. It assigns work based on who's ready rather than blocking the whole crew waiting on one truck.
 
-You need to fetch data from three APIs concurrently in your Rust application. Sequential requests take over a second each, making your program unacceptably slow. Using threads feels heavy-handed for I/O-bound work, and managing thread pools manually adds complexity you'd rather avoid. You need concurrent I/O without the overhead of OS threads.
+What makes Rust specifically interesting is that the paging protocol isn't built into a runtime you can't inspect. It's compiled into your code. When you mark a function `async`, the Rust compiler generates an anonymous struct — a state machine — that implements the `Future` trait. Each `.await` point is a state transition in that machine. The executor drives it forward by calling `poll()`. When a future yields `Poll::Pending`, the executor moves to other work and expects to be notified when the future is ready again.
+
+That's the model. The rest of this article fills in the precision.
+
+## Why Rust Designed It This Way
+
+Rust's async/await has three design choices that generated real debate before RFC 2394 settled them in 2018. I think all three were right.
+
+**Lazy futures.** In JavaScript and Python, calling an async function starts executing it to the first `await`. In Rust, calling an async function produces a `Future` value — nothing executes. The executor has to explicitly poll it to start. This confuses developers who expect async code to "start" when invoked. But the laziness is load-bearing: it's what makes `tokio::join!` safe (no execution races when combining futures), what lets you build combinators without running code twice, and what keeps futures cheap to create before deciding to run them.
+
+**No built-in runtime.** JavaScript has an event loop baked into V8 and Node. Python's asyncio ships in the standard library. Rust ships with nothing — you pick a dependency: `tokio`, `async-std`, or `smol`. This generates real friction. Beginners wonder why their async code won't compile and discover they need a runtime before they can do anything. I'd still argue this was the right call. Rust runs on embedded targets, in WebAssembly, in game engines, and in OS-level services. A single opinionated runtime would be overhead for contexts that don't need it, or would need to be optional anyway. Making the choice explicit is more honest than hiding it.
+
+**Zero-cost abstraction.** Async functions compile to state machines — no heap allocation per future in the common case, no virtual dispatch, no garbage collector pressure. The trade-off is compile-time complexity and generated code that's hard to read in a debugger. The RFC 2394 discussion goes deep on alternative designs including generator-based approaches. The state machine approach won because it meets Rust's core promise: you don't pay for what you don't use.
+
+## What the Compiler Actually Generates
+
+When you write:
 
 ```rust
-use std::thread;
-use std::time::Duration;
+async fn fetch_price(ticker: &str) -> f64 {
+    let response = http_client.get(ticker).await;
+    parse_price(response)
+}
+```
 
-fn fetch_user(id: u32) -> String {
-    thread::sleep(Duration::from_secs(1)); // simulates network call
-    format!("User {}", id)
+The compiler doesn't generate a function that blocks until the price arrives. It generates an anonymous struct that implements `Future`. The struct holds all local state that needs to survive across `.await` points — in this case, the `ticker` reference, the in-progress HTTP request, and whatever `parse_price` needs. Between `.await` points, no OS thread is blocked.
+
+The `Future` trait has one required method:
+
+```rust
+fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output>
+```
+
+The executor calls `poll()`. If the HTTP response is ready, it advances to `parse_price` and eventually returns `Poll::Ready(price)`. If not ready, it returns `Poll::Pending` — and the HTTP client is responsible for registering a *waker* with the system's I/O notification mechanism (epoll on Linux, kqueue on macOS, IOCP on Windows) so the executor knows when to try again.
+
+That waker is the key piece beginners miss. Returning `Poll::Pending` without registering a waker means the executor never polls again and the future silently stalls. This is why writing your own async primitives in Rust is harder than using them — you have to manage wakers correctly.
+
+The executor keeps a queue of ready tasks. When a waker fires, it moves the task back to the ready queue. Tokio's default runtime uses a work-stealing thread pool across multiple OS threads. Your async code sees none of this machinery directly.
+
+## Sequential vs Concurrent: The Difference That Matters
+
+**Before — sequential, each call blocks the next:**
+
+```rust
+use std::time::Duration;
+use std::thread;
+
+fn fetch_repo_info(repo: &str) -> String {
+    thread::sleep(Duration::from_millis(500));
+    format!("info for {}", repo)
 }
 
 fn main() {
-    let start = std::time::Instant::now();
-    
-    let user1 = fetch_user(1);
-    let user2 = fetch_user(2);
-    let user3 = fetch_user(3);
-    
-    println!("{}, {}, {}", user1, user2, user3);
-    println!("Took {:?}", start.elapsed()); // ~3 seconds!
+    let tokio_info = fetch_repo_info("tokio-rs/tokio");
+    let serde_info  = fetch_repo_info("serde-rs/serde");
+    let hyper_info  = fetch_repo_info("hyperium/hyper");
+    println!("{}, {}, {}", tokio_info, serde_info, hyper_info);
+    // takes ~1500ms — each request waits on the previous one
 }
 ```
 
-This blocking approach forces requests to wait on each other. Each `fetch_user` call blocks the thread for a full second. With three calls, you're looking at three seconds minimum. Even spawning OS threads for each request adds overhead and doesn't scale well beyond a few dozen concurrent operations.
-
-## The Rust Solution: Async/Await
-
-Understanding how [async/await](/languages/typescript/async-await/) works in Rust requires recognizing that it's a zero-cost abstraction for cooperative multitasking. Rust's async/await transforms your code into state machines called futures that can pause execution and resume later without blocking threads.
+**After — concurrent, all three run on one thread:**
 
 ```rust
 use tokio::time::{sleep, Duration};
 
-async fn fetch_user(id: u32) -> String {
-    sleep(Duration::from_secs(1)).await;
-    format!("User {}", id)
+async fn fetch_repo_info(repo: &str) -> String {
+    sleep(Duration::from_millis(500)).await;
+    format!("info for {}", repo)
 }
 
 #[tokio::main]
 async fn main() {
-    let start = std::time::Instant::now();
-    
-    let (user1, user2, user3) = tokio::join!(
-        fetch_user(1),
-        fetch_user(2),
-        fetch_user(3)
+    let (tokio_info, serde_info, hyper_info) = tokio::join!(
+        fetch_repo_info("tokio-rs/tokio"),
+        fetch_repo_info("serde-rs/serde"),
+        fetch_repo_info("hyperium/hyper"),
     );
-    
-    println!("{}, {}, {}", user1, user2, user3);
-    println!("Took {:?}", start.elapsed()); // ~1 second!
+    println!("{}, {}, {}", tokio_info, serde_info, hyper_info);
+    // takes ~500ms — all three run concurrently
 }
 ```
 
-The `async` keyword marks `fetch_user` as an asynchronous function that returns a `Future`. The `.await` keyword pauses execution at that point, yielding control back to the executor. The `tokio::join!` macro runs all three futures concurrently on the same thread. Instead of blocking for three seconds, all requests happen simultaneously and complete in approximately one second—the time of the slowest request.
+`tokio::join!` drives all three futures concurrently on the same thread by interleaving them at each `.await` point. Total time matches the slowest request, not the sum of all three. This is the concrete gain from async: I/O wait time stops being serial.
 
-## How Async/Await Works in Rust
+## When Not to Reach for Async
 
-When you mark a function `async`, Rust doesn't execute it immediately. Instead, it returns a `Future`—a type that represents a value that might not be ready yet. The `Future` trait has a single method, `poll`, which the runtime calls repeatedly to check if the value is ready.
+Don't use async for CPU-bound work. Async gives you concurrency for I/O — while one task waits on a network response, the executor runs another task. If your task is computing a hash, running a physics simulation, or compressing a file, there's nothing to yield at. The future will poll, find nothing ready, and either block the executor thread or spin wastefully. For CPU-bound parallelism, use Rayon or `tokio::task::spawn_blocking`.
 
-The `.await` keyword is where the magic happens. It tells Rust to suspend the current function's execution and return control to the executor. The compiler transforms your async function into a state machine that tracks where execution paused. When you `.await` a future, the executor can switch to polling other futures, maximizing CPU utilization without spawning additional threads.
+Don't use async for one-shot scripts. A CLI tool that reads a file and prints output has nothing to gain from async. Adding Tokio pulls in a runtime startup cost, a multithreaded scheduler, and a noticeably larger binary. Sync code is simpler and faster here.
 
-Rust's async model is lazy by design—futures do nothing until polled. You need an executor (also called a runtime) to drive futures to completion. Popular executors include Tokio, async-std, and smol. The executor manages a work queue, polls futures, and handles waking them when resources become available.
+Don't call blocking operations inside async functions. `std::thread::sleep` blocks the thread. `std::fs::File::open` blocks on disk I/O. Inside Tokio's executor, either of these stalls the entire worker thread — no other futures on that thread make progress until the block resolves. Use `tokio::time::sleep` and `tokio::fs::File` instead. If you must call blocking code, wrap it in `tokio::task::spawn_blocking`, which runs it on a dedicated thread pool outside the async executor.
 
-Unlike languages with built-in async runtimes, Rust lets you choose your executor or even write your own. This zero-cost approach means you only pay for async overhead in code that uses it. Synchronous Rust code remains completely unaffected. The compiler enforces memory safety across async boundaries using the same lifetime and borrowing rules, preventing data races at compile time rather than runtime.
+## How Other Languages Made Different Choices
 
-## Going Further — Real-World Patterns
+JavaScript's async model is built into the runtime. Every JS environment inherits an event loop — you don't choose one. More importantly, creating a Promise starts executing the async function to the first `await`:
 
-**Pattern 1: Concurrent HTTP Requests with Error Handling**
+```javascript
+// JavaScript: execution begins the moment you call this
+const pricePromise = fetchPrice("AAPL");
+```
 
 ```rust
-use reqwest;
-use tokio;
+// Rust: nothing runs — this is just a value
+let price_fut = fetch_price("AAPL");
+// execution starts when the executor polls it
+let price = price_fut.await;
+```
 
-async fn fetch_json(url: &str) -> Result<serde_json::Value, reqwest::Error> {
-    let response = reqwest::get(url).await?;
-    let json = response.json().await?;
-    Ok(json)
-}
+Python's asyncio is closer to Rust's model: coroutines are also lazy and don't run until driven by an event loop. The important difference is the GIL. Python's asyncio gives you concurrency — one coroutine runs at a time, others yield — but not parallelism. Tokio can run futures on multiple OS threads in parallel.
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let urls = vec![
-        "https://api.github.com/repos/rust-lang/rust",
-        "https://api.github.com/repos/tokio-rs/tokio",
-        "https://api.github.com/repos/serde-rs/serde",
-    ];
-    
-    let futures: Vec<_> = urls.iter()
-        .map(|url| fetch_json(url))
-        .collect();
-    
-    let results = futures::future::join_all(futures).await;
-    
-    for (idx, result) in results.iter().enumerate() {
-        match result {
-            Ok(json) => println!("Repo {}: {}", idx, json["name"]),
-            Err(e) => eprintln!("Failed to fetch repo {}: {}", idx, e),
-        }
-    }
-    
-    Ok(())
+Go takes a different approach entirely. Goroutines are green threads managed by the Go scheduler, not futures in the poll-based sense. You write blocking-looking code:
+
+```go
+func fetchPrice(ticker string) float64 {
+    resp, _ := http.Get("https://api.example.com/" + ticker)
+    return parsePrice(resp.Body)
 }
 ```
 
-This pattern handles multiple async operations that might fail independently. The `futures::future::join_all` function waits for all futures to complete, collecting their results into a vector. Unlike `tokio::join!`, this works with a dynamically-sized collection of futures. Each result is a `Result` type, letting you handle individual failures without canceling other requests.
+The Go scheduler transparently switches goroutines at I/O points. Simpler to write. The trade-off: you give up control over when switching happens, and goroutines carry more overhead than Rust's state-machine futures.
 
-**Pattern 2: Async Streams for Processing Data**
+My read: Go's model is the right default for most application code — the ergonomics win outweighs the overhead. Rust's model is the right choice when you need guaranteed memory safety across async boundaries, zero overhead on targets where a goroutine scheduler isn't viable (embedded, WASM), or the ability to plug in your own executor.
 
-```rust
-use tokio_stream::{self as stream, StreamExt};
-use tokio::time::{sleep, Duration};
+## One Thing to Take With You
 
-async fn process_batch(batch: Vec<i32>) -> i32 {
-    sleep(Duration::from_millis(100)).await; // simulate processing
-    batch.iter().sum()
-}
-
-#[tokio::main]
-async fn main() {
-    let data = stream::iter(1..=100)
-        .chunks(10)
-        .map(|chunk| process_batch(chunk))
-        .buffer_unordered(5); // process 5 batches concurrently
-    
-    tokio::pin!(data);
-    
-    let mut total = 0;
-    while let Some(result) = data.next().await {
-        total += result;
-    }
-    
-    println!("Total: {}", total); // 5050
-}
-```
-
-Async streams extend futures to sequences of values. The `buffer_unordered` combinator processes up to five chunks concurrently, significantly faster than processing sequentially. This pattern excels when working with large datasets, database cursors, or paginated API responses where you want to process items as they arrive rather than waiting for all data upfront.
-
-**Pattern 3: Spawning Background Tasks**
-
-```rust
-use tokio::time::{sleep, Duration};
-use tokio::sync::mpsc;
-
-#[tokio::main]
-async fn main() {
-    let (tx, mut rx) = mpsc::channel(32);
-    
-    // Spawn background worker
-    tokio::spawn(async move {
-        for i in 1..=5 {
-            sleep(Duration::from_millis(200)).await;
-            tx.send(format!("Message {}", i)).await.unwrap();
-        }
-    });
-    
-    // Main task processes messages as they arrive
-    while let Some(msg) = rx.recv().await {
-        println!("Received: {}", msg);
-    }
-}
-```
-
-The `tokio::spawn` function runs an async task in the background, similar to spawning a thread but much lighter weight. Tasks communicate through channels (`mpsc` for multiple producer, single consumer). This pattern handles background work like periodic health checks, log flushing, or metrics collection while your main application logic continues running.
-
-## What to Watch Out For
-
-**Blocking in Async Contexts**: Never call blocking operations (like `std::thread::sleep` or synchronous file I/O) inside async functions. They block the entire executor thread, preventing other futures from making progress. Always use async-native alternatives like `tokio::time::sleep` or `tokio::fs`. If you must call blocking code, wrap it in `tokio::task::spawn_blocking` to run it on a dedicated thread pool.
-
-**Executor Mismatches**: Not all async libraries work with all executors. A future created for Tokio won't work with async-std's executor without adapters. Check library documentation for runtime requirements. When building libraries, use the `async-trait` crate to define async traits, and avoid assuming a specific executor unless your use case requires it.
-
-**Send Bounds and Async Closures**: Futures that cross `.await` points must be `Send` if they'll be spawned on multi-threaded runtimes like Tokio. This fails if your future holds non-`Send` types like `Rc` or `RefCell` across `.await` points. The compiler error messages point to the problematic type. Solution: restructure code to drop non-`Send` types before awaiting, or use `Send`-safe alternatives like `Arc` and `Mutex`.
-
-**Combinatorial State Machine Explosion**: Each `.await` point creates a new state in the generated state machine. Functions with many sequential awaits can generate large state machines, increasing binary size. For most code this is negligible, but in extremely hot paths with dozens of await points, consider restructuring into smaller functions or using explicit state machines. Profile before optimizing—this rarely matters in practice.
-
-## Summary
-
-Async/await in Rust solves the problem of efficient concurrent I/O without the overhead of OS threads. By transforming async functions into state machines called futures, Rust achieves zero-cost concurrency that's both memory-safe and performant. The key insight is that futures are lazy—they do nothing until an executor polls them. Using `.await` pauses execution and yields control, allowing the executor to multiplex thousands of concurrent operations on a small thread pool. The compiler enforces safety across async boundaries using the same ownership and lifetime rules as synchronous code. Master the basics with simple concurrent requests, then progress to streams, background tasks, and error handling patterns as your needs grow.
-
-
-For memory management across async boundaries, see our guide on Rust Lifetimes. Learn to handle failures gracefully in Rust Error Handling. Compare Rust's approach with JavaScript Async/Await. Reference the Rust Concurrency Cheat Sheet for quick syntax lookups.
+Rust futures are lazy — they do nothing until polled. That's not a limitation, it's the design. It's what makes `tokio::join!` safe, what makes combinators compose correctly, and what keeps the executor from doing invisible work behind your back. When Rust async behavior feels surprising, it usually traces to expecting JavaScript's "starts on creation" semantics and getting Rust's "starts on poll" instead. Get that one fact into your mental model and the rest follows.

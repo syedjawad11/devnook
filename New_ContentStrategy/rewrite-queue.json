@@ -1,8 +1,8 @@
 {
   "sessions_completed": 1,
   "total": 47,
-  "done_count": 1,
-  "pending_count": 46,
+  "done_count": 4,
+  "pending_count": 43,
   "articles": [
     {
       "order": 1,
@@ -20,7 +20,9 @@
       "concept": "json-decode",
       "file_path": "src/content/languages/php/php-json-decode.md",
       "published_date": "2026-04-12",
-      "status": "pending"
+      "status": "done",
+      "rewritten_on": "2026-05-17",
+      "session": 2
     },
     {
       "order": 3,
@@ -28,7 +30,9 @@
       "concept": "file-handling",
       "file_path": "src/content/languages/python/python-file-handling-tutorial.md",
       "published_date": "2026-04-12",
-      "status": "pending"
+      "status": "done",
+      "rewritten_on": "2026-05-17",
+      "session": 2
     },
     {
       "order": 4,
@@ -36,7 +40,9 @@
       "concept": "async-await",
       "file_path": "src/content/languages/rust/rust-async-await.md",
       "published_date": "2026-04-12",
-      "status": "pending"
+      "status": "done",
+      "rewritten_on": "2026-05-17",
+      "session": 2
     },
     {
       "order": 5,
