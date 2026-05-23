@@ -16,6 +16,8 @@ This workspace owns the full content pipeline for devnook.dev:
 - **Ingest** — `../web_content/output/` → drafts (antigravity, status=drafted)
 - **Antigravity QA** — fixes + approves antigravity drafts (status=approved)
 - **Publisher** — staged posts → `../devnook/src/content/` + git commit + push
+- **GSC Analyst** — Google Search Console data analysis, quick_wins ranking
+- **SEO Optimizer** — rewrites published articles using DataForSEO keyword research + content-style-system.md
 
 The Astro site repo is at `../devnook/`. No content pipeline code lives there.
 
@@ -25,27 +27,43 @@ The Astro site repo is at `../devnook/`. No content pipeline code lives there.
 
 ```
 ORCHESTRATOR (Sonnet main session)
-  ├── Planner   (Haiku)  — agents/subagent-prompts/planner.md
-  ├── Writer    (Sonnet) — agents/subagent-prompts/writer.md
-  ├── Ingest    (Haiku)  — agents/subagent-prompts/ingest.md
-  ├── Antigravity QA (Sonnet) — agents/subagent-prompts/antigravity-qa.md
-  └── Publisher (Haiku)  — agents/subagent-prompts/publisher.md
+  ├── @content-planner   (Haiku)   — .claude/agents/content-planner.md
+  ├── @content-writer    (Sonnet)  — .claude/agents/content-writer.md
+  ├── @content-ingest    (Haiku)   — .claude/agents/content-ingest.md
+  ├── @antigravity-qa    (Sonnet)  — .claude/agents/antigravity-qa.md
+  ├── @content-publisher (Haiku)   — .claude/agents/content-publisher.md
+  ├── @gsc-analyst       (Sonnet)  — .claude/agents/gsc-analyst.md
+  └── @seo-optimizer     (Sonnet)  — .claude/agents/seo-optimizer.md
 ```
 
-Orchestrator spawns subagents via `Agent()` tool. No Python LLM calls anywhere.
+Invoke via `@agent-name` in Claude Code session (native subagent syntax). No `Agent(prompt=open(...))` spawning needed.
+
+---
+
+## MCP Servers
+
+Configured in `.mcp.json` and `.claude/settings.json`:
+
+| Server | Purpose |
+|--------|---------|
+| dataforseo | Keyword research, search volume, SERP analysis |
+| gsc | Google Search Console — impressions, clicks, quick_wins |
 
 ---
 
 ## Workflow Patterns
 
 **Workflow A — weekly programmatic content:**
-Planner → Ingest (parallel) → Writer (batch=5) → Publisher
+`@content-planner` → `@content-ingest` (parallel) → `@content-writer` (batch=5) → `@content-publisher`
 
 **Workflow A2 — antigravity (web-scraped) content:**
-Ingest (from `../web_content/output/`) → Antigravity QA (batch=10) → Publisher
+`@content-ingest` (from `../web_content/output/`) → `@antigravity-qa` (batch=10) → `@content-publisher`
 
 **Workflow D — status check:**
 Inline sqlite3 query (no subagent needed)
+
+**Workflow E — SEO rewrite (on-demand):**
+`@gsc-analyst REPORT_TYPE=quick_wins` → pick slug from `data/rewrite-queue.json` → `@seo-optimizer SLUG=...` → verify build → commit+push
 
 ---
 
@@ -53,16 +71,21 @@ Inline sqlite3 query (no subagent needed)
 
 | Path | Purpose |
 |------|---------|
-| `agents/content-team/registry.db` | SQLite registry (36 published / 16 staged / 10 rejected as of 2026-04-25) |
+| `agents/content-team/registry.db` | SQLite registry (~74+ published as of session #50) |
 | `agents/content-team/registry.py` | DB helpers — get_db, update_post_status, get_queued_posts, get_published_slugs, log_pipeline_run, get_next_template |
 | `agents/content-team/drafts/` | Writer output, QA-approved posts |
 | `agents/content-team/staging.py` | Moves approved drafts → content-staging/ |
 | `agents/content-team/templates/` | Post template files (lang-v1 through v5, guide-v1 through v4, etc.) |
 | `agents/publish/publish.py` | Drip publisher — moves content-staging/ → ../devnook/src/content/, updates registry, pings GSC, commits+pushes devnook |
 | `agents/publish/gsc_ping.py` | Google Search Console Indexing API |
+| `agents/skills/content-style-system.md` | **Single source of truth** — 720 lines: 18 language section templates, 3 approved voices, forbidden language, SEO rules, frontmatter spec |
+| `agents/skills/seo-writing-rules.md` | SEO writing rules (superseded by content-style-system.md for language posts) |
+| `agents/skills/devnook-brand-voice.md` | Brand voice guidelines |
+| `agents/skills/content-schema.md` | Content schema reference |
+| `agents/skills/qa-rejection-criteria.md` | QA rejection criteria |
 | `content-staging/` | Staging area (FIFO queue, oldest-mtime-first) |
-| `agents/subagent-prompts/` | Subagent prompt files |
-| `agents/skills/` | Shared skill files (SEO rules, brand voice, content schema, QA criteria) |
+| `data/rewrite-queue.json` | Registry-driven SEO rewrite queue — all published language articles, processed on-demand by @seo-optimizer |
+| `.claude/agents/` | Native subagent prompt files (7 agents) |
 | `../web_content/output/` | Antigravity ingest source |
 | `../devnook/src/content/` | Published content destination |
 
@@ -101,14 +124,18 @@ posts (
 
 | Rule | Impact |
 |------|--------|
+| `content-style-system.md` is the single source of truth | All writing agents and QA agents must read it before writing. Approved voices: terse-senior, thoughtful-explainer, tutorial-guide. Banned: opinionated-commentator, empathetic-debugger. |
 | Antigravity QA never rejects | Trusted Gemini content; QA fixes structural/SEO only, always sets qa_status='passed', word range 1500–2500 |
 | Languages category owned by Antigravity | Planner + Writer must never queue languages posts |
 | Publisher staging query uses `status IN ('staged')` | Use `staging.py` to move approved → staged before publishing |
 | `publish.py` uses `shutil.move()` | Deletes from content-staging/ on move; content-staging/ MUST be in `git add` in CI workflows |
 | Related posts not written by agents | PostLayout.astro auto-derives related list at render time. Agents must NOT write `## Related` sections. `strip_related_section()` in publish.py is the safety net. |
 | `related_posts` frontmatter field unused | Leave as `[]` in all new drafts |
-| No API-based Python LLM calls | All LLM work goes through Agent() subagent invocations; no llm_router, no anthropic SDK in Python |
-| Meta description minimum 120 characters | Hard floor for all new posts. Existing SEO rule in `agents/skills/seo-writing-rules.md` (140–160 chars) already satisfies this, but the 120-char floor must be enforced by Writer + QA so no future regression occurs. Past short-meta posts have already been fixed — do not re-audit. |
+| No API-based Python LLM calls | All LLM work goes through native `@agent-name` subagent invocations; no llm_router, no anthropic SDK in Python |
+| Meta description minimum 120 characters | Hard floor for all new posts. SEO rule in `agents/skills/seo-writing-rules.md` (140–160 chars) already satisfies this. Always verify with `len()` — agent self-reported counts are unreliable. |
+| Frontmatter values with `: ` must be quoted | Any frontmatter value containing colon+space (e.g. description) must be wrapped in double quotes to avoid YAML parse errors at Astro build time. |
+| No H1 in markdown body | PostLayout.astro renders `frontmatter.title` as `<h1>`. A body `# Title` creates a duplicate H1 — Ahrefs flags it. |
+| Internal links — no `/languages/` URL fabrication | Agents must never write a `/languages/` URL unless the exact path is verified from INTERNAL_LINKS or registry. Never derive URLs from filenames. |
 
 ---
 
@@ -133,16 +160,15 @@ python agents/publish/publish.py --count N
 
 # Stage approved drafts
 python agents/content-team/staging.py
-
-# Spawn subagent (example — Writer for 5 queued posts)
-# In Claude Code session: Agent(prompt=open('agents/subagent-prompts/writer.md').read(), ...)
 ```
+
+Subagents are invoked via `@agent-name` directly in the Claude Code session (no Python spawning needed).
 
 ---
 
 ## CI Workflows
 
-- `.github/workflows/drip-publish.yml` — daily 08:00 UTC cron (3 posts/day)
+- `.github/workflows/drip-publish.yml` — daily 08:00 UTC cron (2 posts/day as of session #36)
 - `.github/workflows/on-demand-publish.yml` — manual trigger
 
 Both workflows:
@@ -153,138 +179,74 @@ Both workflows:
 
 ---
 
-## Last Session (2026-04-26, #30)
+## Session History
 
-**Status:** ✅ Complete. Hardened both Writer and Antigravity QA subagent prompts against fabricated `/languages/` URLs.
+### Sessions #30–#37 (2026-04-26 to 2026-05-10) — summary
 
-### What was done in #30
-- **Added constraint to `agents/subagent-prompts/antigravity-qa.md`** (Constraints section, after "Never fabricate internal link slugs"): agents must never write a `/languages/` URL unless the exact path appears verbatim in INTERNAL_LINKS; if not found, strip the hyperlink and leave anchor text as plain text.
-- **Added constraint to `agents/subagent-prompts/writer.md`** (Constraints section, after the `## Related` constraint): agents must never write a `/languages/` URL unless the exact path appears verbatim in INTERNAL_LINKS; must not derive URLs from filenames or slugs — correct URL uses `concept` from the registry, accessible only via INTERNAL_LINKS.
+- **#30**: Hardened Writer and Antigravity QA against fabricated `/languages/` URLs.
+- **#31**: Fixed `validate_language_links()` to catch single-segment malformed paths (e.g. `/languages/how-to-handle-error-in-rust`).
+- **#32**: (Content pipeline maintenance — details in session log.)
+- **#33**: Fixed over-aggressive language link validator (single_re wrongly flagged `/languages/go`); fixed registry desync for 4 published posts.
+- **#34**: Diagnosed Apr 29–30 drip failures (4 staged posts had broken links); stripped 9 broken hyperlinks from 4 staged files; pipeline unblocked.
+- **#35**: Diagnosed CI non-failures (workflows were green; publisher silently skipped broken-link posts); published all 4 remaining staged posts manually.
+- **#36**: Ingested 8 antigravity articles, QA'd, staged 7 (rejected 1 — SEO cannibalization). Reduced drip cron to 2/day.
+- **#37**: Fixed registry desync (3 posts stuck in staged); hardened antigravity-qa.md + writer.md (trailing slash requirement, no H1 in body); ingested + QA'd + staged 15 antigravity posts.
 
-### Current state after #30
-- Registry unchanged: **36 published / 16 staged / 10 rejected**, 0 queued
-- Staged breakdown: 12 language posts (positions 1–12) + 4 cheatsheets (positions 13–16)
-- Drip cron (08:00 UTC, 3/day) continues publishing — no manual action needed
+### Sessions #38–#48 — summary
 
-### Key rules established / confirmed in #30
-- `/languages/` URLs in body prose are only allowed if the exact path is in INTERNAL_LINKS — applies to both Writer and Antigravity QA
-- Antigravity QA strips any non-verified `/languages/` hyperlink (anchor text kept); Writer must not derive them at all
+- Built and iterated on voice system: created `agents/skills/content-style-system.md` (720 lines) as single source of truth for all language post writing. Defined 3 approved voices (terse-senior, thoughtful-explainer, tutorial-guide). Banned opinionated-commentator and empathetic-debugger.
+- Built `data/rewrite-queue.json` — registry-driven queue for all published language articles.
+- Expanded antigravity pipeline; multiple ingest/QA/publish cycles.
+- Tuned seo-writing-rules.md and brand voice files.
+- Registry grew from ~59 published (post-#37) to ~67 published by #48.
 
-### What was done in #31
-- **Fixed `validate_language_links()` blind spot** in `agents/publish/publish.py`: added a second regex (`single_re`) that catches and flags malformed single-segment `/languages/{anything}` paths (e.g. `/languages/how-to-handle-error-in-rust`) which previously bypassed the guard entirely. Publisher now runs two passes: single-segment check (always flagged) then two-segment registry check (existing logic).
+### Last Session (#49, 2026-05-XX)
 
-## Last Session (2026-04-30, #34)
+**Status:** ✅ Complete. GSC MCP verified end-to-end. 7 native subagents built in `.claude/agents/`.
 
-**Status:** ✅ Complete. Fixed broken `/languages/` links blocking the drip queue; pipeline unblocked.
+- **GSC MCP verified**: Live site data — 15 clicks, 3,267 impressions, 0.46% CTR, avg position 29.8.
+- **Built 7 subagents** in `.claude/agents/`: content-planner, content-writer, content-ingest, antigravity-qa, content-publisher, gsc-analyst, seo-optimizer.
+- Old `agents/subagent-prompts/` pattern retired; all subagents now native Claude Code agents invoked via `@agent-name`.
 
-### What was done in #34
-- **Diagnosed Apr 29 & Apr 30 drip failures**: 4 of 7 staged posts contained broken `/languages/{lang}/{concept}` cross-references to posts not yet in the registry. The FIFO queue always served these 4 posts first (tied oldest mtime), so every cron run picked 3 broken posts, all 3 failed `validate_language_links()`, and zero posts were published.
-- **Fixed 4 staged files** — stripped 9 broken hyperlinks while preserving anchor text (per antigravity-qa.md rule). Also corrected a `list-comprehensions` → `list-comprehension` plural typo in the dictionary comprehension post that pointed to a rejected (404) concept.
-  - `content-staging/languages/how-to-use-destructuring-in-javascript.md` — stripped `spread-operator`, `arrow-functions` links
-  - `content-staging/languages/how-to-use-interfaces-in-go.md` — stripped `structs`, `error-handling`, `concurrency` links
-  - `content-staging/languages/how-to-use-pattern-matching-in-rust.md` — stripped `rust/error-handling`, `python/match-statement`, `go/type-switch` links
-  - `content-staging/languages/python/how-to-do-dictionary-comprehension-in-python.md` — fixed `list-comprehension` URL, stripped `generators` link
-- **Committed and pushed** fix to `devnook-content` repo (`253e9d2`).
+### Last Session (#50, 2026-05-23)
 
-### Current state after #34
-- Registry: **45 published / 7 staged / 10 rejected**, 0 queued
-- All 7 staged posts now pass validator; drip cron will resume normally at 08:00 UTC May 1
-- Queue empties after ~May 2 (7 posts ÷ 3/day)
+**Status:** ✅ Complete. seo-optimizer pipeline tested end-to-end. `python-string-methods-cheatsheet` rewritten and live.
 
-### Next session priorities
-- Run Planner → Writer to refill staging queue (queue empties ~May 2)
-- Future improvement (out of scope today): `validate_language_links()` should filter by `status='published'` so rejected/staged concepts can't be linked to
+- **seo-optimizer end-to-end test**: Full pipeline on `python-string-methods-cheatsheet` — keyword research (DataForSEO), rewrite, build verify, commit, push.
+- **Article rewritten**: 919 → 1,380 words. Primary keyword `python string methods` (vol: 2,900, diff: 59). First H2 contains keyword. 5 internal links woven in.
+- **Two bugs fixed**: (1) Description over 160 chars — agent self-reported incorrectly; always verify with `len()`. (2) Unquoted description with `: ` broke YAML parse at build time.
+- **Build passed** (109 pages). Commit `79e6173` pushed to `origin main`. Live at `https://devnook.dev/cheatsheets/python-string-methods-cheatsheet`.
+- **rewrite-queue.json rebuilt** from registry: cancelled old 47-article batch queue, regenerated from all published language articles (47 entries, all `status: "pending"`).
+- **CLAUDE.md updated** to reflect current subagent architecture, MCP servers, Workflow E, session history through #50.
 
----
+### Current state after #50
 
-## Last Session (2026-05-10, #37)
+- Registry: **~74 published / 15 staged / 11 rejected**, 0 queued
+- Drip: 2/day — revert to 3/day once staging queue is refilled
+- `data/rewrite-queue.json`: 47 language articles queued for SEO rewrite, all `status: "pending"`
 
-**Status:** ✅ Complete. Ingested, QA'd, and staged 15 antigravity posts; all 7 prior staged posts fully drained by drip.
+### Next session priorities (#51)
 
-### What was done in #37
-- **Fixed registry desync**: 3 posts (`how-to-async-await-in-javascript`, `how-to-close-console-in-rust`, `what-is-rest-api-in-java`) confirmed live but showing `staged` — marked `published`. (Note: drip cron also published them May 4–5, so both paths converged correctly.)
-- **Updated `agents/subagent-prompts/antigravity-qa.md`**: Added trailing slash requirement for all internal links (both relative `/languages/...` and absolute `https://devnook.dev/...`).
-- **Updated `agents/skills/seo-writing-rules.md` + `agents/subagent-prompts/writer.md`**: Clarified no H1 in markdown body — Astro layout renders `frontmatter.title` as `<h1>`; body H1 creates duplicate.
-- **Ingested 15 articles** from `../web_content/output/` via Ingest subagent → 15 draft files in `agents/content-team/drafts/`.
-- **QA'd all 15** via Antigravity QA subagent (2 batches due to timeout on batch 1 with 10 drafts): fixed `og_image`, `category`, `description`, trailing slashes on internal links, stripped `## Related` sections.
-- **Staged all 15** to `content-staging/` via `staging.py`.
-- **Registry merge**: Drip published 4 posts (May 3–5) while session commit was pending. Resolved binary `registry.db` conflict by accepting remote (newer published state), then re-inserting 15 new staged rows from draft files.
+1. **Scale seo-optimizer** — run `@gsc-analyst REPORT_TYPE=quick_wins`, pick top slugs from `data/rewrite-queue.json`, run `@seo-optimizer SLUG=...` batch.
+2. **Deferred** — FAQPage schema validation in Google Rich Results Test; add FAQs to `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url` tools.
+3. **GSC ping** — set `GOOGLE_SERVICE_ACCOUNT_JSON` secret in content workspace GitHub repo to stop "Skipping GSC ping" cron noise.
 
-### Current state after #37
-- Registry: **59 published / 15 staged / 11 rejected**, 0 queued
-- Staged breakdown: cpp (3), kotlin (2), google-forms (1), python (2), csharp (1), java (2), php (1), ruby (1), javascript (2)
-- Drip schedule at 2/day: 15 posts → starts draining from May 11, drains ~May 18
-- `drip-publish.yml` remains at `count=2`
+### Last Session (#51, 2026-05-23)
 
-### Next session priorities
-- After ~May 18, run Planner → Writer to refill staging queue
-- Revert drip cron back to `count=3` when refilling queue
-- Watch for `how-to-close-response-in-google-form` (`language=google-forms`) — non-standard language may cause Astro content collection issues at build time
+**Status:** ✅ Complete. Workflow E end-to-end test with new modular-v1 system. `javascript-closures` rewritten and live.
 
----
+- **Workflow correction codified**: GSC quick_wins is never used in Workflow E. Correct flow: pick from `data/rewrite-queue.json` → DataForSEO keyword research → rewrite → show draft for user approval → publish. Saved as feedback memory.
+- **Article rewritten**: `javascript-closures` — 1,044 → 1,258 words. `template_id: modular-v1`. Voice: `thoughtful-explainer`. Sections: open-mental-model, core-how-it-works, code-minimal, code-realistic, prac-gotchas, close-next. Primary keyword `javascript closures` (vol: 1,600, diff: 38). Fixed broken schema_org URL (was `/languages/`, now full path).
+- **Build passed** (109 pages). Registry updated. `rewrite-queue.json` updated: order 5 marked done, 46 remaining.
 
-## Last Session (2026-05-02, #36)
+### Current state after #51
 
-**Status:** ✅ Complete. Ingested, QA'd, and staged 7 antigravity posts; drip cron reduced to 2/day.
+- Registry: **~74 published / 15 staged / 11 rejected**, 0 queued
+- `data/rewrite-queue.json`: 46 language articles pending SEO rewrite (`javascript-closures` done)
+- Drip: 2/day — revert to 3/day once staging queue is refilled
 
-### What was done in #36
-- **Ingested 8 antigravity articles** from `../web_content/output/_ingested/2026-05-02/` directly via Python (Ingest subagent skips `_ingested/` subdirectory, so orchestrator bypassed it).
-- **QA'd all 8** via Antigravity QA subagent — all passed. Fixes: og_image format, category, published_date, invalid related_posts cleared, H1 added, internal links woven in, Related sections stripped.
-- **Rejected `how-to-file-handling-in-python`** — SEO cannibalization with already-published `python-file-handling-tutorial` (same language=python, concept=file-handling). Draft deleted.
-- **Staged 7 posts** to `content-staging/` via `staging.py`.
-- **Reduced drip cron to `count=2`** in `.github/workflows/drip-publish.yml` (was 3) — both schedule path and `workflow_dispatch` default.
-- **Committed and pushed** to `devnook-content` (`04b7b33`).
+### Next session priorities (#52)
 
-### Current state after #36
-- Registry: **52 published / 7 staged / 11 rejected**, 0 queued
-- Drip schedule: May 3 (2) + May 4 (2) + May 5 (2) + May 6 (1) = 7 posts
-- Cron now runs at 2/day — remember to revert to 3/day once queue is refilled
-
-### Next session priorities
-- After May 6, run Planner → Writer to refill staging queue
-- Revert drip cron back to `count=3` when refilling queue
-
----
-
-## Last Session (2026-05-01, #35)
-
-**Status:** ✅ Complete. Diagnosed CI non-failures; cleared staging queue manually.
-
-### What was done in #35
-- **Installed and authenticated gh CLI** to enable direct CI log inspection.
-- **Diagnosed Apr 29–30 "failures"**: Workflow runs were all green (exit 0), not authentication or PAT failures. The publisher silently skipped all 3 picked posts each day because they had broken `/languages/` links — same root cause session #34 fixed. No CI infrastructure issues.
-- **Confirmed all 4 remaining staged posts pass validation** after session #34's fixes.
-- **Published all 4 staged posts manually** (user requested clearing the queue ahead of evening batch creation):
-  - `how-to-use-destructuring-in-javascript`
-  - `how-to-use-interfaces-in-go`
-  - `how-to-use-pattern-matching-in-rust`
-  - `how-to-do-dictionary-comprehension-in-python`
-- **Committed and pushed** both repos: devnook (`e36c4da`) and devnook-content (`bfe8772`).
-
-### Current state after #35
-- Registry: **52 published / 0 staged / 10 rejected**, 0 queued
-- Staging queue is empty — drip cron will publish nothing until queue is refilled
-- CI is healthy; no secrets rotation needed
-
-### Next session priorities
-- Run Planner → Writer pipeline to generate a new batch of articles and stage them (planned for evening of May 1)
-
----
-
-## Last Session (2026-04-29, #33)
-
-**Status:** ✅ Complete. Fixed overly aggressive language link validator and registry desync; pipeline unblocked.
-
-### What was done in #33
-- **Diagnosed Apr 29 drip failure**: All 7 remaining staged posts were skipped because `validate_language_links()` `single_re` (added in #31) incorrectly flagged valid language category landing page links (`/languages/go`, `/languages/python`, etc.) as malformed single-segment paths.
-- **Fixed `validate_language_links()` in `agents/publish/publish.py`**: `single_re` now only flags single-segment paths that contain a hyphen — language names are never hyphenated but post slugs always are. Valid category links like `/languages/go` pass through cleanly.
-- **Fixed registry desync**: 4 posts published Apr 25–26 were stuck in `staged` status due to `registry.db` not persisting in those CI commits. Updated to `published`: `how-to-check-regex-pattern-in-javascript`, `how-to-do-file-handling-in-google-colab`, `how-to-parse-json-in-ruby`, `how-to-use-environment-variables-in-rust`.
-- **Committed and pushed** both fixes to `devnook-content` repo (`6aa0a54`).
-
-### Current state after #33
-- Registry: **45 published / 7 staged / 10 rejected**, 0 queued
-- 7 staged posts drain: Apr 30 (3) + May 1 (3) + May 2 (1)
-- Queue empty after May 2
-
-### Next session priorities
-- Run Planner → Writer to refill staging queue before May 2 (queue empties that day)
+1. **Continue SEO rewrites** — pick next batch from `data/rewrite-queue.json` (order 1–4 or by topic quality), run DataForSEO research, rewrite under modular-v1 system.
+2. **Deferred** — FAQPage schema validation in Google Rich Results Test; add FAQs to `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url` tools.
+3. **GSC ping** — set `GOOGLE_SERVICE_ACCOUNT_JSON` secret in content workspace GitHub repo to stop "Skipping GSC ping" cron noise.
