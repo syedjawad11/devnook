@@ -40,44 +40,32 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-16, #45)
+## Last Session (2026-05-23, #46)
 
-**Status:** ✅ Language article rewrite system fully set up. Infrastructure committed, session 1 manually completed (1 article), test Claude Routine created for tonight.
+**Status:** ✅ Content pipeline redesign — Stage 0 + Stage 1 complete. `New_ContentStrategy/` deleted from this repo. Consolidated style system now lives in content workspace.
 
 ### What was done
 
-- **Created `New_ContentStrategy/` rewrite infrastructure** — committed in `4b30e89`:
-  - `REWRITE-WORKFLOW.md` — master self-contained instruction set for the Claude Routine
-  - `SELECTION-GUIDE.md` — 9-step section selection algorithm in Claude-readable natural language (replaces deleted `select_sections.py`)
-  - `rewrite-queue.json` — 47 articles ordered by `published_date` asc, all `"status": "pending"` except order 1
-  - `rewrite-tracker.json` — per-language section history for diversity enforcement (seeds typescript from session 1)
-  - Deleted: `migration.sql`, `INSTALL.md`, `select_sections.py` (Python/SQLite pipeline incompatible with remote Claude Routines)
-- **Session 1 manual rewrite complete** — `src/content/languages/typescript/async-await-typescript.md` rewritten:
-  - Voice: `thoughtful-explainer`, Sections: `[open-problem, core-design-decision, code-side-by-side, comp-cross-language, prac-gotchas, close-one-thing]`, ~1,680 words
-  - Queue updated: `sessions_completed: 1`, `done_count: 1`, `pending_count: 46`
-- **Test Claude Routine created** — fires tonight at 2026-05-17T01:00:00Z (3:00 AM Malta):
-  - Routine ID: `trig_01FZHoRx5tsnS6WCyrCk7DfV`
-  - URL: `https://claude.ai/code/routines/trig_01FZHoRx5tsnS6WCyrCk7DfV`
-  - Rewrites orders 2, 3, 4: `php/json-decode`, `python/file-handling`, `rust/async-await`
-  - Commits + pushes to `main` — fires once then auto-disables
-- **GitHub App installed** on `syedjawad11/devnook` — required for remote routines to push code.
+- **Stage 0 (Freeze):** Confirmed no active local cron jobs. `drip-publish.yml` remains paused (schedule commented out). Remote routine `trig_01FZHoRx5tsnS6WCyrCk7DfV` fired and auto-disabled on 2026-05-17 as expected.
+- **Stage 1 (Consolidate):**
+  - Created `../devnook_content_workspace/agents/skills/content-style-system.md` — single source-of-truth style file. Contains 18 language sections (reduced from 33), 12 new AI/Productivity sections, 3 approved voices (`terse-senior`, `thoughtful-explainer`, `tutorial-guide`), forbidden language rules (first-person experiential markers banned), SEO rules, frontmatter spec.
+  - Created `../devnook_content_workspace/data/rewrite-queue.json` — all 47 articles at `pending` (orders 1–4 reset; old rewrites used dropped voices/sections and need a fresh pass).
+  - Deleted `New_ContentStrategy/` from this repo (16 files git rm'd) — the old 33-section modular system is superseded.
+  - Updated this CLAUDE.md to remove stale `New_ContentStrategy` references.
 
-### Previous session (#44) summary
+### Previous session (#45) summary
 
-FAQPage JSON-LD added to all 14 tool pages that have visible FAQs. Commits: `4907a22` (infrastructure), `f74f21f` (14 markdown files).
+Language article rewrite system set up (`New_ContentStrategy/` folder), 1 article manually rewritten, test routine created. Routine fired 2026-05-17 and auto-disabled.
 
-### Next session priorities (#46)
+### Next session priorities (#47)
 
-1. **Morning review (do first)** — check the 3 articles rewritten by the test routine:
-   - `src/content/languages/php/php-json-decode.md`
-   - `src/content/languages/python/python-file-handling-tutorial.md`
-   - `src/content/languages/rust/rust-async-await.md`
-   - Verify: fresh body prose, frontmatter preserved, no `# H1`, `template_id: modular-v1`, word counts in range, `rewrite-queue.json` shows orders 2/3/4 `"done"`, `pending_count: 43`.
-2. **If test passes — set up two recurring routines** (4 articles each, 8/day, ~6 days to finish):
-   - Routine A: `0 23 * * *` UTC (= 1:00 AM Malta CEST)
-   - Routine B: `0 5 * * *` UTC (= 7:00 AM Malta CEST)
-3. **After all 47 rewrites done** — re-enable drip-publish cron manually (do NOT auto-enable — the rewrite routine's stop condition does not re-enable it).
-4. **Deferred from #45** — Re-run Ahrefs crawler, validate FAQPage schema in Google Rich Results Test, add FAQs to 3 skipped tools (`meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`), content expansion for WARN posts.
+1. **Stage 2 — Install MCPs** in both workspaces:
+   - DataForSEO MCP: auth via `DATAFORSEO_LOGIN` + `DATAFORSEO_PASSWORD` env vars
+   - Google Search Console MCP: auth via `GOOGLE_SERVICE_ACCOUNT_JSON`
+   - Install in `../devnook_content_workspace/.claude/settings.json` (create) and `devnook/.claude/settings.json` (extend)
+   - Verify with sanity-check calls before moving to Stage 3
+2. **Stage 3 — Build 7 new subagents** in `../devnook_content_workspace/.claude/agents/`
+3. **Deferred from #44** — FAQPage schema validation in Google Rich Results Test, add FAQs to 3 skipped tools (`meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`).
 
 ### Deferred (do not do)
 
