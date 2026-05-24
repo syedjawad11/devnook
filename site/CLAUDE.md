@@ -40,42 +40,43 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-23, #50)
+## Last Session (2026-05-24, #54)
 
-**Status:** ✅ seo-optimizer pipeline tested end-to-end. `python-string-methods-cheatsheet` rewritten, built, pushed, and live.
+**Status:** ✅ Pipeline B persistent routine live. Content workspace cleaned (0 staged).
 
-### What was done in #50
+### What was done in #51–#54 (content workspace sessions)
 
-- **seo-optimizer end-to-end test**: Ran full pipeline on `python-string-methods-cheatsheet` — keyword research (DataForSEO), rewrite, build verify, commit, push.
-- **Article rewritten**: 919 → 1,380 words. Primary keyword `python string methods` (vol: 2,900, diff: 59). First H2 contains keyword. 5 internal links woven in. Tables and code blocks expanded.
-- **Two bugs caught and fixed**:
-  - Description was 168 chars (over 160 limit) — agent self-reported 157 incorrectly. Always verify with `len()` in Python.
-  - YAML parse error: unquoted description containing `: ` broke js-yaml at build time. Fixed by wrapping in double quotes.
-- **Build passed** (109 pages, no errors). Commit `79e6173` pushed to `origin main`. Cloudflare auto-deploy triggered.
-- **Live URL**: `https://devnook.dev/cheatsheets/python-string-methods-cheatsheet`
-- **Registry updated** in `../devnook_content_workspace/agents/content-team/registry.db` — title, description, keyword, updated_at.
+- **#51**: `javascript-closures` rewritten under modular-v1 system (1,044 → 1,258 words). Commit `721f748` pushed to `origin main`.
+- **#52**: External links gap fixed across all agents. `python-string-methods-cheatsheet` and `javascript-closures` patched with external links. Commit `b95c4a7` pushed. `.claude/agents/` now tracked in content workspace git.
+- **#53**: Pipeline B orchestrator built (`pipeline-b-orchestrator.md`). 20 AI/Productivity topics queued in `data/pipeline-b-topics.json`. Session-only CronCreate test failed (session closed before firing).
+- **#54**: 3 stuck Pipeline A posts deleted from staging, registry cleaned to 0 staged. `pipeline-b-orchestrator.md` rewritten to call DataForSEO REST API directly (local MCP cannot be a remote connector). **Pipeline B CCR routine created**: `trig_01LD6ZaMZq3G6R5Aehz7xMHY`, daily 14:00 UTC (16:00 Malta CEST). First run: today 2026-05-24. Manage: `https://claude.ai/code/routines/trig_01LD6ZaMZq3G6R5Aehz7xMHY`.
 
-### Key learnings from #50
+### Key learnings from #50–#54
 
-- Custom subagents (`seo-optimizer`, `gsc-analyst`, etc.) are NOT built-in agent types — invoke as `general-purpose` with full instructions embedded in the prompt.
 - Always verify description length with Python `len()` — agent self-reported counts are unreliable.
-- Any frontmatter value containing `: ` (colon + space) must be wrapped in double quotes to avoid YAML parse errors at build time.
+- Any frontmatter value containing `: ` must be wrapped in double quotes to avoid YAML parse errors at build time.
 - PowerShell here-strings use `@'...'@` syntax — bash-style `cat <<'EOF'` is invalid in PowerShell.
+- Local npm MCPs (`npx dataforseo-mcp-server`) cannot be remote connectors — remote CCR routines must call REST APIs directly.
+- Never use `[skip ci]` in devnook commit messages — Cloudflare Pages skips the build.
+- No H1 in markdown body — `PostLayout.astro` renders `frontmatter.title` as `<h1>`; duplicate H1 flagged by Ahrefs.
 
-### Previous session (#49) summary
+### Current pipeline state
 
-GSC MCP fully verified end-to-end. Live site data: 15 clicks, 3,267 impressions, 0.46% CTR, avg position 29.8. Built 7 subagents in `../devnook_content_workspace/.claude/agents/` (content-planner, content-writer, content-ingest, antigravity-qa, content-publisher, gsc-analyst, seo-optimizer).
+- Registry: **~74 published / 0 staged / 14 rejected**
+- Pipeline A (`drip-publish.yml`): paused — cron commented out, 0 staged, redesign deferred
+- Pipeline B: **live daily at 16:00 Malta** — first run today at 16:00; publishes to `src/content/blog/`
+- SEO rewrites: 46 language articles queued in `data/rewrite-queue.json`
 
-### Next session priorities (#51)
+### Next session priorities (#55)
 
-1. **Scale seo-optimizer** — run on more articles from the registry. Feed GSC quick_wins list to prioritize which slugs to rewrite first. Invoke `@gsc-analyst REPORT_TYPE=quick_wins` first, then batch `@seo-optimizer` on top 5.
-2. **Deferred from #44** — FAQPage schema validation in Google Rich Results Test, add FAQs to 3 skipped tools (`meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`).
-3. **GSC ping fix** — set `GOOGLE_SERVICE_ACCOUNT_JSON` secret in content workspace GitHub repo secrets to stop cron "Skipping GSC ping" noise.
+1. **Verify first Pipeline B run** — check `../devnook_content_workspace/data/pipeline-b-runs.log` for success entry; visit `https://devnook.dev/blog/how-to-use-claude-code`.
+2. **Continue SEO rewrites** — `@seo-optimizer` batch from `data/rewrite-queue.json` under modular-v1 system.
+3. **Deferred** — FAQPage schema validation for `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`.
 
 ### Deferred (do not do)
 
 - **AdSense integration** — revisit only at 50k visitors/month
-- **GSC ping** — `GOOGLE_SERVICE_ACCOUNT_JSON` secret never set in content workspace repo; every cron run prints "Skipping GSC ping". Non-blocking config gap — defer to a dedicated session.
+- **GSC ping** — `GOOGLE_SERVICE_ACCOUNT_JSON` secret never set in content workspace repo. Non-blocking — defer.
 - Blog filter chips wiring (decorative only)
 - Search bar wiring (`SearchBar.astro` parked)
 
