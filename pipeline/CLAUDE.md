@@ -63,7 +63,9 @@ Configured in `.mcp.json` and `.claude/settings.json`:
 Inline sqlite3 query (no subagent needed)
 
 **Workflow E — SEO rewrite (on-demand):**
-`@gsc-analyst REPORT_TYPE=quick_wins` → pick slug from `data/rewrite-queue.json` → `@seo-optimizer SLUG=...` → verify build → commit+push
+Pick slug from `data/rewrite-queue.json` → `@seo-optimizer SLUG=...` → verify build → commit+push
+
+**NOTE**: GSC quick_wins is NEVER used in Workflow E. All language articles are rewritten regardless of GSC impressions/clicks. The goal is semantic SEO coverage across all articles, not filtering by GSC performance.
 
 ---
 
@@ -85,7 +87,7 @@ Inline sqlite3 query (no subagent needed)
 | `agents/skills/qa-rejection-criteria.md` | QA rejection criteria |
 | `content-staging/` | Staging area (FIFO queue, oldest-mtime-first) |
 | `data/rewrite-queue.json` | Registry-driven SEO rewrite queue — all published language articles, processed on-demand by @seo-optimizer |
-| `.claude/agents/` | Native subagent prompt files (7 agents) |
+| `.claude/agents/` | Native subagent prompt files (7 agents) — **now tracked in git** (session #52); `settings.json` remains gitignored (contains credentials) |
 | `../web_content/output/` | Antigravity ingest source |
 | `../devnook/src/content/` | Published content destination |
 
@@ -136,6 +138,7 @@ posts (
 | Frontmatter values with `: ` must be quoted | Any frontmatter value containing colon+space (e.g. description) must be wrapped in double quotes to avoid YAML parse errors at Astro build time. |
 | No H1 in markdown body | PostLayout.astro renders `frontmatter.title` as `<h1>`. A body `# Title` creates a duplicate H1 — Ahrefs flags it. |
 | Internal links — no `/languages/` URL fabrication | Agents must never write a `/languages/` URL unless the exact path is verified from INTERNAL_LINKS or registry. Never derive URLs from filenames. |
+| External links required — 1–2 per article | Every article must contain 1–2 external links to authoritative sources. Priority order: MDN (JS/CSS/Web APIs) → official language docs (Python, Node.js, Rust etc.) → W3C/WHATWG specs → Wikipedia (CS concepts) → reputable vendor docs (OpenAI, HuggingFace) for AI topics. Place naturally in body prose — not clustered at the end. Zero external links = automatic QA rejection. Both `content-writer.md` and `seo-optimizer.md` enforce this; `qa-rejection-criteria.md` rejects on zero. |
 
 ---
 
@@ -239,13 +242,26 @@ Both workflows:
 - **Article rewritten**: `javascript-closures` — 1,044 → 1,258 words. `template_id: modular-v1`. Voice: `thoughtful-explainer`. Sections: open-mental-model, core-how-it-works, code-minimal, code-realistic, prac-gotchas, close-next. Primary keyword `javascript closures` (vol: 1,600, diff: 38). Fixed broken schema_org URL (was `/languages/`, now full path).
 - **Build passed** (109 pages). Registry updated. `rewrite-queue.json` updated: order 5 marked done, 46 remaining.
 
-### Current state after #51
+### Last Session (#52, 2026-05-24)
+
+**Status:** ✅ Complete. External links pipeline gap diagnosed and fixed across all agents and QA.
+
+- **Root cause found**: `content-writer.md` had no external link instruction — new articles were written with zero external links. `qa-rejection-criteria.md` was also missing the check, so articles with zero external links passed QA silently.
+- **`seo-optimizer.md`** already had external link instructions (correct) — but `content-writer.md` did not.
+- **Fixes applied**:
+  - `content-writer.md` — added 1–2 external link requirement to body writing rules and self-validate checklist.
+  - `qa-rejection-criteria.md` — added "Zero external links" as automatic rejection condition under Content Quality.
+- **Articles patched**: `python-string-methods-cheatsheet` and `javascript-closures` already had 1 external link each from seo-optimizer (meeting minimum); committed and pushed to devnook `main`. Cloudflare auto-deployed.
+- **`.claude/agents/` now tracked in git**: Removed `.claude/` from `.gitignore`, replaced with `.claude/settings.json` and `.claude/settings.local.json` (credentials stay local). All 7 agent files committed and pushed to content workspace `master`.
+
+### Current state after #52
 
 - Registry: **~74 published / 15 staged / 11 rejected**, 0 queued
 - `data/rewrite-queue.json`: 46 language articles pending SEO rewrite (`javascript-closures` done)
 - Drip: 2/day — revert to 3/day once staging queue is refilled
+- All pipeline agents now enforce external links; QA rejects on zero external links
 
-### Next session priorities (#52)
+### Next session priorities (#53)
 
 1. **Continue SEO rewrites** — pick next batch from `data/rewrite-queue.json` (order 1–4 or by topic quality), run DataForSEO research, rewrite under modular-v1 system.
 2. **Deferred** — FAQPage schema validation in Google Rich Results Test; add FAQs to `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url` tools.
