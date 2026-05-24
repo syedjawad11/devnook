@@ -1,0 +1,160 @@
+=== PWD ===
+/home/user
+
+=== CWD CONTENTS ===
+total 20
+drwxr-xr-x  5 root root 4096 May 24 17:13 .
+drwxr-xr-x  5 root root 4096 May 24 16:15 ..
+drwxr-xr-x  2 root root 4096 May 24 17:13 data
+drwxr-xr-x 11 root root 4096 May 24 16:15 devnook
+drwxr-xr-x  7 root root 4096 May 24 16:15 devnook-content
+
+=== PARENT (..) ===
+total 20
+drwxr-xr-x  5 root   root   4096 May 24 16:15 .
+drwxr-xr-x 21 claude ubuntu 4096 May 24 17:13 ..
+drwxr-xr-x  6 claude claude 4096 May 24 16:15 claude
+drwxr-x---  2 ubuntu ubuntu 4096 Feb 17 02:09 ubuntu
+drwxr-xr-x  5 root   root   4096 May 24 17:13 user
+
+=== GRANDPARENT (../..) ===
+total 84
+drwxr-xr-x  21 claude ubuntu  4096 May 24 17:13 .
+drwxr-xr-x  21 claude ubuntu  4096 May 24 17:13 ..
+lrwxrwxrwx   1 root   root       7 Apr 22  2024 bin -> usr/bin
+drwxr-xr-x   2 root   root    4096 Apr  8  2024 bin.usr-is-merged
+drwxr-xr-x   2 root   root    4096 Apr 22  2024 boot
+-rw-r--r--   1 root   root      88 May 24 17:13 container_info.json
+drwxr-xr-x   6 root   root    2300 May 24 17:13 dev
+drwxr-xr-x  75 root   root    4096 Mar 31 13:31 etc
+drwxr-xr-x   5 root   root    4096 May 24 16:15 home
+lrwxrwxrwx   1 root   root       7 Apr 22  2024 lib -> usr/lib
+drwxr-xr-x   2 root   root    4096 Nov 14  2024 lib.usr-is-merged
+lrwxrwxrwx   1 root   root       9 Apr 22  2024 lib64 -> usr/lib64
+drwx------   2 root   root   12288 Jan  1  1970 lost+found
+drwxr-xr-x   2 root   root    4096 Feb 17 02:02 media
+drwxr-xr-x   3 root   root    4096 May 24 16:15 mnt
+drwxr-xr-x   2 root   root    4096 May 24 16:15 old_root
+drwxr-xr-x  15 root   root    4096 May 24 16:15 opt
+dr-xr-xr-x 135 root   root       0 May 24 06:30 proc
+drwx------  13 root   root    4096 May 24 17:13 root
+drwxr-xr-x  12 root   root    4096 May 24 16:15 run
+lrwxrwxrwx   1 root   root       8 Apr 22  2024 sbin -> usr/sbin
+drwxr-xr-x   2 root   root    4096 Feb 17 02:02 srv
+dr-xr-xr-x  12 root   root       0 May 24 06:30 sys
+drwxrwxrwt   6 root   root    4096 May 24 17:13 tmp
+drwxr-xr-x  12 root   root    4096 Feb 17 02:02 usr
+drwxr-xr-x  11 root   root    4096 Feb 17 02:09 var
+
+=== /workspace ===
+ls: cannot access '/workspace': No such file or directory
+
+=== /home ===
+total 20
+drwxr-xr-x  5 root   root   4096 May 24 16:15 .
+drwxr-xr-x 21 claude ubuntu 4096 May 24 17:13 ..
+drwxr-xr-x  6 claude claude 4096 May 24 16:15 claude
+drwxr-x---  2 ubuntu ubuntu 4096 Feb 17 02:09 ubuntu
+drwxr-xr-x  5 root   root   4096 May 24 17:13 user
+
+=== /tmp ===
+total 544
+drwxrwxrwt  6 root   root     4096 May 24 17:13 .
+drwxr-xr-x 21 claude ubuntu   4096 May 24 17:13 ..
+drwxr-xr-x  3 root   root     4096 Mar 31 13:31 147.0.7727.24
+drwx------  3 root   root     4096 May 24 17:13 claude-0
+-rw-------  1 root   root        0 May 24 16:15 claude-code-3166924390.diag.log
+-rw-------  1 root   root     5937 May 24 17:13 claude-code-3468309132.diag.log
+-rw-------  1 root   root    37606 May 24 17:13 claude-code.log
+-rw-r--r--  1 root   root     7680 May 24 17:13 claude-command
+lrwxrwxrwx  1 root   root       35 May 24 17:13 code-sign -> /opt/env-runner/environment-manager
+-rw-------  1 root   root       76 May 24 17:13 codesign-mcp-config.json
+-rw-r--r--  1 root   root    59629 May 24 17:13 env-manager.log
+-rw-------  1 root   root     2149 May 24 16:15 environment-manager-1899578491.diag.log
+-rw-------  1 root   root     2023 May 24 17:13 environment-manager-2722512066.diag.log
+-rw-r--r--  1 root   root        0 May 24 17:13 environment-manager-cse_01VWfAb7xs7jMbNqvEtgDEuY.lock
+-rw-r--r--  1 root   root    42379 May 24 17:13 environment-manager.out
+drwxr-xr-x  2 root   root     4096 Mar 31 13:31 hsperfdata_root
+-rw-------  1 root   root     1030 May 24 17:13 mcp-config-cse_01VWfAb7xs7jMbNqvEtgDEuY.json
+drwxr-xr-x  3 root   root     4096 Mar 31 13:31 node-compile-cache
+-rw-r--r--  1 root   root   166404 Mar 31 13:28 ruby-build.20260331132748.452.log
+-rw-r--r--  1 root   root    90887 Mar 31 13:29 ruby-build.20260331132853.12405.log
+-rw-r--r--  1 root   root    88866 Mar 31 13:31 ruby-build.20260331132955.24573.log
+
+=== find devnook dirs (maxdepth 6) ===
+/home/user/devnook
+/home/user/devnook-content
+
+=== find src/content dirs (maxdepth 8) ===
+/home/user/devnook/src/content
+
+=== find astro.config files ===
+/home/user/devnook/astro.config.mjs
+
+=== git remotes in cwd ===
+fatal: not a git repository (or any of the parent directories): .git
+
+=== git branch in cwd ===
+fatal: not a git repository (or any of the parent directories): .git
+
+=== env (filtered) ===
+AI_AGENT=claude-code_2-1-150_agent
+ANTHROPIC_BASE_URL=https://api.anthropic.com
+ANT_IMAGE_REPOSITORY=sandbox-ccr-default
+ANT_IMAGE_TAG=74306e8bfdefb9f88fc0b5f3d4940d7086b3d3bb
+BUN_INSTALL=/root/.bun
+BUN_OPTIONS=--smol
+CCR_ENABLE_TRACING=true
+CCR_TEST_GITPROXY=1
+CLAUDECODE=1
+CLAUDE_AFTER_LAST_COMPACT=true
+CLAUDE_AUTO_BACKGROUND_TASKS=true
+CLAUDE_CODE_ACCOUNT_UUID=61973bf4-caac-468e-9291-6ae0b4217023
+CLAUDE_CODE_CONTAINER_ID=container_01UrxryPwPP57qygjBLHU2WY--claude_code_remote--ebd7fc
+CLAUDE_CODE_DEBUG=true
+CLAUDE_CODE_DIAGNOSTICS_FILE=/tmp/claude-code-3468309132.diag.log
+CLAUDE_CODE_DISABLE_BUILTIN_ANTMCP=1
+CLAUDE_CODE_ENTRYPOINT=remote_trigger
+CLAUDE_CODE_ENVIRONMENT_RUNNER_VERSION=release-b5ac58d65-ext
+CLAUDE_CODE_EXECPATH=/opt/claude-code/bin/claude
+CLAUDE_CODE_ORGANIZATION_UUID=84379768-f5ba-4e9a-8ceb-3ea10bc6d348
+CLAUDE_CODE_POST_FOR_SESSION_INGRESS_V2=true
+CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST=1
+CLAUDE_CODE_PROXY_RESOLVES_HOSTS=true
+CLAUDE_CODE_REMOTE=true
+CLAUDE_CODE_REMOTE_ENVIRONMENT_TYPE=cloud_default
+CLAUDE_CODE_REMOTE_SEND_KEEPALIVES=true
+CLAUDE_CODE_REMOTE_SESSION_ID=cse_01VWfAb7xs7jMbNqvEtgDEuY
+CLAUDE_CODE_REMOTE_SKIP_SETTINGS_SYNC=1
+CLAUDE_CODE_SESSION_ID=67a9c794-6c41-4c4d-b13f-183c107999fd
+CLAUDE_CODE_USER_EMAIL=syedjawadhassan11@gmail.com
+CLAUDE_CODE_USE_CCR_V2=true
+CLAUDE_CODE_VERSION=2.1.42
+CLAUDE_CODE_WORKER_EPOCH=1
+CLAUDE_EFFORT=high
+CLAUDE_ENABLE_STREAM_WATCHDOG=1
+CODESIGN_MCP_PORT=33939
+COREPACK_ENABLE_AUTO_PIN=0
+DEBIAN_FRONTEND=noninteractive
+ENVRUNNER_SKIP_ACK=true
+ENV_MANAGER_ENABLE_DIAG_LOGS=true
+GIT_EDITOR=true
+HOME=/root
+IS_SANDBOX=yes
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64
+MCP_CONNECTION_NONBLOCKING=true
+MCP_TOOL_TIMEOUT=60000
+NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+NODE_OPTIONS=--max-old-space-size=8192
+NoDefaultCurrentDirectoryInExePath=1
+OLDPWD=/
+PATH=/root/.local/bin:/root/.cargo/bin:/usr/local/go/bin:/opt/node22/bin:/opt/maven/bin:/opt/gradle/bin:/opt/rbenv/bin:/root/.bun/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
+PWD=/home/user
+PYTHONUNBUFFERED=1
+RBENV_ROOT=/opt/rbenv
+REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+RUSTUP_HOME=/root/.rustup
+RUST_BACKTRACE=1
+SHELL=/bin/bash
+SHLVL=1
