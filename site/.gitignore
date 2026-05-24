@@ -1,4 +1,5 @@
 .env
+.mcp.json
 node_modules/
 dist/
 .astro/
@@ -7,3 +8,4 @@ __pycache__/
 agents/content-team/registry.db
 .gemini/
 .claude/
+audits/*.csv

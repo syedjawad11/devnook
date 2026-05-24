@@ -40,32 +40,37 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-23, #46)
+## Last Session (2026-05-23, #50)
 
-**Status:** ✅ Content pipeline redesign — Stage 0 + Stage 1 complete. `New_ContentStrategy/` deleted from this repo. Consolidated style system now lives in content workspace.
+**Status:** ✅ seo-optimizer pipeline tested end-to-end. `python-string-methods-cheatsheet` rewritten, built, pushed, and live.
 
-### What was done
+### What was done in #50
 
-- **Stage 0 (Freeze):** Confirmed no active local cron jobs. `drip-publish.yml` remains paused (schedule commented out). Remote routine `trig_01FZHoRx5tsnS6WCyrCk7DfV` fired and auto-disabled on 2026-05-17 as expected.
-- **Stage 1 (Consolidate):**
-  - Created `../devnook_content_workspace/agents/skills/content-style-system.md` — single source-of-truth style file. Contains 18 language sections (reduced from 33), 12 new AI/Productivity sections, 3 approved voices (`terse-senior`, `thoughtful-explainer`, `tutorial-guide`), forbidden language rules (first-person experiential markers banned), SEO rules, frontmatter spec.
-  - Created `../devnook_content_workspace/data/rewrite-queue.json` — all 47 articles at `pending` (orders 1–4 reset; old rewrites used dropped voices/sections and need a fresh pass).
-  - Deleted `New_ContentStrategy/` from this repo (16 files git rm'd) — the old 33-section modular system is superseded.
-  - Updated this CLAUDE.md to remove stale `New_ContentStrategy` references.
+- **seo-optimizer end-to-end test**: Ran full pipeline on `python-string-methods-cheatsheet` — keyword research (DataForSEO), rewrite, build verify, commit, push.
+- **Article rewritten**: 919 → 1,380 words. Primary keyword `python string methods` (vol: 2,900, diff: 59). First H2 contains keyword. 5 internal links woven in. Tables and code blocks expanded.
+- **Two bugs caught and fixed**:
+  - Description was 168 chars (over 160 limit) — agent self-reported 157 incorrectly. Always verify with `len()` in Python.
+  - YAML parse error: unquoted description containing `: ` broke js-yaml at build time. Fixed by wrapping in double quotes.
+- **Build passed** (109 pages, no errors). Commit `79e6173` pushed to `origin main`. Cloudflare auto-deploy triggered.
+- **Live URL**: `https://devnook.dev/cheatsheets/python-string-methods-cheatsheet`
+- **Registry updated** in `../devnook_content_workspace/agents/content-team/registry.db` — title, description, keyword, updated_at.
 
-### Previous session (#45) summary
+### Key learnings from #50
 
-Language article rewrite system set up (`New_ContentStrategy/` folder), 1 article manually rewritten, test routine created. Routine fired 2026-05-17 and auto-disabled.
+- Custom subagents (`seo-optimizer`, `gsc-analyst`, etc.) are NOT built-in agent types — invoke as `general-purpose` with full instructions embedded in the prompt.
+- Always verify description length with Python `len()` — agent self-reported counts are unreliable.
+- Any frontmatter value containing `: ` (colon + space) must be wrapped in double quotes to avoid YAML parse errors at build time.
+- PowerShell here-strings use `@'...'@` syntax — bash-style `cat <<'EOF'` is invalid in PowerShell.
 
-### Next session priorities (#47)
+### Previous session (#49) summary
 
-1. **Stage 2 — Install MCPs** in both workspaces:
-   - DataForSEO MCP: auth via `DATAFORSEO_LOGIN` + `DATAFORSEO_PASSWORD` env vars
-   - Google Search Console MCP: auth via `GOOGLE_SERVICE_ACCOUNT_JSON`
-   - Install in `../devnook_content_workspace/.claude/settings.json` (create) and `devnook/.claude/settings.json` (extend)
-   - Verify with sanity-check calls before moving to Stage 3
-2. **Stage 3 — Build 7 new subagents** in `../devnook_content_workspace/.claude/agents/`
-3. **Deferred from #44** — FAQPage schema validation in Google Rich Results Test, add FAQs to 3 skipped tools (`meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`).
+GSC MCP fully verified end-to-end. Live site data: 15 clicks, 3,267 impressions, 0.46% CTR, avg position 29.8. Built 7 subagents in `../devnook_content_workspace/.claude/agents/` (content-planner, content-writer, content-ingest, antigravity-qa, content-publisher, gsc-analyst, seo-optimizer).
+
+### Next session priorities (#51)
+
+1. **Scale seo-optimizer** — run on more articles from the registry. Feed GSC quick_wins list to prioritize which slugs to rewrite first. Invoke `@gsc-analyst REPORT_TYPE=quick_wins` first, then batch `@seo-optimizer` on top 5.
+2. **Deferred from #44** — FAQPage schema validation in Google Rich Results Test, add FAQs to 3 skipped tools (`meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`).
+3. **GSC ping fix** — set `GOOGLE_SERVICE_ACCOUNT_JSON` secret in content workspace GitHub repo secrets to stop cron "Skipping GSC ping" noise.
 
 ### Deferred (do not do)
 
