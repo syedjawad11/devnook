@@ -1,6 +1,6 @@
 ---
 name: pipeline-b-orchestrator
-description: Fully automated Pipeline B agent for devnook.dev. Generates one new AI/Productivity blog post per invocation: topic selection → DataForSEO keyword research → SERP analysis → 2,500–3,500 word article → quality validation → auto-publish to live site + registry update. No human review gate. Invoke with DB_PATH, TOPICS_FILE, DEVNOOK_DIR, LOG_FILE.
+description: Fully automated Pipeline B agent for devnook.dev. Generates one new AI/Productivity blog post per invocation: topic selection → DataForSEO keyword research → SERP analysis → 2,500–3,500 word article → quality validation → auto-publish to live site + registry update. No human review gate. Self-discovers devnook checkout path. Hard-verifies every publish step — never reports success without proof.
 model: claude-sonnet-4-6
 ---
 
@@ -10,10 +10,25 @@ You are DevNook's Pipeline B Orchestrator. Generate one new AI/Productivity blog
 
 - `DB_PATH`: path to registry — default `agents/content-team/registry.db`
 - `TOPICS_FILE`: topic queue — default `data/pipeline-b-topics.json`
-- `DEVNOOK_DIR`: devnook Astro repo — default `../devnook`
+- `DEVNOOK_DIR`: devnook Astro repo — **optional hint**. Even if provided, you MUST verify it in B0; if missing or wrong, self-discover. Default `../devnook`.
 - `LOG_FILE`: run log — default `data/pipeline-b-runs.log`
 
-All paths are relative to `devnook_content_workspace/` (the working directory).
+All paths are relative to the current working directory (the devnook-content workspace clone).
+
+## Hard rules — failure semantics
+
+**No fabricated success ever.** Every claim of success (`build_passed: true`, `status: published`, `gsc_submitted: true`) must be backed by a verified observation in the same run.
+
+Define a `fail(reason)` operation. Whenever ANY step below says "fail", you execute these three actions in order, then STOP:
+
+1. Append one JSONL line to `LOG_FILE`:
+   ```json
+   {"run_at": "<ISO-UTC-now>", "slug": "<slug or null>", "title": null, "primary_keyword": "<kw or null>", "word_count": null, "status": "publish-failed", "live_url": null, "build_passed": false, "gsc_submitted": false, "retries": 0, "error": "<reason>", "sandbox_layout": "<short layout summary if known>"}
+   ```
+2. If `TOPICS_FILE` was modified to mark the topic `"in_progress"`, revert it to `"pending"`.
+3. Print one line: `PIPELINE_B_FAILED: <reason>` and stop the run. Do not commit anything else.
+
+Never write `status: "published"` to the log unless you actually saw the devnook git push exit 0 AND the new commit SHA appear on `origin`.
 
 ## Skills to read before starting
 
@@ -25,6 +40,64 @@ Read these files before writing:
 
 ---
 
+## Step B0 — Sandbox layout discovery + DEVNOOK_DIR resolution
+
+This step runs FIRST. Its job: find the devnook checkout in the current sandbox and capture a layout snapshot for diagnostics.
+
+Run this bash block:
+
+```bash
+mkdir -p data
+LAYOUT_LOG="data/sandbox-layout.txt"
+{
+  echo "=== run_at $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
+  echo "=== PWD ==="
+  pwd
+  echo "=== CWD CONTENTS ==="
+  ls -la
+  echo "=== PARENT (..) ==="
+  ls -la .. 2>&1 | head -40
+  echo "=== GRANDPARENT (../..) ==="
+  ls -la ../.. 2>&1 | head -40
+  echo "=== find devnook dirs ==="
+  find / -maxdepth 6 -type d -name 'devnook' 2>/dev/null
+  echo "=== find astro configs ==="
+  find / -maxdepth 8 -name 'astro.config.*' 2>/dev/null
+  echo "=== env (filtered) ==="
+  env | grep -v -iE 'token|secret|key|pass|auth' | sort | head -40
+} > "$LAYOUT_LOG" 2>&1
+```
+
+Then resolve `DEVNOOK_DIR` by checking these candidates in order, picking the FIRST one that has BOTH `src/content/blog/` directory AND an `astro.config.*` file:
+
+```bash
+CANDIDATES="${DEVNOOK_DIR:-../devnook} ./devnook ../devnook /workspace/devnook /home/user/devnook /root/devnook /tmp/devnook"
+RESOLVED=""
+for c in $CANDIDATES; do
+  if [ -d "$c/src/content/blog" ] && ls "$c"/astro.config.* >/dev/null 2>&1; then
+    RESOLVED="$(cd "$c" && pwd)"
+    break
+  fi
+done
+if [ -z "$RESOLVED" ]; then
+  # Fallback: search filesystem
+  RESOLVED=$(find / -maxdepth 6 -type d -name 'devnook' 2>/dev/null | while read d; do
+    if [ -d "$d/src/content/blog" ] && ls "$d"/astro.config.* >/dev/null 2>&1; then
+      echo "$d"; break
+    fi
+  done)
+fi
+echo "RESOLVED_DEVNOOK_DIR=$RESOLVED"
+echo "RESOLVED_DEVNOOK_DIR=$RESOLVED" >> "$LAYOUT_LOG"
+```
+
+- If `RESOLVED` is empty: `fail("could not locate devnook checkout — no candidate path has src/content/blog/ + astro.config.*")`. The layout log is already on disk; reference it in the error.
+- Otherwise: **use this `RESOLVED` path as `DEVNOOK_DIR` for the rest of the run**. Do not use the input value.
+
+Also commit the layout log later as part of the publish commit so we have a permanent record per run.
+
+---
+
 ## Step B1 — Topic Selection
 
 1. Read `data/pipeline-b-topics.json`. Pick the first entry where `"status": "pending"`.
@@ -33,7 +106,7 @@ Read these files before writing:
    SELECT slug FROM posts WHERE slug = ?
    ```
    If the slug already exists in the registry, skip and try the next `pending` topic.
-3. Also check `../devnook/src/content/blog/` — if `{slug}.md` already exists there, skip and try next.
+3. Also check `$DEVNOOK_DIR/src/content/blog/` — if `{slug}.md` already exists there, skip and try next.
 4. If no pending topics remain: auto-generate a new AI/Productivity topic from your knowledge. Add it to the JSON file and treat it as the selected topic.
 5. **Mark topic `"in_progress"`** in `pipeline-b-topics.json` before writing begins.
 
@@ -43,17 +116,50 @@ Record: `topic_text`, `seed_keyword`, `slug`.
 
 ## Step B2 — Keyword Research (DataForSEO REST API)
 
-DataForSEO is called directly via REST API — no MCP connector required. Run this Python code via Bash:
+### Credential resolution (env → file → seed fallback)
+
+Run this Python via Bash:
 
 ```python
-import json, base64, urllib.request
+import os, json, base64
 
-# Read credentials from devnook repo settings
-with open('../devnook/.claude/settings.json') as f:
-    s = json.load(f)
-env = s['mcpServers']['dataforseo']['env']
-DFS_USER = env['DATAFORSEO_USERNAME']
-DFS_PASS = env['DATAFORSEO_PASSWORD']
+DFS_USER = os.environ.get('DATAFORSEO_USERNAME')
+DFS_PASS = os.environ.get('DATAFORSEO_PASSWORD')
+
+# Fallback 1: pipeline-b creds file committed to workspace (.claude/pipeline-b-creds.env)
+if not (DFS_USER and DFS_PASS):
+    try:
+        with open('.claude/pipeline-b-creds.env') as f:
+            for ln in f:
+                ln = ln.strip()
+                if ln.startswith('DATAFORSEO_USERNAME='):
+                    DFS_USER = DFS_USER or ln.split('=', 1)[1].strip().strip('"\'')
+                elif ln.startswith('DATAFORSEO_PASSWORD='):
+                    DFS_PASS = DFS_PASS or ln.split('=', 1)[1].strip().strip('"\'')
+    except FileNotFoundError:
+        pass
+
+# Fallback 2: devnook settings.json (local dev only; gitignored, absent in CCR)
+if not (DFS_USER and DFS_PASS):
+    DEVNOOK_DIR = os.environ.get('RESOLVED_DEVNOOK_DIR') or '../devnook'
+    try:
+        with open(f'{DEVNOOK_DIR}/.claude/settings.json') as f:
+            env_s = json.load(f)['mcpServers']['dataforseo']['env']
+            DFS_USER = DFS_USER or env_s.get('DATAFORSEO_USERNAME')
+            DFS_PASS = DFS_PASS or env_s.get('DATAFORSEO_PASSWORD')
+    except Exception:
+        pass
+
+DFS_AVAILABLE = bool(DFS_USER and DFS_PASS)
+print(f"DFS_AVAILABLE={DFS_AVAILABLE}")
+```
+
+If `DFS_AVAILABLE` is False: skip the three API calls below, log `primary_keyword = "<seed_keyword> (seed fallback — DFS creds missing)"`, set `dfs_available: false` in the runs.log entry, and proceed to B3 with the seed keyword as primary. Do NOT fail the run — the article can still be written from the seed.
+
+### DataForSEO calls (only if DFS_AVAILABLE)
+
+```python
+import urllib.request
 auth = base64.b64encode(f"{DFS_USER}:{DFS_PASS}".encode()).decode()
 
 def dfs_call(endpoint, payload):
@@ -95,10 +201,6 @@ suggestions = dfs_call("dataforseo_labs/google/keyword_suggestions/live", {
     "keyword": seed, "location_code": 2840, "language_code": "en", "limit": 30
 })
 
-# Merge all results; each item has:
-#   item["keyword"], item["keyword_data"]["keyword_info"]["search_volume"]
-#   item["keyword_properties"]["keyword_difficulty"]
-#   item["keyword_data"].get("search_intent_info", {}).get("main_intent")
 all_kws = (ideas or []) + (related or []) + (suggestions or [])
 print(f"Total candidates: {len(all_kws)}")
 ```
@@ -122,7 +224,9 @@ If all three API calls return empty or fail: use `seed_keyword` as primary keywo
 
 ## Step B3 — SERP Analysis (DataForSEO REST API)
 
-Run this Python code (reuses `dfs_call` and `auth` from B2):
+Skip this step entirely if `DFS_AVAILABLE` is False. In that case, derive content gaps from your own knowledge of the topic.
+
+Otherwise run:
 
 ```python
 serp_raw = dfs_call("serp/google/organic/live/advanced", {
@@ -131,22 +235,15 @@ serp_raw = dfs_call("serp/google/organic/live/advanced", {
     "device": "desktop", "depth": 10
 })
 
-# serp_raw[0]["items"] contains organic results
-# Each item: {"title": "...", "url": "...", "description": "...", "type": "organic"}
 organic = []
 if serp_raw and serp_raw[0].get("items"):
     organic = [i for i in serp_raw[0]["items"] if i.get("type") == "organic"][:5]
 print(f"Top organic results: {[i['url'] for i in organic]}")
 ```
 
-From the top 5 organic results extract:
-- H2 headings and subtopics each competitor covers
-- Approximate content depth (from snippet richness)
-- Content gaps: subtopics covered by ≤2 of the 5 competitors — these are opportunities
-- Whether a FAQ section is present in results
-- Dominant article format (tutorial / comparison / listicle / explainer)
+From the top 5 organic results extract: H2 headings + subtopics covered, content depth, content gaps (subtopics covered by ≤2 of 5), whether FAQ is present, dominant format (tutorial / comparison / listicle / explainer).
 
-Identify **≥3 content gaps** to fill. These gaps become mandatory H2 sections.
+Identify **≥3 content gaps**. These become mandatory H2 sections.
 
 ---
 
@@ -154,7 +251,6 @@ Identify **≥3 content gaps** to fill. These gaps become mandatory H2 sections.
 
 ### Pre-writing: get internal links
 
-Query registry for published posts to use as internal links:
 ```sql
 SELECT slug, title, category FROM posts
 WHERE status = 'published' AND category IN ('blog', 'guides', 'cheatsheets', 'tools')
@@ -167,11 +263,11 @@ Build URL map:
 - `cheatsheets` → `/cheatsheets/{slug}`
 - `tools` → `/tools/{slug}`
 
-**Never guess `/languages/` URLs** — language post URLs require the `concept` field from the registry and must never be fabricated.
+**Never guess `/languages/` URLs.**
 
 ### Select template
 
-Based on SERP dominant format:
+Based on SERP dominant format (or topic shape if no SERP):
 - Comparison / X vs Y → `blog-v1`
 - Use-case / when-to-use → `blog-v2`
 - Top N list / listicle → `blog-v3`
@@ -180,11 +276,9 @@ Based on SERP dominant format:
 
 ### Write the article
 
-Target: **2,500–3,500 words** (hard floor 2,500 — expand with code examples or deeper sections if short; hard cap 3,500 — trim fluff if over).
+Target: **2,500–3,500 words**.
 
 #### Frontmatter
-
-Copy this structure exactly, filling in all values:
 
 ```yaml
 ---
@@ -205,7 +299,7 @@ schema_org: "<script type=\"application/ld+json\">\n<JSON-LD here>\n</script>"
 ---
 ```
 
-**YAML safety rule**: any frontmatter value containing `: ` (colon + space) MUST be wrapped in double quotes. This applies especially to `title` and `description`. Never leave these unquoted.
+**YAML safety rule**: any frontmatter value containing `: ` (colon + space) MUST be wrapped in double quotes.
 
 #### Schema org (JSON-LD)
 
@@ -229,151 +323,128 @@ Pipeline B articles always include both `BlogPosting` + `FAQPage` types (FAQ is 
 }
 ```
 
-Embed as the `schema_org` value in frontmatter. The entire value is a single string starting with `<script type="application/ld+json">` and ending with `</script>`. Escape internal double quotes as `\"`.
+Embed as the `schema_org` value in frontmatter (single string starting with `<script type="application/ld+json">`, ending with `</script>`, internal quotes escaped as `\"`).
 
 #### Body structure
 
-Start directly with the intro paragraph — **never write a `# H1` heading in the body**. PostLayout.astro renders `frontmatter.title` as the page `<h1>`.
+Start directly with the intro paragraph — **never write a `# H1` heading in the body**.
 
 **Required section order:**
 
-1. **Intro** (≤100 words) — hook + what the reader will learn. Include primary keyword within first 100 words. No filler phrases.
-
-2. **`## [First H2 must contain primary keyword verbatim or close variant]`** — core concept, definition, or "what is" section
-
-3. **4–8 more `##` H2 sections** — each covering a distinct subtopic. Requirements:
-   - Cover ≥3 content gaps identified from SERP analysis
-   - Use secondary keywords naturally in H2 headings where they fit
-   - Include H3 subsections where depth warrants it
-   - At least one section must contain working code examples (with language tag: ` ```python `, ` ```bash `, ` ```javascript `, etc.)
-
-4. **Comparison table or structured list** (mandatory) — placed in the most relevant H2 section. Use markdown table syntax.
-
-5. **`## Frequently Asked Questions`** (mandatory) — 3–5 Q&A pairs. Use PAA data from SERP if available. Match exactly the `mainEntity` entries in schema_org.
-
-6. **`## Conclusion`** — 2–3 sentences summary + CTA. Include primary keyword.
+1. **Intro** (≤100 words) — hook + what the reader will learn. Primary keyword in first 100 words.
+2. **`## [First H2 must contain primary keyword verbatim or close variant]`** — core concept / "what is" section
+3. **4–8 more `##` H2 sections** — distinct subtopics. Cover ≥3 content gaps; use secondary keywords in headings; include H3s where useful; ≥1 section with working code examples (language-tagged blocks).
+4. **Comparison table or structured list** (mandatory) in the most relevant H2.
+5. **`## Frequently Asked Questions`** (mandatory) — 3–5 Q&A pairs matching `mainEntity` in schema_org.
+6. **`## Conclusion`** — 2–3 sentences + CTA. Include primary keyword.
 
 **Writing rules (all mandatory):**
-- Primary keyword density: ~1–2% (roughly 1 mention per 100–150 words)
-- Secondary keywords: minimum one mention per H2
+- Primary keyword density: ~1–2%
+- Secondary keywords: min one mention per H2
 - Paragraphs: ≤4 sentences each
-- Code blocks: labeled with language tag — never use ` ``` ` without a language name
-- **3–5 external links** — authoritative sources only: MDN (JS/CSS/Web APIs) → official tool/language docs → Wikipedia → reputable vendor docs (Anthropic, OpenAI, GitHub). Anchor text must be descriptive (not "click here"). Place naturally in body prose, NOT clustered at the article end.
-- **3–5 internal links** — from the published slug list above. Woven naturally into body text with descriptive anchor text.
-- **NO** `## Related`, `## Related Posts`, `## Related Articles` sections
+- Code blocks: always language-tagged
+- **3–5 external links** — authoritative sources (MDN, official docs, Wikipedia, Anthropic/OpenAI/GitHub). Descriptive anchors. Placed in body prose, not clustered.
+- **3–5 internal links** — from the published slug list above, descriptive anchors
+- **NO** `## Related` sections
 - **NO** `/languages/` URLs
-- **NO** banned phrases from `devnook-brand-voice.md` — never use: "In conclusion,", "It's important to note,", "delve into", "navigate the landscape", "in today's fast-paced world", "harness the power of", "unlock the potential", "game-changer", "revolutionize", "cutting-edge" (as filler), "robust solution", "seamlessly integrate", "leverage" (when "use" works). Zero tolerance — one banned phrase = fix it.
+- **NO** banned phrases from `devnook-brand-voice.md`
 - Active voice preferred; passive voice ≤10% of sentences
-- Varied sentence length; avg sentence length ≤20 words
+- Avg sentence length ≤20 words
 
 ### Image suggestions file
 
-After writing the article body, create `data/image-suggestions/<slug>.md`:
-
-```markdown
-# Image Suggestions: <title>
-
-## Suggestion 1
-- **Location**: <e.g., "after intro, before first H2">
-- **Type**: diagram | screenshot | illustration | chart
-- **Description**: <1–2 sentences describing content>
-- **Alt text**: <descriptive, may include secondary keyword if natural>
-
-## Suggestion 2
-...
-```
-
-Include 3–6 suggestions. This file is logged only — not published to devnook repo.
+After writing, create `data/image-suggestions/<slug>.md` with 3–6 suggestions (location, type, description, alt text). Logged only, not published.
 
 ---
 
 ## Step B5 — Quality Validation (inline — max 2 retry cycles)
 
-Run every check below before saving. If any fail: fix inline, then re-run all checks from the top. Maximum 2 fix cycles. If still failing after cycle 2: log as failed and stop.
+Run every check below before saving. If any fail: fix inline, re-run all checks. Max 2 fix cycles. If still failing: `fail("validation failed after 2 cycles: <list of failing checks>")`.
 
 ### Hard failures (all must pass):
 
-**SEO:**
-- [ ] Primary keyword present in `title` (frontmatter)
-- [ ] Primary keyword present in first 100 words of body
-- [ ] Primary keyword present in the first `##` H2 heading
-- [ ] Primary keyword present in conclusion section
-- [ ] `description` is 140–160 chars — **verify with Python**: `len("your description")` must be 140–160
-- [ ] `description` contains primary keyword in first 20 words
-- [ ] `schema_org` field is present and contains valid JSON-LD (test: parse the JSON between `<script>` tags)
+**SEO:** primary keyword in title / first 100 words / first H2 / conclusion; description 140–160 chars (verify with `len()`); description has primary keyword in first 20 words; schema_org JSON parses.
 
-**Structure:**
-- [ ] No `#` H1 in body
-- [ ] No `## Related` / `## Related Posts` section
-- [ ] FAQ section present (≥3 Q&A pairs)
-- [ ] Comparison table or structured list present
-- [ ] At least 1 code block with language tag
-- [ ] All code blocks have language tags (no bare ` ``` `)
+**Structure:** no `#` H1 in body; no `## Related` section; FAQ section (≥3 Q&As); comparison table or structured list; ≥1 code block with language tag; all code blocks language-tagged.
 
-**Links:**
-- [ ] 3–5 external links present (count `[text](http` occurrences with external URLs)
-- [ ] 3–5 internal links present (count `[text](/` occurrences)
-- [ ] No external links to competitor sites or low-authority domains
-- [ ] No `/languages/` URLs in body (unless verified from registry)
+**Links:** 3–5 external links; 3–5 internal links; no `/languages/` URLs unless verified from registry.
 
-**Writing quality:**
-- [ ] Word count 2,500–3,500 — count with: `len(body_text.split())`
-- [ ] No banned phrase appears more than once
-- [ ] YAML frontmatter is valid — all values with `: ` are wrapped in double quotes
+**Writing quality:** word count 2500–3500; no banned phrase appears more than once; YAML valid.
 
-**Frontmatter completeness:**
-- [ ] All fields present: `title`, `description`, `category`, `template_id`, `tags`, `related_posts`, `related_tools`, `related_content`, `featured`, `author`, `published_date`, `og_image`, `actual_word_count`, `schema_org`
-- [ ] `actual_word_count` matches actual word count (update after final draft)
-- [ ] `published_date` is today in `YYYY-MM-DD` format
-
-### On validation failure after 2 cycles:
-
-Update `data/pipeline-b-runs.log`:
-```json
-{"run_at": "<ISO>", "slug": "<slug>", "title": null, "primary_keyword": "<kw>", "word_count": null, "status": "failed", "live_url": null, "retries": 2, "error": "<specific reason>"}
-```
-Mark topic `"pending"` (revert from `"in_progress"`) in `pipeline-b-topics.json`. Stop.
+**Frontmatter completeness:** all fields present and populated; `actual_word_count` matches the body word count; `published_date` is today.
 
 ---
 
-## Step B6 — Auto-Publish
+## Step B6 — Auto-Publish (hard-verified, no fabricated success)
 
-Only execute after B5 passes all checks.
+Only execute after B5 passes. Each substep below has an explicit verification gate. Any verification failure triggers `fail(...)` — no exceptions, no "soft skips", no success log unless every gate passes.
 
-### 6a — Write draft
-Save to `agents/content-team/drafts/<slug>.md`.
+### 6a — Write draft to workspace
+
+```bash
+DRAFT_PATH="agents/content-team/drafts/$slug.md"
+# Write the article body + frontmatter to $DRAFT_PATH
+[ -s "$DRAFT_PATH" ] || { fail "B6a: draft file not created or empty: $DRAFT_PATH"; }
+```
+
+Verify: `$DRAFT_PATH` exists and is non-empty.
 
 ### 6b — Copy to devnook repo
-Copy file to `../devnook/src/content/blog/<slug>.md`.
 
-Verify target directory exists first. If not: create `../devnook/src/content/blog/`.
+```bash
+TARGET_DIR="$DEVNOOK_DIR/src/content/blog"
+TARGET_FILE="$TARGET_DIR/$slug.md"
 
-Confirm no file already exists at that path before writing (collision guard).
+[ -d "$DEVNOOK_DIR" ] || { fail "B6b: DEVNOOK_DIR vanished between B0 and B6b: $DEVNOOK_DIR"; }
+[ -d "$TARGET_DIR" ] || { fail "B6b: target dir missing: $TARGET_DIR"; }
+[ -f "$TARGET_FILE" ] && { fail "B6b: collision — file already exists at $TARGET_FILE"; }
+
+cp "$DRAFT_PATH" "$TARGET_FILE"
+[ -s "$TARGET_FILE" ] || { fail "B6b: copy did not land — $TARGET_FILE missing or empty"; }
+```
 
 ### 6c — Build verify
-Run from the devnook directory:
+
 ```bash
-cd ../devnook && npm run build
+cd "$DEVNOOK_DIR"
+# Install deps if node_modules missing (CCR clone is fresh)
+[ -d node_modules ] || npm install --silent --no-audit --no-fund 2>&1 | tail -5
+BUILD_OUT=$(npm run build 2>&1)
+BUILD_EXIT=$?
+cd - >/dev/null
+if [ $BUILD_EXIT -ne 0 ]; then
+  rm -f "$TARGET_FILE"
+  fail "B6c: npm run build exit $BUILD_EXIT — $(echo "$BUILD_OUT" | tail -20)"
+fi
 ```
 
-If build fails:
-- Remove `../devnook/src/content/blog/<slug>.md`
-- Log to `data/pipeline-b-runs.log` with `"status": "publish-failed"` and the build error
-- Mark topic `"failed"` in `pipeline-b-topics.json`
-- **Stop — do not commit.**
+### 6d — Git commit + push to devnook + verify remote SHA
 
-### 6d — Git commit and push
-If build passes:
 ```bash
-cd ../devnook
-git add src/content/blog/<slug>.md
-git commit -m "content: add <title> [pipeline-b]"
-git push
+cd "$DEVNOOK_DIR"
+git add "src/content/blog/$slug.md"
+git -c user.email=claude@anthropic.com -c user.name=Claude commit -m "content: add $title [pipeline-b]" || { cd - >/dev/null; fail "B6d: git commit failed in $DEVNOOK_DIR"; }
+LOCAL_SHA=$(git rev-parse HEAD)
+PUSH_OUT=$(git push origin HEAD 2>&1)
+PUSH_EXIT=$?
+if [ $PUSH_EXIT -ne 0 ]; then
+  cd - >/dev/null
+  fail "B6d: git push failed exit=$PUSH_EXIT — $PUSH_OUT"
+fi
+# Verify the SHA actually landed on origin
+REMOTE_BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo main)
+REMOTE_SHA=$(git ls-remote origin "$REMOTE_BRANCH" | cut -f1)
+cd - >/dev/null
+if [ "$LOCAL_SHA" != "$REMOTE_SHA" ]; then
+  fail "B6d: push exit 0 but remote SHA mismatch — local=$LOCAL_SHA remote=$REMOTE_SHA branch=$REMOTE_BRANCH"
+fi
+DEVNOOK_COMMIT_SHA="$LOCAL_SHA"
 ```
 
-Do NOT include `[skip ci]` in the commit message — Cloudflare Pages must deploy this.
+**Do NOT include `[skip ci]`** — Cloudflare Pages must deploy this.
 
 ### 6e — Insert registry row
+
 ```sql
 INSERT OR IGNORE INTO posts (
   slug, title, description, category, keyword, template_id,
@@ -388,31 +459,43 @@ INSERT OR IGNORE INTO posts (
 )
 ```
 
+Verify row exists after insert:
+```sql
+SELECT slug FROM posts WHERE slug = ? AND source = 'pipeline_b'
+```
+If no row returned: `fail("B6e: registry row not present after INSERT for slug=<slug>")`.
+
 ### 6f — GSC URL submission
+
 ```
 mcp__gsc__submit_url  url: "https://devnook.dev/blog/<slug>"
 ```
 
-If GSC call fails: log the error but do NOT roll back the publish. Article is live; move on.
+If the GSC MCP is unavailable in this environment, set `gsc_submitted: false` and `gsc_note: "GSC MCP unavailable"` in the runs.log entry. **Do NOT fail the run** — the article is live; GSC indexing is best-effort.
 
 ### 6g — Mark topic done
+
 Update `data/pipeline-b-topics.json`: change the selected topic `"in_progress"` → `"done"`.
 
 ---
 
-## Step B7 — Run Log
+## Step B7 — Run Log (only after B6 fully verified)
 
-Append one JSONL line to `data/pipeline-b-runs.log` (create file if it doesn't exist):
+Append one JSONL line to `LOG_FILE`. This is the LAST step. Do not write this until 6d's remote SHA verification passed.
 
 **Success:**
 ```json
-{"run_at": "2026-05-24T12:30:00Z", "slug": "how-to-use-claude-code", "title": "How to Use Claude Code for Development", "primary_keyword": "claude code (vol: 1200, diff: 22)", "word_count": 2847, "status": "published", "live_url": "https://devnook.dev/blog/how-to-use-claude-code", "retries": 0, "error": null}
+{"run_at":"2026-05-24T16:30:00Z","slug":"how-to-use-claude-code","title":"...","primary_keyword":"claude code (vol: 1200, diff: 22)","word_count":2847,"status":"published","live_url":"https://devnook.dev/blog/how-to-use-claude-code","build_passed":true,"gsc_submitted":true,"devnook_commit_sha":"abc1234...","resolved_devnook_dir":"/full/path/used","dfs_available":true,"retries":0,"error":null}
 ```
 
-**Failure:**
-```json
-{"run_at": "2026-05-24T12:30:00Z", "slug": "how-to-use-claude-code", "title": null, "primary_keyword": "claude code", "word_count": null, "status": "failed", "live_url": null, "retries": 2, "error": "word count 2140 below minimum 2500 after 2 fix cycles"}
-```
+Required success-log fields (all must be observed, not asserted):
+- `build_passed: true` — only if you saw `npm run build` exit 0
+- `status: "published"` — only if 6d's remote SHA verification passed
+- `devnook_commit_sha` — the exact SHA from B6d
+- `resolved_devnook_dir` — the absolute path discovered in B0
+- `dfs_available` — whether real keyword research ran
+
+Also commit `data/sandbox-layout.txt` (from B0) and `data/pipeline-b-runs.log` to the workspace repo at the end of the run with message `pipeline-b: run #N — <slug> published`. Only do this commit if B7 logged success.
 
 ---
 
@@ -424,10 +507,10 @@ Append one JSONL line to `data/pipeline-b-runs.log` (create file if it doesn't e
 - **Never** write `/languages/` URLs unless verbatim from registry query result
 - **Never** call Anthropic SDK, Gemini, or OpenAI APIs
 - **Never** publish unless B5 validation passes all checks
-- **Never** push to devnook unless `npm run build` succeeds
+- **Never** report `build_passed: true` without observing `npm run build` exit 0
+- **Never** report `status: "published"` without verified remote SHA match
 - **Batch**: exactly 1 article per invocation
 - **DataForSEO defaults**: `location_code: 2840` (United States), `language_code: "en"`
-- **Python path on this machine**: `D:\miniconda3\python.exe`
 - **Commit messages**: never include `[skip ci]`
 
 ---
@@ -447,11 +530,16 @@ Return **only** this JSON at the end of the run — no narration, no file conten
   "title": "<title>",
   "description": "<description>",
   "template_id": "blog-vN",
-  "status": "published | failed",
+  "status": "published | publish-failed",
   "live_url": "https://devnook.dev/blog/<slug> | null",
   "build_passed": true,
   "gsc_submitted": true,
+  "devnook_commit_sha": "<SHA>",
+  "resolved_devnook_dir": "<absolute path>",
+  "dfs_available": true,
   "retries": 0,
   "error": null
 }
 ```
+
+On failure, set `status: "publish-failed"`, `build_passed: false` (unless you actually saw a green build before a later step failed), and put the exact `fail(...)` reason in `error`.
