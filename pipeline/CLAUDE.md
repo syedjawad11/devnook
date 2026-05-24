@@ -32,8 +32,9 @@ ORCHESTRATOR (Sonnet main session)
   ├── @content-ingest    (Haiku)   — .claude/agents/content-ingest.md
   ├── @antigravity-qa    (Sonnet)  — .claude/agents/antigravity-qa.md
   ├── @content-publisher (Haiku)   — .claude/agents/content-publisher.md
-  ├── @gsc-analyst       (Sonnet)  — .claude/agents/gsc-analyst.md
-  └── @seo-optimizer     (Sonnet)  — .claude/agents/seo-optimizer.md
+  ├── @gsc-analyst              (Sonnet)  — .claude/agents/gsc-analyst.md
+  ├── @seo-optimizer            (Sonnet)  — .claude/agents/seo-optimizer.md
+  └── @pipeline-b-orchestrator  (Sonnet)  — .claude/agents/pipeline-b-orchestrator.md
 ```
 
 Invoke via `@agent-name` in Claude Code session (native subagent syntax). No `Agent(prompt=open(...))` spawning needed.
@@ -65,6 +66,9 @@ Inline sqlite3 query (no subagent needed)
 **Workflow E — SEO rewrite (on-demand):**
 Pick slug from `data/rewrite-queue.json` → `@seo-optimizer SLUG=...` → verify build → commit+push
 
+**Workflow B — daily AI/Productivity blog post (Pipeline B):**
+`@pipeline-b-orchestrator` — full auto-publish loop: topic selection → DataForSEO keyword research → SERP analysis → write (2,500–3,500 words) → inline QA → publish → run log. No human review gate.
+
 **NOTE**: GSC quick_wins is NEVER used in Workflow E. All language articles are rewritten regardless of GSC impressions/clicks. The goal is semantic SEO coverage across all articles, not filtering by GSC performance.
 
 ---
@@ -73,7 +77,11 @@ Pick slug from `data/rewrite-queue.json` → `@seo-optimizer SLUG=...` → verif
 
 | Path | Purpose |
 |------|---------|
-| `agents/content-team/registry.db` | SQLite registry (~74+ published as of session #50) |
+| `agents/content-team/registry.db` | SQLite registry (~74+ published as of session #53) |
+| `.claude/agents/pipeline-b-orchestrator.md` | Pipeline B orchestrator — full B1–B7 flow (topic → KW research → SERP → write → QA → publish → log) |
+| `data/pipeline-b-topics.json` | Pipeline B topic queue — 20 AI/Productivity topics, `status: pending/in_progress/done` |
+| `data/pipeline-b-runs.log` | Pipeline B run log — JSONL, one entry per run, created on first run |
+| `data/image-suggestions/` | Image suggestions per Pipeline B article — 3–6 entries each |
 | `agents/content-team/registry.py` | DB helpers — get_db, update_post_status, get_queued_posts, get_published_slugs, log_pipeline_run, get_next_template |
 | `agents/content-team/drafts/` | Writer output, QA-approved posts |
 | `agents/content-team/staging.py` | Moves approved drafts → content-staging/ |
@@ -242,7 +250,7 @@ Both workflows:
 - **Article rewritten**: `javascript-closures` — 1,044 → 1,258 words. `template_id: modular-v1`. Voice: `thoughtful-explainer`. Sections: open-mental-model, core-how-it-works, code-minimal, code-realistic, prac-gotchas, close-next. Primary keyword `javascript closures` (vol: 1,600, diff: 38). Fixed broken schema_org URL (was `/languages/`, now full path).
 - **Build passed** (109 pages). Registry updated. `rewrite-queue.json` updated: order 5 marked done, 46 remaining.
 
-### Last Session (#52, 2026-05-24)
+### Session (#52, 2026-05-24)
 
 **Status:** ✅ Complete. External links pipeline gap diagnosed and fixed across all agents and QA.
 
@@ -254,15 +262,28 @@ Both workflows:
 - **Articles patched**: `python-string-methods-cheatsheet` and `javascript-closures` already had 1 external link each from seo-optimizer (meeting minimum); committed and pushed to devnook `main`. Cloudflare auto-deployed.
 - **`.claude/agents/` now tracked in git**: Removed `.claude/` from `.gitignore`, replaced with `.claude/settings.json` and `.claude/settings.local.json` (credentials stay local). All 7 agent files committed and pushed to content workspace `master`.
 
-### Current state after #52
+### Last Session (#53, 2026-05-24)
+
+**Status:** ✅ Complete. Pipeline B infrastructure created and test run scheduled.
+
+- **Pipeline B orchestrator created**: `.claude/agents/pipeline-b-orchestrator.md` — self-contained agent (Sonnet 4.6) owning full B1–B7 flow: topic selection, DataForSEO keyword research (3 MCP calls: keyword_ideas, related_keywords, keyword_suggestions), SERP analysis (serp_organic_live_advanced top 5), article writing (2,500–3,500 words, mandatory FAQ + comparison table, 3–5 external links, 3–5 internal links), inline quality validation (max 2 retry cycles), auto-publish (write → npm run build → git commit+push → GSC submit), run log.
+- **Topic queue created**: `data/pipeline-b-topics.json` — 20 AI/Productivity topics (Claude Code, best AI coding assistants, prompt engineering, AI pair programming, AI debugging, etc.), all `status: "pending"`.
+- **Test cron scheduled**: One-shot at 14:30 Malta time (12:30 UTC, May 24) — `CronCreate` job ID `88805fdf`. **Session-only** — `durable: true` did not persist to disk; session must stay open until cron fires.
+- **Fallback manual invocation**: `@pipeline-b-orchestrator with DB_PATH=agents/content-team/registry.db TOPICS_FILE=data/pipeline-b-topics.json DEVNOOK_DIR=../devnook LOG_FILE=data/pipeline-b-runs.log`
+- **Key spec decisions**: keyword filter `vol ≥ 500, diff < 30` (relax to ≤45 if needed); scoring `vol*0.5 + (30-diff)*10`; blog category; template_id round-robin blog-v1–blog-v5; registry INSERT with `source='pipeline_b'`, `content_type='editorial'`, `status='published'`; `schema_org` dual-type `["BlogPosting","FAQPage"]`.
+
+### Current state after #53
 
 - Registry: **~74 published / 15 staged / 11 rejected**, 0 queued
-- `data/rewrite-queue.json`: 46 language articles pending SEO rewrite (`javascript-closures` done)
+- `data/rewrite-queue.json`: 46 language articles pending SEO rewrite
+- `data/pipeline-b-topics.json`: 20 topics pending (Pipeline B first run scheduled or run today)
 - Drip: 2/day — revert to 3/day once staging queue is refilled
-- All pipeline agents now enforce external links; QA rejects on zero external links
+- All pipeline agents enforce external links; QA rejects on zero external links
 
-### Next session priorities (#53)
+### Next session priorities (#54)
 
-1. **Continue SEO rewrites** — pick next batch from `data/rewrite-queue.json` (order 1–4 or by topic quality), run DataForSEO research, rewrite under modular-v1 system.
-2. **Deferred** — FAQPage schema validation in Google Rich Results Test; add FAQs to `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url` tools.
-3. **GSC ping** — set `GOOGLE_SERVICE_ACCOUNT_JSON` secret in content workspace GitHub repo to stop "Skipping GSC ping" cron noise.
+1. **Verify Pipeline B test run** — check `data/pipeline-b-runs.log` for `"status": "published"`; visit `https://devnook.dev/blog/{slug}`; confirm `[pipeline-b]` git commit; check registry row `WHERE source='pipeline_b'`; verify topic #1 marked `"done"`.
+2. **Schedule daily Pipeline B cron** — once test passes all 5 checks, set recurring daily cron `30 12 * * *`.
+3. **Continue SEO rewrites** — pick next batch from `data/rewrite-queue.json`, run DataForSEO research, rewrite under modular-v1 system.
+4. **Deferred** — FAQPage schema validation; add FAQs to `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url` tools.
+5. **GSC ping** — set `GOOGLE_SERVICE_ACCOUNT_JSON` secret in content workspace GitHub repo to stop "Skipping GSC ping" cron noise.
