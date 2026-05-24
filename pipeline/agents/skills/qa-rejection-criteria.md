@@ -17,6 +17,7 @@
 - [ ] Fewer than 3 internal links
 - [ ] More than 8 internal links
 - [ ] Any internal link pointing to a non-existent slug in registry.db
+- [ ] Zero external links (every article must have 1–2 external links to authoritative sources — MDN, official language docs, W3C, Wikipedia, or reputable vendor docs)
 - [ ] Contains any banned phrase from devnook-brand-voice.md
 - [ ] Title is identical to an existing post in registry.db
 - [ ] First 8 words of title match an existing post
