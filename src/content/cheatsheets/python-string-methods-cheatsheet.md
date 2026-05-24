@@ -30,7 +30,7 @@ keyword: python string methods
 slug: python-string-methods-cheatsheet
 ---
 
-Every Python string method you'll reach for regularly, organized by what you're trying to do. Whether you're parsing CSV data, sanitizing user input, building formatted output, or checking string content, this reference has the method, its syntax, and a working example.
+Every Python string method you'll reach for regularly, organized by what you're trying to do. Whether you're parsing CSV data, sanitizing user input, building formatted output, or checking string content, this reference has the method, its syntax, and a working example. For the complete list including rarely-used variants, the [Python official string methods documentation](https://docs.python.org/3/library/stdtypes.html#string-methods) is the definitive reference.
 
 ## Python String Methods for Splitting and Joining
 

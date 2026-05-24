@@ -5,5 +5,7 @@
             "path": "D:\\Program Files\\Git\\bin\\bash.exe",
             "icon": "terminal-bash"
         }
-    }
+    },
+    "claudeCode.allowDangerouslySkipPermissions": true,
+    "claudeCode.preferredLocation": "panel"
 }

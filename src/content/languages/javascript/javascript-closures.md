@@ -179,3 +179,5 @@ Closures interact with two other JavaScript concepts in ways that reward close a
 From there, async/await and Promises are closures working at scale: every `.then()` callback and every line of code after an `await` is a function that captures the surrounding scope. The state machine that async/await compiles to is essentially a series of closures threaded together by the JavaScript runtime. If async code behaves unexpectedly, the explanation usually lives in the closure semantics described here.
 
 Finally, React hooks are the most pervasive modern application of closures in frontend development. Every `useState`, `useEffect`, and `useCallback` call is built on the same Lexical Environment mechanics covered in this article. The stale closure trap above is the single most common React bug, and recognizing it comes down to knowing that closures capture references, not values, at a point in time.
+
+MDN's [Closures guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Closures) is a reliable reference for the formal definition and additional examples — worth bookmarking alongside this article.
