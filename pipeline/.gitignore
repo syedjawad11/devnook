@@ -1,7 +1,8 @@
 __pycache__/
 *.pyc
 *.bak
-.claude/
+.claude/settings.json
+.claude/settings.local.json
 *.db-journal
 *.db-wal
 *.db-shm
