@@ -272,18 +272,29 @@ Both workflows:
 - **Fallback manual invocation**: `@pipeline-b-orchestrator with DB_PATH=agents/content-team/registry.db TOPICS_FILE=data/pipeline-b-topics.json DEVNOOK_DIR=../devnook LOG_FILE=data/pipeline-b-runs.log`
 - **Key spec decisions**: keyword filter `vol ≥ 500, diff < 30` (relax to ≤45 if needed); scoring `vol*0.5 + (30-diff)*10`; blog category; template_id round-robin blog-v1–blog-v5; registry INSERT with `source='pipeline_b'`, `content_type='editorial'`, `status='published'`; `schema_org` dual-type `["BlogPosting","FAQPage"]`.
 
-### Current state after #53
+### Last Session (#54, 2026-05-24)
 
-- Registry: **~74 published / 15 staged / 11 rejected**, 0 queued
+**Status:** ✅ Complete. Pipeline B persistent routine created. DataForSEO REST API integration shipped.
+
+- **3 staged Pipeline A posts deleted**: Removed `content-staging/languages/javascript/how-to-make-http-requests-in-javascript.md`, `how-to-use-generator-function-in-javascript.md`, `content-staging/languages/ruby/how-to-inherit-a-class-in-ruby.md`. Registry marked all 3 `status='rejected'`. Content staging is now empty.
+- **DataForSEO MCP diagnosis**: Local npm package (`npx dataforseo-mcp-server`) is NOT a cloud-hosted service — cannot appear as a remote connector on claude.ai. Remote CCR routines cannot use it.
+- **Orchestrator rewritten for REST API**: `pipeline-b-orchestrator.md` B2 and B3 sections replaced with direct DataForSEO REST API calls via Python `urllib`. Credentials read at runtime from `../devnook/.claude/settings.json` (committed to devnook git, accessible to remote CCR session). Commit `86878ea` pushed to `origin master`.
+- **Pipeline B persistent routine created**: ID `trig_01LD6ZaMZq3G6R5Aehz7xMHY`. Daily at 14:00 UTC (16:00 Malta CEST). Sources: `devnook-content` + `devnook` (both checked out side-by-side). Model: `claude-sonnet-4-6`. Manage at: `https://claude.ai/code/routines/trig_01LD6ZaMZq3G6R5Aehz7xMHY`.
+- **First run**: Today 2026-05-24 at 14:00 UTC (16:00 Malta). Verification pending.
+
+### Current state after #54
+
+- Registry: **~74 published / 0 staged / 14 rejected**, 0 queued
 - `data/rewrite-queue.json`: 46 language articles pending SEO rewrite
-- `data/pipeline-b-topics.json`: 20 topics pending (Pipeline B first run scheduled or run today)
-- Drip: 2/day — revert to 3/day once staging queue is refilled
+- `data/pipeline-b-topics.json`: 20 topics pending (topic #1 in progress — first CCR run today at 16:00 Malta)
+- Drip (Pipeline A): paused — `drip-publish.yml` cron commented out; 0 staged; redesign deferred
+- Pipeline B: **live daily at 16:00 Malta (14:00 UTC)** — routine `trig_01LD6ZaMZq3G6R5Aehz7xMHY`
 - All pipeline agents enforce external links; QA rejects on zero external links
 
-### Next session priorities (#54)
+### Next session priorities (#55)
 
-1. **Verify Pipeline B test run** — check `data/pipeline-b-runs.log` for `"status": "published"`; visit `https://devnook.dev/blog/{slug}`; confirm `[pipeline-b]` git commit; check registry row `WHERE source='pipeline_b'`; verify topic #1 marked `"done"`.
-2. **Schedule daily Pipeline B cron** — once test passes all 5 checks, set recurring daily cron `30 12 * * *`.
+1. **Verify first Pipeline B run** — check `data/pipeline-b-runs.log` for JSONL entry with `"status": "published"`; verify topic #1 marked `"done"` in `pipeline-b-topics.json`; visit `https://devnook.dev/blog/how-to-use-claude-code`; check registry row `WHERE source='pipeline_b'`.
+2. **If run failed** — read log for error, fix orchestrator, trigger manually via `RemoteTrigger action:run`.
 3. **Continue SEO rewrites** — pick next batch from `data/rewrite-queue.json`, run DataForSEO research, rewrite under modular-v1 system.
-4. **Deferred** — FAQPage schema validation; add FAQs to `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url` tools.
-5. **GSC ping** — set `GOOGLE_SERVICE_ACCOUNT_JSON` secret in content workspace GitHub repo to stop "Skipping GSC ping" cron noise.
+4. **Pipeline A redesign** — separate session; define new drip strategy before re-enabling cron.
+5. **Deferred** — FAQPage schema validation; add FAQs to `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url` tools; `GOOGLE_SERVICE_ACCOUNT_JSON` secret in content workspace GitHub repo.
