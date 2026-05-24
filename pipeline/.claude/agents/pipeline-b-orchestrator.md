@@ -40,61 +40,73 @@ Read these files before writing:
 
 ---
 
-## Step B0 — Sandbox layout discovery + DEVNOOK_DIR resolution
+## Step B0 — Sandbox layout discovery + workspace/devnook resolution
 
-This step runs FIRST. Its job: find the devnook checkout in the current sandbox and capture a layout snapshot for diagnostics.
+This step runs FIRST. Confirmed CCR sandbox layout (probed 2026-05-24):
+- cwd at session start = `/home/user` (NOT inside any repo)
+- workspace checkout at `/home/user/devnook-content`
+- devnook checkout at `/home/user/devnook`
 
-Run this bash block:
+Do NOT assume cwd is the workspace — explicitly discover both repos and cd into the workspace before anything else.
 
+### B0a — Discover WORKSPACE_DIR (devnook-content checkout)
+
+Run this bash:
+```bash
+WORKSPACE_CANDIDATES="./devnook-content ../devnook-content /home/user/devnook-content /root/devnook-content /workspace/devnook-content /tmp/devnook-content"
+WS=""
+for c in $WORKSPACE_CANDIDATES; do
+  if [ -d "$c/agents/content-team" ] && [ -d "$c/.claude/agents" ]; then
+    WS="$(cd "$c" && pwd)"; break
+  fi
+done
+if [ -z "$WS" ]; then
+  WS=$(find / -maxdepth 6 -type d -name 'devnook-content' 2>/dev/null | head -1)
+  [ -n "$WS" ] && WS="$(cd "$WS" && pwd)"
+fi
+echo "WORKSPACE_DIR=$WS"
+```
+
+- If `WS` is empty: `fail("could not locate devnook-content workspace checkout")`. Stop.
+- Otherwise: **`cd "$WS"` immediately and stay there for the rest of the run**. All subsequent relative paths (`agents/...`, `data/...`, `$DB_PATH`, `$TOPICS_FILE`, `$LOG_FILE`) now resolve correctly.
+
+### B0b — Discover DEVNOOK_DIR
+
+After cd-ing into workspace, run:
 ```bash
 mkdir -p data
 LAYOUT_LOG="data/sandbox-layout.txt"
 {
   echo "=== run_at $(date -u +%Y-%m-%dT%H:%M:%SZ) ==="
-  echo "=== PWD ==="
-  pwd
-  echo "=== CWD CONTENTS ==="
-  ls -la
-  echo "=== PARENT (..) ==="
-  ls -la .. 2>&1 | head -40
-  echo "=== GRANDPARENT (../..) ==="
-  ls -la ../.. 2>&1 | head -40
-  echo "=== find devnook dirs ==="
-  find / -maxdepth 6 -type d -name 'devnook' 2>/dev/null
-  echo "=== find astro configs ==="
-  find / -maxdepth 8 -name 'astro.config.*' 2>/dev/null
-  echo "=== env (filtered) ==="
-  env | grep -v -iE 'token|secret|key|pass|auth' | sort | head -40
-} > "$LAYOUT_LOG" 2>&1
-```
+  echo "=== PWD ==="; pwd
+  echo "=== WORKSPACE_DIR ==="; echo "$WS"
+  echo "=== sibling dirs (..) ==="; ls -la .. 2>&1 | head -30
+  echo "=== devnook candidates ==="
+} > "$LAYOUT_LOG"
 
-Then resolve `DEVNOOK_DIR` by checking these candidates in order, picking the FIRST one that has BOTH `src/content/blog/` directory AND an `astro.config.*` file:
-
-```bash
-CANDIDATES="${DEVNOOK_DIR:-../devnook} ./devnook ../devnook /workspace/devnook /home/user/devnook /root/devnook /tmp/devnook"
-RESOLVED=""
-for c in $CANDIDATES; do
+DEVNOOK_CANDIDATES="../devnook ./devnook /home/user/devnook /root/devnook /workspace/devnook /tmp/devnook"
+DN=""
+for c in $DEVNOOK_CANDIDATES; do
+  echo "  trying $c -> $([ -d "$c/src/content/blog" ] && echo yes || echo no)" >> "$LAYOUT_LOG"
   if [ -d "$c/src/content/blog" ] && ls "$c"/astro.config.* >/dev/null 2>&1; then
-    RESOLVED="$(cd "$c" && pwd)"
-    break
+    DN="$(cd "$c" && pwd)"; break
   fi
 done
-if [ -z "$RESOLVED" ]; then
-  # Fallback: search filesystem
-  RESOLVED=$(find / -maxdepth 6 -type d -name 'devnook' 2>/dev/null | while read d; do
+if [ -z "$DN" ]; then
+  DN=$(find / -maxdepth 6 -type d -name 'devnook' 2>/dev/null | while read d; do
     if [ -d "$d/src/content/blog" ] && ls "$d"/astro.config.* >/dev/null 2>&1; then
       echo "$d"; break
     fi
   done)
 fi
-echo "RESOLVED_DEVNOOK_DIR=$RESOLVED"
-echo "RESOLVED_DEVNOOK_DIR=$RESOLVED" >> "$LAYOUT_LOG"
+echo "RESOLVED_DEVNOOK_DIR=$DN" >> "$LAYOUT_LOG"
+echo "DEVNOOK_DIR=$DN"
 ```
 
-- If `RESOLVED` is empty: `fail("could not locate devnook checkout — no candidate path has src/content/blog/ + astro.config.*")`. The layout log is already on disk; reference it in the error.
-- Otherwise: **use this `RESOLVED` path as `DEVNOOK_DIR` for the rest of the run**. Do not use the input value.
+- If `DN` is empty: `fail("could not locate devnook checkout — see data/sandbox-layout.txt for what was probed")`.
+- Otherwise: **use `$DN` as `DEVNOOK_DIR` for the rest of the run**. Do not use the input value.
 
-Also commit the layout log later as part of the publish commit so we have a permanent record per run.
+Also commit `data/sandbox-layout.txt` later as part of the workspace commit in B7 so we have a permanent record per run.
 
 ---
 
