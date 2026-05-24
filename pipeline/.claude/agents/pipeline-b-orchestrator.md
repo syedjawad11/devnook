@@ -41,49 +41,66 @@ Record: `topic_text`, `seed_keyword`, `slug`.
 
 ---
 
-## Step B2 — Keyword Research (DataForSEO MCP)
+## Step B2 — Keyword Research (DataForSEO REST API)
 
-Use `seed_keyword` from the selected topic. Run all three calls with these exact parameters:
+DataForSEO is called directly via REST API — no MCP connector required. Run this Python code via Bash:
 
-**Call 1** — `mcp__dataforseo__dataforseo_labs_google_keyword_ideas`
-```json
-{
-  "keyword": "<seed_keyword>",
-  "location_code": 2840,
-  "language_code": "en",
-  "filters": [
-    ["keyword_data.keyword_info.search_volume", ">=", 500],
-    "and",
-    ["keyword_properties.keyword_difficulty", "<", 30]
-  ],
-  "order_by": ["keyword_data.keyword_info.search_volume,desc"],
-  "limit": 30
-}
-```
+```python
+import json, base64, urllib.request
 
-**Call 2** — `mcp__dataforseo__dataforseo_labs_google_related_keywords`
-```json
-{
-  "keyword": "<seed_keyword>",
-  "location_code": 2840,
-  "language_code": "en",
-  "filters": [
-    ["keyword_data.keyword_info.search_volume", ">=", 500],
-    "and",
-    ["keyword_properties.keyword_difficulty", "<", 30]
-  ],
-  "limit": 30
-}
-```
+# Read credentials from devnook repo settings
+with open('../devnook/.claude/settings.json') as f:
+    s = json.load(f)
+env = s['mcpServers']['dataforseo']['env']
+DFS_USER = env['DATAFORSEO_USERNAME']
+DFS_PASS = env['DATAFORSEO_PASSWORD']
+auth = base64.b64encode(f"{DFS_USER}:{DFS_PASS}".encode()).decode()
 
-**Call 3** — `mcp__dataforseo__dataforseo_labs_google_keyword_suggestions`
-```json
-{
-  "keyword": "<seed_keyword>",
-  "location_code": 2840,
-  "language_code": "en",
-  "limit": 30
-}
+def dfs_call(endpoint, payload):
+    req = urllib.request.Request(
+        f"https://api.dataforseo.com/v3/{endpoint}",
+        data=json.dumps([payload]).encode(),
+        headers={"Authorization": f"Basic {auth}", "Content-Type": "application/json"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            resp = json.loads(r.read())
+        tasks = resp.get("tasks", [])
+        if tasks and tasks[0].get("result"):
+            return tasks[0]["result"]
+    except Exception as e:
+        print(f"DataForSEO error ({endpoint}): {e}")
+    return []
+
+seed = "<seed_keyword>"  # replace with actual seed_keyword
+
+# Call 1: keyword ideas (vol >= 500, diff < 30)
+ideas = dfs_call("dataforseo_labs/google/keyword_ideas/live", {
+    "keyword": seed, "location_code": 2840, "language_code": "en",
+    "filters": [["keyword_data.keyword_info.search_volume", ">=", 500],
+                "and", ["keyword_properties.keyword_difficulty", "<", 30]],
+    "order_by": ["keyword_data.keyword_info.search_volume,desc"], "limit": 30
+})
+
+# Call 2: related keywords (vol >= 500, diff < 30)
+related = dfs_call("dataforseo_labs/google/related_keywords/live", {
+    "keyword": seed, "location_code": 2840, "language_code": "en",
+    "filters": [["keyword_data.keyword_info.search_volume", ">=", 500],
+                "and", ["keyword_properties.keyword_difficulty", "<", 30]],
+    "limit": 30
+})
+
+# Call 3: keyword suggestions
+suggestions = dfs_call("dataforseo_labs/google/keyword_suggestions/live", {
+    "keyword": seed, "location_code": 2840, "language_code": "en", "limit": 30
+})
+
+# Merge all results; each item has:
+#   item["keyword"], item["keyword_data"]["keyword_info"]["search_volume"]
+#   item["keyword_properties"]["keyword_difficulty"]
+#   item["keyword_data"].get("search_intent_info", {}).get("main_intent")
+all_kws = (ideas or []) + (related or []) + (suggestions or [])
+print(f"Total candidates: {len(all_kws)}")
 ```
 
 ### Keyword selection
@@ -97,23 +114,29 @@ Intent filter: keep `informational` or `commercial` intent only. Discard `naviga
 - **Secondary keywords (3–4)**: volume ≥500, difficulty ≤35 (relax to ≤45 if fewer than 3 qualify); distinct angles
 - **Semantic/LSI supporting (4–6)**: volume ≥100, difficulty <40; natural topic coverage
 
-If DataForSEO returns no results for any call: use `seed_keyword` as primary keyword and proceed.
+If all three API calls return empty or fail: use `seed_keyword` as primary keyword and proceed.
 
 **Derive `slug`** from primary keyword: kebab-case, max 60 chars, strip stop words where slug gets too long. Example: `"how to use claude code for development"` → `"how-to-use-claude-code"`.
 
 ---
 
-## Step B3 — SERP Analysis
+## Step B3 — SERP Analysis (DataForSEO REST API)
 
-Call `mcp__dataforseo__serp_organic_live_advanced`:
-```json
-{
-  "keyword": "<primary_keyword>",
-  "location_code": 2840,
-  "language_code": "en",
-  "device": "desktop",
-  "depth": 10
-}
+Run this Python code (reuses `dfs_call` and `auth` from B2):
+
+```python
+serp_raw = dfs_call("serp/google/organic/live/advanced", {
+    "keyword": "<primary_keyword>",
+    "location_code": 2840, "language_code": "en",
+    "device": "desktop", "depth": 10
+})
+
+# serp_raw[0]["items"] contains organic results
+# Each item: {"title": "...", "url": "...", "description": "...", "type": "organic"}
+organic = []
+if serp_raw and serp_raw[0].get("items"):
+    organic = [i for i in serp_raw[0]["items"] if i.get("type") == "organic"][:5]
+print(f"Top organic results: {[i['url'] for i in organic]}")
 ```
 
 From the top 5 organic results extract:
