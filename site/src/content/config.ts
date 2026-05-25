@@ -57,6 +57,7 @@ const blogCollection = defineCollection({
     title: z.string(),
     description: z.string(),
     category: z.literal('blog'),
+    subcategory: z.string().optional(),
     template_id: z.string(),
     tags: z.array(z.string()),
     related_posts: z.array(z.string()),

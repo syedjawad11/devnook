@@ -4,58 +4,34 @@ import PostCard from '../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
 
 const allBlogPosts = await getCollection('blog');
-const allGuides = await getCollection('guides');
-const allLangPosts = await getCollection('languages');
 
-type CombinedPost = {
-  title: string;
-  description: string;
-  tags: string[];
-  date: string;
-  href: string;
-  filterCat: string;
-};
+function slugify(s: string): string {
+  return s.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+}
 
-const combinedPosts: CombinedPost[] = [
-  ...allBlogPosts.map(p => ({
+const sortedPosts = allBlogPosts
+  .map(p => ({
     title: p.data.title,
     description: p.data.description,
     tags: p.data.tags,
     date: p.data.published_date,
     href: `/blog/${p.slug}/`,
-    filterCat: 'blog',
-  })),
-  ...allGuides.map(p => ({
-    title: p.data.title,
-    description: p.data.description,
-    tags: p.data.tags,
-    date: p.data.published_date,
-    href: `/guides/${p.slug}/`,
-    filterCat: 'guides',
-  })),
-  ...allLangPosts.map(p => ({
-    title: p.data.title,
-    description: p.data.description,
-    tags: p.data.tags,
-    date: p.data.published_date,
-    href: `/languages/${p.data.language}/${p.data.concept}/`,
-    filterCat: 'languages',
-  })),
-];
+    subcategory: slugify(p.data.subcategory ?? ''),
+  }))
+  .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-const sortedPosts = combinedPosts.sort(
-  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-);
-
-const [featured, ...rest] = sortedPosts;
+const uniqueSubcategories = [...new Set(
+  allBlogPosts
+    .map(p => p.data.subcategory)
+    .filter((s): s is string => !!s)
+)].sort();
 
 const FILTERS = [
-  { label: 'All',               key: 'all' },
-  { label: 'Comparisons',       key: 'blog' },
-  { label: 'AI & Productivity', key: 'ai' },
-  { label: 'Tutorials',         key: 'languages' },
-  { label: 'How-tos',           key: 'guides' },
+  { label: 'All', key: 'all' },
+  ...uniqueSubcategories.map(s => ({ label: s, key: slugify(s) })),
 ];
+
+const [featured, ...rest] = sortedPosts;
 
 function formatMonth(dateStr?: string) {
   if (!dateStr) return '';
@@ -95,8 +71,7 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
               class="featured"
               href={featured.href}
               data-post-item
-              data-filter-cat={featured.filterCat}
-              data-tags={featured.tags.join(',')}
+              data-subcategory={featured.subcategory}
             >
               <div class="featured-thumb" aria-hidden="true">
                 <span class="thumb-mark">{(featured.title ?? '').charAt(0)}</span>
@@ -116,7 +91,7 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
           {rest.length > 0 && (
             <div class="posts-grid">
               {rest.map((post) => (
-                <div data-post-item data-filter-cat={post.filterCat} data-tags={post.tags.join(',')}>
+                <div data-post-item data-subcategory={post.subcategory}>
                   <PostCard
                     title={post.title}
                     description={post.description}
@@ -144,30 +119,15 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
 </BaseLayout>
 
 <script>
-  const AI_TAGS = ['ai', 'llm', 'gpt', 'chatgpt', 'gemini', 'claude', 'openai', 'machine-learning', 'productivity'];
-
   const chips = document.querySelectorAll<HTMLButtonElement>('.chip[data-filter]');
   const postItems = document.querySelectorAll<HTMLElement>('[data-post-item]');
   const noResults = document.querySelector<HTMLElement>('.no-results');
 
-  function isAiPost(el: HTMLElement): boolean {
-    const tags = (el.dataset.tags ?? '').toLowerCase().split(',');
-    const cat = el.dataset.filterCat ?? '';
-    return tags.some(t => AI_TAGS.some(ai => t.trim().includes(ai))) || cat === 'ai';
-  }
-
   function filterPosts(key: string) {
     let visible = 0;
     postItems.forEach(el => {
-      const cat = el.dataset.filterCat ?? '';
-      let show = false;
-      if (key === 'all') {
-        show = true;
-      } else if (key === 'ai') {
-        show = isAiPost(el);
-      } else {
-        show = cat === key;
-      }
+      const sub = el.dataset.subcategory ?? '';
+      const show = key === 'all' || sub === key;
       el.style.display = show ? '' : 'none';
       if (show) visible++;
     });

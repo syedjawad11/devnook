@@ -1,5 +1,6 @@
 ---
 category: blog
+subcategory: "Comparisons"
 content_type: editorial
 description: 'CSS Flexbox vs Grid explained: learn the key differences, use cases,
   and when to choose each layout method with practical examples.'

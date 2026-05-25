@@ -2,6 +2,7 @@
 actual_word_count: 1244
 author: devnook
 category: blog
+subcategory: "Comparisons"
 description: 'ChatGPT vs Gemini tested on real developer tasks: code generation, debugging,
   documentation, and API quality. Here''s the honest verdict.'
 featured: false

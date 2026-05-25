@@ -1,6 +1,7 @@
 ---
 actual_word_count: 1464
 category: blog
+subcategory: "Comparisons"
 description: Quick sort, merge sort, bubble sort — implemented in 4 languages. Understand
   O(n log n) vs O(n²) with visual complexity tables.
 og_image: /og/blog/sorting-algorithms-comparison.png
