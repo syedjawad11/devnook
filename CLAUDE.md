@@ -40,9 +40,22 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-25, #55)
+## Last Session (2026-05-25, #56)
 
-**Environment:** Claude Code Online (claude.ai/code) — NOT local VS Code. First session run via web.
+**Environment:** Claude Code Online (claude.ai/code) — ephemeral remote container.
+
+**Status:** ✅ Blog AI & Productivity filter false-positive fix pushed to `claude/laughing-planck-N7U6H` (commit `ed9e158`). Merge to main to deploy.
+
+### What was done in #56
+
+- **Blog AI filter false-positive fixed**: Language posts tagged `raii` (C++ RAII pattern) were appearing under "AI & Productivity" because the session #55 substring fix (`t.includes(ai)`) matched `ai` inside `raii`. Fixed by switching to **word-segment matching**: each tag is split on `-` and any segment must exactly equal an AI keyword. `raii` → `['raii']` → no match. `claude-code` → `['claude', 'code']` → `claude` still matches. Logic in `isAiPost()` at `src/pages/blog/index.astro:153`.
+
+### Key learnings from #56
+
+- Substring matching on hyphenated tags is fragile — `raii`, `terraform`, `email` etc. all contain common AI substrings. Always use word-segment exact matching: split tag on `-`, check each segment.
+- Blog AI filter pattern: `AI_TAGS.includes(tag) || tag.split('-').some(seg => AI_TAGS.includes(seg))` — handles both full tags (`machine-learning`, `openai`) and compound tags (`claude-code`, `ai-productivity`).
+
+### Previous Session (2026-05-25, #55)
 
 **Status:** ✅ Blog AI & Productivity filter fix deployed to main.
 
@@ -52,7 +65,6 @@ Start each session from this file + MEMORY.md only.
 
 ### Key learnings from #55
 
-- Blog filter chip matching was exact — compound tags like `claude-code`, `ai-productivity`, `ai-coding-assistant` never matched. Always use substring matching for tag-based filters.
 - Claude Code Online runs in an ephemeral remote container — `node_modules` not installed, so `npm run build` / `npx astro build` cannot be used to verify builds locally. Push to main and let Cloudflare Pages verify.
 - Claude Code Online sessions behave identically to local except: no local dev server, no `node_modules`, git push goes through a proxy at `127.0.0.1`.
 
@@ -91,10 +103,11 @@ Start each session from this file + MEMORY.md only.
 - Never use `[skip ci]` in devnook commit messages — Cloudflare Pages skips the build.
 - No H1 in markdown body — `PostLayout.astro` renders `frontmatter.title` as `<h1>`; duplicate H1 flagged by Ahrefs.
 
-### Next session priorities (carried to #56)
+### Next session priorities (#57)
 
-1. **Verify first Pipeline B run** — check `../devnook_content_workspace/data/pipeline-b-runs.log` for success entry; visit `https://devnook.dev/blog/how-to-use-claude-code`.
-2. **Continue SEO rewrites** — `@seo-optimizer` batch from `data/rewrite-queue.json` under modular-v1 system.
+1. **Merge `claude/laughing-planck-N7U6H` to main** — AI filter false-positive fix, commit `ed9e158`.
+2. **Verify first Pipeline B run** — check `../devnook_content_workspace/data/pipeline-b-runs.log` for success entry.
+3. **Continue SEO rewrites** — `@seo-optimizer` batch from `data/rewrite-queue.json` under modular-v1 system.
 3. **Deferred** — FAQPage schema validation for `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`.
 
 ### Deferred (do not do)
@@ -162,6 +175,7 @@ Spawn with: `Agent(prompt=open('agents/subagent-prompts/builder.md').read(), ...
 | Related callouts plugin (session 32) | `src/plugins/related-callouts/index.mjs` — build-time rehype plugin injects up to 3 `<aside class="related-callout">` nodes at interior H2 boundaries. Scoring mirrors PostLayout.astro. CSS in `public/styles/global.css` (not scoped). Per-post opt-out: `excludeRelatedCallouts: true` in frontmatter. |
 | No H1 in markdown body (session 42) | `PostLayout.astro` renders `frontmatter.title` as the page `<h1>`. Any `# Title` line in the body creates a second `<h1>` — Ahrefs flags as "Multiple H1 tags". Content pipeline files patched: `writer.md`, `antigravity-qa.md`, `seo-writing-rules.md`. Never write or instruct agents to write a body H1. |
 | Never use `[skip ci]` in devnook commit messages (session 43) | Cloudflare Pages honors `[skip ci]` and skips the build — so drip-publish commits would never deploy. The `[skip ci]` in `drip-publish.yml` line 78 is intentional (content-workspace side, prevents workflow retriggering itself). The devnook-side commit in `publish.py` must NOT include it. |
+| Blog AI filter uses word-segment matching (session 56) | `isAiPost()` in `src/pages/blog/index.astro` splits each tag on `-` and checks segments for exact AI keyword match. Never use substring/includes matching — `raii` contains `ai`, `terraform` contains `ai`, etc. Pattern: `AI_TAGS.includes(tag) \|\| tag.split('-').some(seg => AI_TAGS.includes(seg))` |
 
 ---
 
