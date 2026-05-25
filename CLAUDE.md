@@ -40,7 +40,38 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-24, #54)
+## Last Session (2026-05-25, #55)
+
+**Environment:** Claude Code Online (claude.ai/code) — NOT local VS Code. First session run via web.
+
+**Status:** ✅ Blog AI & Productivity filter fix deployed to main.
+
+### What was done in #55
+
+- **Blog filter bug fixed**: `how-to-use-claude-code` was not appearing under "AI & Productivity" filter. Root cause: `isAiPost()` in `src/pages/blog/index.astro` used exact tag matching (`AI_TAGS.includes(tag)`) — compound tags like `claude-code` never matched keyword `claude`. Fixed by switching to substring match (`AI_TAGS.some(ai => tag.includes(ai))`). Commit `a3ea6af` merged to `main` and pushed.
+
+### Key learnings from #55
+
+- Blog filter chip matching was exact — compound tags like `claude-code`, `ai-productivity`, `ai-coding-assistant` never matched. Always use substring matching for tag-based filters.
+- Claude Code Online runs in an ephemeral remote container — `node_modules` not installed, so `npm run build` / `npx astro build` cannot be used to verify builds locally. Push to main and let Cloudflare Pages verify.
+- Claude Code Online sessions behave identically to local except: no local dev server, no `node_modules`, git push goes through a proxy at `127.0.0.1`.
+
+### Current pipeline state
+
+- Registry: **~74 published / 0 staged / 14 rejected**
+- Pipeline A (`drip-publish.yml`): paused — cron commented out, 0 staged, redesign deferred
+- Pipeline B: **live daily at 16:00 Malta** — first run was 2026-05-24 16:00; publishes to `src/content/blog/`
+- SEO rewrites: 46 language articles queued in `data/rewrite-queue.json`
+
+### Next session priorities (#56)
+
+1. **Continue SEO rewrites** — `@seo-optimizer` batch from `data/rewrite-queue.json` under modular-v1 system.
+2. **Verify Pipeline B run logs** — check `../devnook_content_workspace/data/pipeline-b-runs.log`.
+3. **Deferred** — FAQPage schema validation for `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`.
+
+---
+
+## Previous Session (2026-05-24, #54)
 
 **Status:** ✅ Pipeline B persistent routine live. Content workspace cleaned (0 staged).
 
@@ -60,14 +91,7 @@ Start each session from this file + MEMORY.md only.
 - Never use `[skip ci]` in devnook commit messages — Cloudflare Pages skips the build.
 - No H1 in markdown body — `PostLayout.astro` renders `frontmatter.title` as `<h1>`; duplicate H1 flagged by Ahrefs.
 
-### Current pipeline state
-
-- Registry: **~74 published / 0 staged / 14 rejected**
-- Pipeline A (`drip-publish.yml`): paused — cron commented out, 0 staged, redesign deferred
-- Pipeline B: **live daily at 16:00 Malta** — first run today at 16:00; publishes to `src/content/blog/`
-- SEO rewrites: 46 language articles queued in `data/rewrite-queue.json`
-
-### Next session priorities (#55)
+### Next session priorities (carried to #56)
 
 1. **Verify first Pipeline B run** — check `../devnook_content_workspace/data/pipeline-b-runs.log` for success entry; visit `https://devnook.dev/blog/how-to-use-claude-code`.
 2. **Continue SEO rewrites** — `@seo-optimizer` batch from `data/rewrite-queue.json` under modular-v1 system.
