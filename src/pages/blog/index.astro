@@ -151,9 +151,11 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
   const noResults = document.querySelector<HTMLElement>('.no-results');
 
   function isAiPost(el: HTMLElement): boolean {
-    const tags = (el.dataset.tags ?? '').toLowerCase().split(',');
+    const tags = (el.dataset.tags ?? '').toLowerCase().split(',').map(t => t.trim()).filter(Boolean);
     const cat = el.dataset.filterCat ?? '';
-    return tags.some(t => AI_TAGS.some(ai => t.trim().includes(ai))) || cat === 'ai';
+    return cat === 'ai' || tags.some(tag =>
+      AI_TAGS.includes(tag) || tag.split('-').some(seg => AI_TAGS.includes(seg))
+    );
   }
 
   function filterPosts(key: string) {
