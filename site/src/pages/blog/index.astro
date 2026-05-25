@@ -153,7 +153,7 @@ const pageDescription = 'In-depth comparisons, tutorials, and insights on progra
   function isAiPost(el: HTMLElement): boolean {
     const tags = (el.dataset.tags ?? '').toLowerCase().split(',');
     const cat = el.dataset.filterCat ?? '';
-    return tags.some(t => AI_TAGS.includes(t.trim())) || cat === 'ai';
+    return tags.some(t => AI_TAGS.some(ai => t.trim().includes(ai))) || cat === 'ai';
   }
 
   function filterPosts(key: string) {
