@@ -2,6 +2,7 @@
 title: "AI Prompting for Developers: Techniques That Work"
 description: "Prompting AI effectively separates good outputs from wasted time. Master prompt engineering techniques, ChatGPT prompts, and examples for your dev workflow."
 category: blog
+subcategory: "AI & Productivity"
 template_id: blog-v3
 tags: [prompt-engineering, ai-tools, chatgpt, developer-productivity, llm]
 related_posts: []
