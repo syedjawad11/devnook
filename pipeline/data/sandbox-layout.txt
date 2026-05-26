@@ -1,14 +1,10 @@
-=== run_at 2026-05-25T14:04:15Z ===
+=== run_at 2026-05-26T14:09:26Z ===
 === PWD ===
-/home/user/devnook-content
-=== WORKSPACE_DIR ===
 /home/user/devnook-content
 === sibling dirs (..) ===
 total 16
 drwxr-xr-x  4 root root 4096 May 24 16:15 .
 drwxr-xr-x  5 root root 4096 May 24 16:15 ..
-drwxr-xr-x 11 root root 4096 May 25 14:03 devnook
+drwxr-xr-x 11 root root 4096 May 26 14:08 devnook
 drwxr-xr-x  7 root root 4096 May 24 16:15 devnook-content
-=== devnook candidates ===
-  trying ../devnook -> yes
 RESOLVED_DEVNOOK_DIR=/home/user/devnook
