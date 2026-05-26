@@ -149,6 +149,7 @@ From `agents/skills/content-style-system.md` (AI/Productivity post set):
 title: "<primary keyword front-loaded, ≤60 chars — double-quote if contains colon+space>"
 description: "<140–160 chars, primary keyword in first 20 words — double-quote always>"
 category: blog
+subcategory: "AI & Productivity"
 template_id: <blog-v1 through blog-v5, or from content-style-system if different>
 tags: [<3–5 kebab-case tags>]
 related_posts: []
