@@ -65,7 +65,7 @@ import sqlite3
 
 conn = sqlite3.connect('data/keywords.db')
 row = conn.execute(
-    """SELECT id, slug, title, category FROM keyword_sets
+    """SELECT id, slug, title, category, content_collection FROM keyword_sets
        WHERE status = 'ready'
        ORDER BY id ASC
        LIMIT 1"""
@@ -78,7 +78,8 @@ if not row:
     exit(0)
 
 KEYWORD_SET_ID, SLUG, TITLE, CATEGORY = row[0], row[1], row[2], row[3]
-print(f"B1: selected keyword_set_id={KEYWORD_SET_ID} slug='{SLUG}' category='{CATEGORY}'")
+CONTENT_COLLECTION = row[4] if row[4] else 'blog'
+print(f"B1: selected keyword_set_id={KEYWORD_SET_ID} slug='{SLUG}' category='{CATEGORY}' content_collection='{CONTENT_COLLECTION}'")
 ```
 
 ---
@@ -88,7 +89,7 @@ print(f"B1: selected keyword_set_id={KEYWORD_SET_ID} slug='{SLUG}' category='{CA
 Invoke Stage 2 agent:
 ```
 Use agent: pipeline-b-stage2-writer
-Inputs: TOPIC_ID=0, KEYWORD_SET_ID=<KEYWORD_SET_ID from B1>, WORKSPACE_DIR=<WS>
+Inputs: TOPIC_ID=0, KEYWORD_SET_ID=<KEYWORD_SET_ID from B1>, WORKSPACE_DIR=<WS>, CONTENT_COLLECTION=<CONTENT_COLLECTION from B1>
 ```
 
 **Parse Stage 2 output:**
@@ -107,7 +108,7 @@ After Stage 2 success, verify draft file:
 Invoke Stage 3 agent:
 ```
 Use agent: pipeline-b-stage3-qa-publish
-Inputs: TOPIC_ID=0, SLUG=<SLUG from B2>, WORKSPACE_DIR=<WS>, DEVNOOK_DIR=<DN>
+Inputs: TOPIC_ID=0, SLUG=<SLUG from B2>, WORKSPACE_DIR=<WS>, DEVNOOK_DIR=<DN>, CONTENT_COLLECTION=<CONTENT_COLLECTION from B1>
 ```
 
 **Parse Stage 3 output:**
@@ -136,8 +137,9 @@ log_entry = {
     "keyword_set_id": KEYWORD_SET_ID,
     "slug": SLUG,
     "category": CATEGORY,
+    "content_collection": CONTENT_COLLECTION,
     "status": "published",
-    "live_url": f"https://devnook.dev/blog/{SLUG}",
+    "live_url": f"https://devnook.dev/{CONTENT_COLLECTION}/{SLUG}",
     "word_count": WORD_COUNT,
     "devnook_commit_sha": DEVNOOK_COMMIT_SHA,
     "remaining_ready": remaining
@@ -168,7 +170,8 @@ RUNNER_RESULT: success
 KEYWORD_SET_ID: <id>
 SLUG: <slug>
 CATEGORY: <category>
-LIVE_URL: https://devnook.dev/blog/<slug>
+CONTENT_COLLECTION: <blog|cheatsheets>
+LIVE_URL: https://devnook.dev/<collection>/<slug>
 WORD_COUNT: <n>
 DEVNOOK_COMMIT_SHA: <sha>
 REMAINING_READY: <n>

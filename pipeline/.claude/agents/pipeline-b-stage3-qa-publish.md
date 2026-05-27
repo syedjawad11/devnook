@@ -1,6 +1,6 @@
 ---
 name: pipeline-b-stage3-qa-publish
-description: Pipeline B Stage 3 — QA validation and publish. Reads draft from agents/content-team/drafts/<slug>.md, runs hard-fail QA checks (including 2500-word floor), runs npm run build, git commits + pushes to devnook, updates registry.db, and marks topic done.
+description: Pipeline B Stage 3 — QA validation and publish. Reads draft from agents/content-team/drafts/<slug>.md, runs hard-fail QA checks, runs npm run build, git commits + pushes to devnook, updates registry.db. Supports blog and cheatsheets content collections.
 model: claude-sonnet-4-6
 ---
 
@@ -12,11 +12,14 @@ You are Pipeline B Stage 3 — QA + Publish. You validate the draft, build, and 
 - `SLUG`: article slug
 - `WORKSPACE_DIR`: absolute path to devnook-content checkout
 - `DEVNOOK_DIR`: absolute path to devnook Astro checkout
+- `CONTENT_COLLECTION`: `blog` or `cheatsheets` (default: `blog`)
 
 ## Failure semantics
 
 `fail(step, reason)`:
-1. If draft was already copied to devnook: remove it (`rm -f "$DEVNOOK_DIR/src/content/blog/$SLUG.md"`)
+1. If draft was already copied to devnook: remove it from the correct dir:
+   - blog: `rm -f "$DEVNOOK_DIR/src/content/blog/$SLUG.md"`
+   - cheatsheets: `rm -f "$DEVNOOK_DIR/src/content/cheatsheets/$SLUG.md"`
 2. Revert topic status to `draft_ready`
 3. Print `STAGE3_FAILED [<step>]: <reason>`
 4. Stop
@@ -77,22 +80,32 @@ All checks below are hard fails. Any single failure aborts the run.
 ```python
 import re, sys
 
+# Resolve content_collection (from input or default)
+_cc = CONTENT_COLLECTION if 'CONTENT_COLLECTION' in dir() else 'blog'
+is_cheatsheet = (_cc == 'cheatsheets')
+
 failures = []
 
-# 1. Word count >= 2500
+# 1. Word count floor
 word_count = len(re.findall(r'\b\w+\b', body))
 print(f"WORD_COUNT: {word_count}")
-if word_count < 2500:
-    failures.append(f"word_count={word_count} < 2500 (Pipeline B hard floor)")
+min_words = 800 if is_cheatsheet else 2500
+if word_count < min_words:
+    failures.append(f"word_count={word_count} < {min_words} (Pipeline B hard floor for {_cc})")
 
-# 2. actual_word_count in frontmatter matches body (±50)
-fm_wc = fm.get('actual_word_count', 0)
-if abs(fm_wc - word_count) > 50:
-    failures.append(f"actual_word_count frontmatter={fm_wc} vs body={word_count} (delta > 50)")
+# 2. actual_word_count frontmatter match (blog only)
+if not is_cheatsheet:
+    fm_wc = fm.get('actual_word_count', 0)
+    if abs(fm_wc - word_count) > 50:
+        failures.append(f"actual_word_count frontmatter={fm_wc} vs body={word_count} (delta > 50)")
 
 # 3. Required frontmatter fields
-required_fields = ['title', 'description', 'category', 'template_id', 'tags',
-                   'author', 'published_date', 'og_image', 'actual_word_count', 'schema_org']
+if is_cheatsheet:
+    required_fields = ['title', 'description', 'category', 'template_id', 'tags',
+                       'published_date', 'og_image']
+else:
+    required_fields = ['title', 'description', 'category', 'template_id', 'tags',
+                       'author', 'published_date', 'og_image', 'actual_word_count', 'schema_org']
 for field in required_fields:
     if not fm.get(field):
         failures.append(f"frontmatter missing: {field}")
@@ -154,20 +167,22 @@ else:
     else:
         failures.append("no ## Conclusion section found")
 
-# 10. FAQ section with >= 3 Q&As
-faq_match = re.search(r'## Frequently Asked Questions(.+?)(?=^## |\Z)', body, re.DOTALL | re.IGNORECASE | re.MULTILINE)
-if not faq_match:
-    failures.append("no ## Frequently Asked Questions section")
-else:
-    faq_h3s = re.findall(r'^### ', faq_match.group(1), re.MULTILINE)
-    if len(faq_h3s) < 3:
-        failures.append(f"FAQ has {len(faq_h3s)} Q&As (minimum 3)")
+# 10. FAQ section (blog only — cheatsheets don't require FAQ)
+if not is_cheatsheet:
+    faq_match = re.search(r'## Frequently Asked Questions(.+?)(?=^## |\Z)', body, re.DOTALL | re.IGNORECASE | re.MULTILINE)
+    if not faq_match:
+        failures.append("no ## Frequently Asked Questions section")
+    else:
+        faq_h3s = re.findall(r'^### ', faq_match.group(1), re.MULTILINE)
+        if len(faq_h3s) < 3:
+            failures.append(f"FAQ has {len(faq_h3s)} Q&As (minimum 3)")
 
-# 11. Internal links 3–8
+# 11. Internal links
 internal_links = re.findall(r'\[([^\]]+)\]\((/[^)]+)\)', body)
 internal_count = len(internal_links)
-if internal_count < 3:
-    failures.append(f"internal links={internal_count} (minimum 3)")
+min_internal = 2 if is_cheatsheet else 3
+if internal_count < min_internal:
+    failures.append(f"internal links={internal_count} (minimum {min_internal})")
 if internal_count > 8:
     failures.append(f"internal links={internal_count} (maximum 8)")
 
@@ -185,11 +200,12 @@ if languages_links:
                 failures.append(f"internal link to unverified /languages/ URL: {url}")
     reg.close()
 
-# 13. External links >= 3
+# 13. External links
 external_links = re.findall(r'\[([^\]]+)\]\((https?://[^)]+)\)', body)
 ext_count = len(external_links)
-if ext_count < 3:
-    failures.append(f"external links={ext_count} (minimum 3)")
+min_external = 2 if is_cheatsheet else 3
+if ext_count < min_external:
+    failures.append(f"external links={ext_count} (minimum {min_external})")
 
 # 14. Slug not already published
 import sqlite3 as _sql3
@@ -199,17 +215,25 @@ reg2.close()
 if existing_slug:
     failures.append(f"slug '{SLUG}' already exists in registry.db")
 
-# 15. schema_org parses as JSON
-schema_str = str(fm.get('schema_org', ''))
-json_match = re.search(r'<script[^>]*>(.*?)</script>', schema_str, re.DOTALL)
-if json_match:
-    import json as _json
-    try:
-        _json.loads(json_match.group(1))
-    except Exception as e:
-        failures.append(f"schema_org JSON invalid: {e}")
-else:
-    failures.append("schema_org missing <script> tags")
+# 15. schema_org parses as JSON (blog only)
+if not is_cheatsheet:
+    schema_str = str(fm.get('schema_org', ''))
+    json_match = re.search(r'<script[^>]*>(.*?)</script>', schema_str, re.DOTALL)
+    if json_match:
+        import json as _json
+        try:
+            _json.loads(json_match.group(1))
+        except Exception as e:
+            failures.append(f"schema_org JSON invalid: {e}")
+    else:
+        failures.append("schema_org missing <script> tags")
+
+# 16. Cheatsheet-specific: at least 2 code blocks
+if is_cheatsheet:
+    code_blocks = re.findall(r'```', body)
+    code_block_count = len(code_blocks) // 2
+    if code_block_count < 2:
+        failures.append(f"cheatsheet has {code_block_count} code blocks (minimum 2)")
 
 # --- Report ---
 if failures:
@@ -224,16 +248,23 @@ print(f"QA_PASS: all checks passed — word_count={word_count}, internal={intern
 ## Step S3-4 — Copy draft to devnook
 
 ```bash
-TARGET_DIR="$DEVNOOK_DIR/src/content/blog"
+# Resolve target directory from CONTENT_COLLECTION input (default: blog)
+_CC="${CONTENT_COLLECTION:-blog}"
+if [ "$_CC" = "cheatsheets" ]; then
+  TARGET_SUBDIR="cheatsheets"
+else
+  TARGET_SUBDIR="blog"
+fi
+TARGET_DIR="$DEVNOOK_DIR/src/content/$TARGET_SUBDIR"
 TARGET_FILE="$TARGET_DIR/$SLUG.md"
 
 [ -d "$DEVNOOK_DIR" ] || { echo "STAGE3_FAILED [S3-4]: DEVNOOK_DIR not found: $DEVNOOK_DIR"; exit 1; }
-[ -d "$TARGET_DIR" ] || { echo "STAGE3_FAILED [S3-4]: blog dir missing: $TARGET_DIR"; exit 1; }
+[ -d "$TARGET_DIR" ] || { echo "STAGE3_FAILED [S3-4]: $TARGET_SUBDIR dir missing: $TARGET_DIR"; exit 1; }
 [ -f "$TARGET_FILE" ] && { echo "STAGE3_FAILED [S3-4]: file already exists at $TARGET_FILE"; exit 1; }
 
 cp "agents/content-team/drafts/$SLUG.md" "$TARGET_FILE"
 [ -s "$TARGET_FILE" ] || { echo "STAGE3_FAILED [S3-4]: copy failed — $TARGET_FILE missing or empty"; exit 1; }
-echo "COPY_OK: $TARGET_FILE"
+echo "COPY_OK: $TARGET_FILE (collection=$TARGET_SUBDIR)"
 ```
 
 ## Step S3-5 — npm run build
@@ -260,7 +291,13 @@ cd "$DEVNOOK_DIR"
 
 TITLE_SAFE=$(python3 -c "import sys; print(sys.argv[1][:80])" "$TITLE" 2>/dev/null || echo "$SLUG")
 
-git add "src/content/blog/$SLUG.md"
+_CC="${CONTENT_COLLECTION:-blog}"
+if [ "$_CC" = "cheatsheets" ]; then
+  GIT_CONTENT_PATH="src/content/cheatsheets/$SLUG.md"
+else
+  GIT_CONTENT_PATH="src/content/blog/$SLUG.md"
+fi
+git add "$GIT_CONTENT_PATH"
 git -c user.email=claude@anthropic.com -c user.name=Claude \
     commit -m "content: add $TITLE_SAFE [pipeline-b]" \
     || { cd - >/dev/null; echo "STAGE3_FAILED [S3-6]: git commit failed"; exit 1; }
@@ -315,18 +352,22 @@ pk_row = conn3.execute(
 conn3.close()
 primary_kw_str = pk_row[0] if pk_row else SLUG
 
+_cc_reg = CONTENT_COLLECTION if 'CONTENT_COLLECTION' in dir() else 'blog'
+reg_category = _cc_reg  # 'blog' or 'cheatsheets'
+reg_file_path = f"src/content/{_cc_reg}/{SLUG}.md"
+
 reg.execute(
     """INSERT OR IGNORE INTO posts
        (slug, title, description, category, keyword, template_id,
         content_type, source, status,
         published_at, published_date, created_at, updated_at,
         file_path, actual_word_count)
-       VALUES (?, ?, ?, 'blog', ?, ?,
+       VALUES (?, ?, ?, ?, ?, ?,
                'editorial', 'pipeline_b', 'published',
                datetime('now'), ?, datetime('now'), datetime('now'),
                ?, ?)""",
-    (SLUG, fm_title, fm_desc, primary_kw_str, fm_tmpl,
-     today, f"src/content/blog/{SLUG}.md", fm_wc)
+    (SLUG, fm_title, fm_desc, reg_category, primary_kw_str, fm_tmpl,
+     today, reg_file_path, fm_wc)
 )
 reg.commit()
 
@@ -344,8 +385,10 @@ print(f"REGISTRY_OK: slug={SLUG} inserted with status=published")
 
 Attempt GSC submission if MCP is available:
 
-```
-mcp__gsc__submit_url  url: "https://devnook.dev/blog/<SLUG>"
+```python
+_cc_gsc = CONTENT_COLLECTION if 'CONTENT_COLLECTION' in dir() else 'blog'
+live_url = f"https://devnook.dev/{_cc_gsc}/{SLUG}"
+# mcp__gsc__submit_url  url: live_url
 ```
 
 If unavailable: set `gsc_submitted: false`, `gsc_note: "GSC MCP unavailable"`. Do NOT fail the run.
@@ -353,18 +396,21 @@ If unavailable: set `gsc_submitted: false`, `gsc_note: "GSC MCP unavailable"`. D
 ## Step S3-9 — Mark topic done
 
 ```python
-import json as _json
+import json as _json, os as _os
 
-with open('data/pipeline-b-topics.json') as f:
-    topics = _json.load(f)
-for t in topics:
-    if t['id'] == TOPIC_ID:
-        t['status'] = 'done'
-        break
-with open('data/pipeline-b-topics.json', 'w') as f:
-    _json.dump(topics, f, indent=2)
-
-print(f"TOPIC STATUS: topic_id={TOPIC_ID} → done")
+# Best-effort — topics.json may not exist in cluster-driven pipeline
+if _os.path.exists('data/pipeline-b-topics.json'):
+    with open('data/pipeline-b-topics.json') as f:
+        topics = _json.load(f)
+    for t in topics:
+        if t['id'] == TOPIC_ID:
+            t['status'] = 'done'
+            break
+    with open('data/pipeline-b-topics.json', 'w') as f:
+        _json.dump(topics, f, indent=2)
+    print(f"TOPIC STATUS: topic_id={TOPIC_ID} → done")
+else:
+    print(f"TOPIC_STATUS: topics.json not found — skipping (cluster-driven pipeline)")
 ```
 
 ## Step S3-10 — Write run log entry
@@ -383,7 +429,8 @@ log_entry = {
     "primary_keyword": primary_kw_str,
     "word_count": word_count,
     "status": "published",
-    "live_url": f"https://devnook.dev/blog/{SLUG}",
+    "content_collection": CONTENT_COLLECTION if 'CONTENT_COLLECTION' in dir() else 'blog',
+    "live_url": f"https://devnook.dev/{CONTENT_COLLECTION if 'CONTENT_COLLECTION' in dir() else 'blog'}/{SLUG}",
     "build_passed": True,
     "gsc_submitted": False,
     "devnook_commit_sha": DEVNOOK_COMMIT_SHA,
@@ -414,7 +461,8 @@ git push origin HEAD || true
 ```
 STAGE3_RESULT: success
 SLUG: <slug>
-LIVE_URL: https://devnook.dev/blog/<slug>
+CONTENT_COLLECTION: <blog|cheatsheets>
+LIVE_URL: https://devnook.dev/<collection>/<slug>
 WORD_COUNT: <n>
 BUILD_PASSED: true
 DEVNOOK_COMMIT_SHA: <sha>
