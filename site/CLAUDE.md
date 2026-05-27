@@ -14,6 +14,28 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
+## TODO (next session #61)
+
+1. **Run Stage 0 locally** — harvest keywords, embed via Gemini, cluster. Invoke:
+   ```python
+   Agent(subagent_type="general-purpose",
+         prompt=open(".claude/agents/pipeline-b-stage0-harvest-cluster.md").read()
+                + "\n\nWORKSPACE_DIR=C:\\Users\\Syed Jawad Hassan\\Desktop\\devnook_content_workspace")
+   ```
+   Requires `GOOGLE_API_KEY` env var for Gemini embeddings. Expect ~400–1000 keywords, ~20–50 clusters.
+2. **Verify Stage 0 output** — run these queries in `data/keywords.db`:
+   ```sql
+   SELECT status, COUNT(*) FROM clusters GROUP BY status;
+   SELECT category, COUNT(*) FROM clusters WHERE status='viable' GROUP BY category;
+   SELECT primary_keyword, category, total_volume FROM clusters WHERE status='viable' ORDER BY total_volume DESC LIMIT 5;
+   ```
+   If 0 viable: lower `DISTANCE_THRESHOLD` to `0.15`, `UPDATE keyword_pool SET cluster_id=NULL`, `DELETE FROM clusters`, re-run from S0-8.
+3. **Run full orchestrator** — `MAX_ARTICLES_PER_RUN=5`. Expect 5 articles published.
+4. **After first article is live**: cleanup — delete `data/pipeline-b-topics.json`, update `pipelineB.md` docs, archive legacy `pipeline-b-orchestrator.md` (v1).
+5. **Re-enable CCR routine** `trig_012dkTjBKiB8M9ASkKZ1c1Gk` — only after end-to-end run succeeds.
+
+---
+
 ## Project Overview
 
 **DevNook** (devnook.dev) — developer resource site, 1,000+ programmatic posts + 18 client-side browser tools, monetized via AdSense (deferred until 50k visitors/month).
@@ -40,7 +62,70 @@ Start each session from this file + MEMORY.md only.
 
 ---
 
-## Last Session (2026-05-25, #56)
+## Last Session (2026-05-27, #60)
+
+**Status:** ✅ Pipeline B fully redesigned to keyword-first, cluster-driven 4-stage architecture. All agent files written. DB migrated. Ready to run Stage 0.
+
+### What was done in #60
+
+- **Pipeline B flipped to keyword-first** — root cause of Stage 1 failures (topics 5, 7) was topic-first seeding with bad seeds. New design: Stage 0 harvests a keyword pool → clusters → viable clusters become topics. Stages 2 and 3 unchanged.
+- **`data/keywords.db` migrated** — added `keyword_pool` table (harvest universe) and `clusters` table (scored groups). Added `cluster_id` + `category` columns to existing `keyword_sets`. Migration is idempotent (CREATE TABLE IF NOT EXISTS + PRAGMA table_info guards).
+- **`data/pipeline-b-seed-buckets.json` created** — 5 seed buckets, 3 fixed categories (`Comparisons`, `AI & Productivity`, `Tools & Workflows`), $0.50 DataForSEO cap.
+- **`pipeline-b-stage0-harvest-cluster.md` created** — LOCAL ONLY. Harvest via DataForSEO MCP (`keyword_suggestions` + `related_keywords`), embed via Gemini `text-embedding-004`, cluster via `AgglomerativeClustering(metric='cosine', distance_threshold=0.18)`, score viability (`primary≥2 AND secondary≥6 AND longtail≥1`), write clusters to DB.
+- **`pipeline-b-stage1-keywords.md` rewritten** — input is now `CLUSTER_ID` (not `TOPIC_ID`/seed). Reads `keyword_pool WHERE cluster_id=?`, selects 8–12 kws, synthesizes title/slug/description via Gemini Flash, writes `keyword_sets` + `keywords` rows, marks cluster `used`. No DataForSEO calls. No `topics.json` reads.
+- **`pipeline-b-stage2-writer.md` minimal touch** — DB query updated to select `category` column; frontmatter now uses `subcategory` from cluster-inherited category. Body unchanged.
+- **`pipeline-b-orchestrator-v2.md` rewritten** — counts viable clusters, auto-triggers Stage 0 top-up if low, selects top-N by volume, loops Stage 1→2→3 per cluster. `MAX_ARTICLES_PER_RUN` configurable (default 5). No `topics.json` reads.
+- **CCR routine still disabled** (`trig_012dkTjBKiB8M9ASkKZ1c1Gk`) — do not re-enable until Stage 0 has run successfully and viable clusters exist.
+
+### Current pipeline state
+
+- Registry: ~74 published / 0 staged. Topics 1–4 done; topics 5–20 superseded by cluster-driven design.
+- Pipeline B: **PAUSED** — all agent files ready, DB migrated, Stage 0 not yet run.
+- Pipeline A: paused, cron commented out, 0 staged, redesign deferred.
+- SEO rewrites: 46 language articles queued in `data/rewrite-queue.json`.
+
+---
+
+## Previous Session (2026-05-26, #59)
+
+**Status:** ⚠️ Stage 1 failed for topics 5 and 7 (insufficient keywords). CCR routine DISABLED.
+
+### What was done in #59
+
+- **Stage 1 run for topic 5** (`ai-pair-programming-guide`, seed `"AI pair programming"`) — FAILED. Main term KD=50, longtail variants vol<140. Topic 5 marked `insufficient_keywords` (commit `97648f7`).
+- **Stage 1 run for topic 7** (`ai-tools-technical-documentation`, seed `"AI documentation tools"`) — FAILED. Best candidate vol=480 (below threshold), KD=82 (unusable).
+- **CCR routine disabled** (`trig_012dkTjBKiB8M9ASkKZ1c1Gk`, `enabled: false`).
+
+---
+
+## Older Sessions (2026-05-25, #57)
+
+**Status:** ⚠️ Pipeline B Stage 1 keyword filtering broken — CCR routine paused pending redesign.
+
+### What was done in #57
+
+- **Local Stage 1 test run** — confirmed DataForSEO credentials (`admin@devnook.dev`) work locally (balance ~$50.46). CCR 403 errors in prior runs were the sandbox blocking outbound HTTP, NOT bad credentials.
+- **Found 3 API bugs in `pipeline-b-stage1-keywords.md`**:
+  1. `keyword_ideas/live` called with `"keyword": seed` (singular) — should be `"keywords": [seed]` (array)
+  2. `keyword_ideas/live` included `filters` and `order_by` params — both rejected by current DataForSEO plan
+  3. `related_keywords/live` included `filters` param — also rejected by current plan
+- **Keyword relevance failure discovered** — even with API bugs fixed, Stage 1 returns off-topic keywords. Seed "prompt engineering" causes `keyword_ideas/live` to expand to root concept "engineering", returning industrial/civil engineering terms. The actual "prompt engineering" keyword has KD=99 (fails all filters). Stage 1 has no topic-relevance guard.
+- **CCR routine `trig_012dkTjBKiB8M9ASkKZ1c1Gk` paused** (`enabled: false`) — do not re-enable until keyword workflow is redesigned.
+
+### Keyword workflow redesign needed (next session)
+
+The core problem: DataForSEO `keyword_ideas/live` is too broad for niche AI/developer topics — it expands seeds to root concepts and floods results with irrelevant high-volume terms. Stage 1 needs a fundamentally different approach. Options to consider:
+
+- **Use `keyword_suggestions/live` as primary source** (not `keyword_ideas`) — suggestions stay closer to the original seed phrase
+- **Seed with more specific phrases** — e.g. `"prompt engineering for developers"`, `"LLM prompting techniques"` instead of bare `"prompt engineering"`
+- **Add topic-relevance guard** — after filtering, reject keywords that don't contain at least one word from the seed phrase (or a predefined synonym list per topic)
+- **MCP-first approach** — use `mcp__dataforseo__dataforseo_labs_google_keyword_suggestions` directly in a local/manual workflow instead of CCR REST calls
+
+**Do not re-enable the routine or run Stage 1 again until this is resolved.**
+
+---
+
+## Previous Session (2026-05-25, #56)
 
 **Status:** ✅ Pipeline B redesigned to 3-stage modular architecture. New CCR routine armed for 14:00 UTC daily.
 
@@ -77,25 +162,18 @@ Start each session from this file + MEMORY.md only.
 
 ### Current pipeline state
 
-- Registry: **~74 published / 0 staged / 14 rejected**; topic 1 done, topics 2–20 pending
+- Registry: **~74 published / 0 staged / 14 rejected**; topics 1–3 done, topics 4–20 pending
 - Pipeline A (`drip-publish.yml`): paused — cron commented out, 0 staged, redesign deferred
-- Pipeline B: **new v2 routine armed** `trig_012dkTjBKiB8M9ASkKZ1c1Gk`, daily 14:00 UTC. First fire: 2026-05-25T14:01Z.
+- Pipeline B: **PAUSED** — CCR routine `trig_012dkTjBKiB8M9ASkKZ1c1Gk` disabled 2026-05-25. Keyword workflow redesign required before re-enabling.
 - SEO rewrites: 46 language articles queued in `data/rewrite-queue.json`
 
-### Next session priorities (#57)
+### Next session priorities (#58)
 
-1. **Verify first v2 routine fire** — check after 14:00 UTC 2026-05-25:
-   - `data/pipeline-b-runs.log` has new JSONL entry with `"stage": "pipeline_b_full"`, `"status": "published"`.
-   - `data/pipeline-b-topics.json` topic id 2 (`best-ai-coding-assistants`) → `"status": "done"`.
-   - `data/keywords.db` has a `keyword_sets` row for topic_id=2 with 8–12 keywords.
-   - `sqlite3 agents/content-team/registry.db "SELECT slug, status, source FROM posts WHERE source='pipeline_b' ORDER BY published_at DESC LIMIT 5"` returns new row.
-   - `git log` in both repos shows new commits.
-   - Verify `https://devnook.dev/blog/best-ai-coding-assistants` returns 200.
-2. **If v2 fire fails**: read routine transcript via `RemoteTrigger get` for `trig_012dkTjBKiB8M9ASkKZ1c1Gk`. Most likely failure modes: (a) GitHub App access revoked again — re-authorize at settings/installations; (b) DataForSEO creds missing in CCR env — check `.claude/pipeline-b-creds.env` is committed to workspace repo; (c) git push auth.
-3. **If v2 fire passes**: confirm routine runs daily, monitor for 2–3 days before declaring stable.
-4. **Continue SEO rewrites** — `@seo-optimizer` batch from `data/rewrite-queue.json` under modular-v1 system.
-5. **Pipeline A redesign** — apply same 3-stage model (Stage 1 keywords, Stage 2 writer, Stage 3 QA+publish), enforce 1500-word minimum.
-6. **Deferred** — FAQPage schema validation for `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`.
+1. **Pipeline B keyword workflow redesign** — Stage 1 needs a new approach for topic-relevant keyword selection. See "Keyword workflow redesign needed" note above.
+2. **Re-enable CCR routine** — only after Stage 1 redesign is tested locally and produces correct keywords. Routine ID: `trig_012dkTjBKiB8M9ASkKZ1c1Gk`.
+3. **Continue SEO rewrites** — `@seo-optimizer` batch from `data/rewrite-queue.json` under modular-v1 system.
+4. **Pipeline A redesign** — apply same 3-stage model (Stage 1 keywords, Stage 2 writer, Stage 3 QA+publish), enforce 1500-word minimum.
+5. **Deferred** — FAQPage schema validation for `meta-tag-generator`, `readme-generator`, `sitemap-generator-from-url`.
 
 ### Deferred (do not do)
 
