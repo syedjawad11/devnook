@@ -1,28 +1,28 @@
 ---
 name: pipeline-b-stage1-keywords
-description: Pipeline B Stage 1 — keyword research (LOCAL MCP only). Calls DataForSEO via MCP tools (keyword_suggestions + related_keywords), applies topic-relevance guard, strict KD/volume filters (primary KD≤30/vol≥500, secondary KD≤20/vol≥500), and longtail enforcement (10–20% of batch). Saves 8–12 keywords to data/keywords.db. Idempotent. Never invoked by CCR routine.
+description: Pipeline B Stage 1 — cluster → keyword_set. Reads a viable cluster from data/keywords.db, selects 8–12 keywords, synthesizes title/slug/description via Gemini Flash, inherits category from cluster, writes keyword_sets + keywords rows. LOCAL ONLY (uses Gemini API). No DataForSEO calls. No topics.json reads.
 model: claude-sonnet-4-6
 ---
 
 ## EXECUTION MODE — LOCAL ONLY
 
-This stage runs **locally** in a Claude Code session with DataForSEO MCP tools available.
-**Do NOT invoke from a CCR routine.** The CCR routine only runs Stages 2-3 via the orchestrator.
+This stage runs **locally** in a Claude Code session.
+**Do NOT invoke from a CCR routine.** CCR has no local Gemini API access.
 
-Invoke locally:
+Invoke locally (directly or via orchestrator):
 ```python
 Agent(subagent_type="general-purpose",
       prompt=open(".claude/agents/pipeline-b-stage1-keywords.md").read()
-             + "\n\nTOPIC_ID=4\nWORKSPACE_DIR=C:\\Users\\Syed Jawad Hassan\\Desktop\\devnook_content_workspace")
+             + "\n\nCLUSTER_ID=<n>\nWORKSPACE_DIR=C:\\Users\\Syed Jawad Hassan\\Desktop\\devnook_content_workspace")
 ```
 
 ---
 
-You are Pipeline B Stage 1 — Keyword Research. Your only job is to find high-quality, topic-relevant keywords for one topic and save them to `data/keywords.db`. You do NOT write content.
+You are Pipeline B Stage 1 — Cluster to Keyword Set. Your job is to take one viable cluster from `data/keywords.db`, select the best 8–12 keywords from it, synthesize a title/slug/description via Gemini Flash, and write the `keyword_sets` and `keywords` rows to the DB. You do NOT write content. You do NOT call DataForSEO.
 
 ## Inputs
 
-- `TOPIC_ID`: integer id of the topic to research (from `data/pipeline-b-topics.json`)
+- `CLUSTER_ID`: integer id of a cluster row with `status='viable'`
 - `WORKSPACE_DIR`: absolute path to devnook-content workspace
 
 All relative paths below are from `WORKSPACE_DIR`.
@@ -31,7 +31,7 @@ All relative paths below are from `WORKSPACE_DIR`.
 
 `fail(reason)`:
 1. Print `STAGE1_FAILED: <reason>`
-2. Stop (do not change topic status unless marking `insufficient_keywords`)
+2. Stop — do not modify cluster status unless explicitly stated
 
 ---
 
@@ -39,505 +39,299 @@ All relative paths below are from `WORKSPACE_DIR`.
 
 ```bash
 cd "$WORKSPACE_DIR"
-mkdir -p data
 ```
 
-## Step S1-1 — Read topic
+---
 
-```python
-import json
-
-with open('data/pipeline-b-topics.json') as f:
-    topics = json.load(f)
-
-topic = next((t for t in topics if t['id'] == TOPIC_ID), None)
-if topic is None:
-    print(f"STAGE1_FAILED: topic_id={TOPIC_ID} not found in pipeline-b-topics.json")
-    exit(1)
-
-slug = topic['slug']
-seed_keyword = topic['seed_keyword']
-title = topic['topic']
-print(f"TOPIC: id={topic['id']} slug={slug} seed='{seed_keyword}'")
-```
-
-## Step S1-2 — Init keywords.db
+## Step S1-1 — Read cluster row
 
 ```python
 import sqlite3
 
 conn = sqlite3.connect('data/keywords.db')
-conn.execute("""
-CREATE TABLE IF NOT EXISTS keyword_sets (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    topic_id INTEGER NOT NULL,
-    slug TEXT NOT NULL,
-    title TEXT NOT NULL,
-    research_run_at TEXT NOT NULL,
-    total_keywords INTEGER,
-    primary_count INTEGER,
-    secondary_count INTEGER,
-    status TEXT DEFAULT 'ready',
-    notes TEXT
-)
-""")
-conn.execute("""
-CREATE TABLE IF NOT EXISTS keywords (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    keyword_set_id INTEGER NOT NULL,
-    topic_id INTEGER NOT NULL,
-    slug TEXT NOT NULL,
-    keyword TEXT NOT NULL,
-    keyword_type TEXT NOT NULL,
-    search_volume INTEGER,
-    keyword_difficulty INTEGER,
-    cpc REAL,
-    intent TEXT,
-    created_at TEXT DEFAULT (datetime('now')),
-    UNIQUE(keyword_set_id, keyword)
-)
-""")
-conn.commit()
-conn.close()
-```
-
-## Step S1-3 — Idempotency check
-
-```python
-import sqlite3
-
-conn = sqlite3.connect('data/keywords.db')
-existing = conn.execute(
-    "SELECT id, status FROM keyword_sets WHERE topic_id = ? AND status IN ('ready', 'used')",
-    (TOPIC_ID,)
+cluster = conn.execute(
+    'SELECT id, primary_keyword, category, intent, primary_count, secondary_count, longtail_count, total_volume, status FROM clusters WHERE id = ?',
+    (CLUSTER_ID,)
 ).fetchone()
 conn.close()
 
-if existing:
-    print(f"STAGE1_SKIP: keyword_set already exists for topic_id={TOPIC_ID} (status={existing[1]}, id={existing[0]})")
-    print("STAGE1_RESULT: skipped (idempotent)")
-    exit(0)
-```
-
----
-
-## Step S1-4 — Fetch keyword candidates via MCP tools
-
-Call these MCP tools directly. Do NOT use REST API calls. Do NOT read credentials — the MCP server handles authentication.
-
-### Tool call 1 — keyword_suggestions (stays close to seed phrase)
-
-Call `mcp__dataforseo__dataforseo_labs_google_keyword_suggestions` with:
-- `keyword`: `<seed_keyword from S1-1>`
-- `location_code`: `2840`
-- `language_code`: `"en"`
-- `limit`: `50`
-
-### Tool call 2 — related_keywords depth=2 (adds breadth)
-
-Call `mcp__dataforseo__dataforseo_labs_google_related_keywords` with:
-- `keyword`: `<seed_keyword from S1-1>`
-- `location_code`: `2840`
-- `language_code`: `"en"`
-- `depth`: `2`
-- `limit`: `50`
-
-After receiving both responses, extract all keyword items. For each item extract:
-- `keyword` (string)
-- `search_volume`: from `keyword_info.search_volume` or `keyword_data.keyword_info.search_volume` (default 0)
-- `keyword_difficulty`: from `keyword_properties.keyword_difficulty` or top-level `keyword_difficulty` (default 99)
-- `cpc`: from `keyword_info.cpc` (default 0.0)
-- `intent`: from `search_intent_info.main_intent` (default `"informational"`)
-
-Deduplicate by lowercase keyword. Then write the candidates list to a JSON file:
-
-```python
-import json
-
-# Populate `candidates` list from both MCP tool responses above.
-# Each entry: {"keyword": str, "search_volume": int, "keyword_difficulty": int, "cpc": float, "intent": str}
-candidates = [
-    # ... fill with actual data from MCP responses ...
-]
-
-with open('data/stage1_candidates.json', 'w') as f:
-    json.dump(candidates, f, indent=2)
-print(f"RAW_CANDIDATES: {len(candidates)}")
-```
-
----
-
-## Step S1-5 — Topic-relevance guard + pool filtering
-
-```python
-import json, re
-
-STOPWORDS = {
-    "a","an","the","in","on","at","to","for","of","and","or","with","by","how",
-    "use","using","best","get","make","your","you","what","when","why","which",
-    "who","will","can","from","this","that","into","over","after","before","also"
-}
-VALID_INTENTS = {"informational", "commercial", "commercial_investigation"}
-
-def tokens(phrase):
-    words = re.sub(r'[^a-z0-9 ]', '', phrase.lower()).split()
-    return {w for w in words if len(w) >= 4 and w not in STOPWORDS}
-
-def tokens_overlap(kw_tokens, seed_tokens):
-    # prefix match so "prompts"/"prompting" match seed token "prompt", etc.
-    for kt in kw_tokens:
-        for st in seed_tokens:
-            if kt.startswith(st) or st.startswith(kt):
-                return True
-    return False
-
-def score(kw):
-    return (kw["search_volume"] * 0.5) + ((30 - kw["keyword_difficulty"]) * 10)
-
-def is_longtail(kw):
-    return len(kw["keyword"].split()) >= 3 and kw["search_volume"] >= 500
-
-with open('data/pipeline-b-topics.json') as f:
-    _topics = json.load(f)
-_topic = next(t for t in _topics if t['id'] == TOPIC_ID)
-seed_keyword = _topic['seed_keyword']
-seed_tokens = tokens(seed_keyword)
-
-with open('data/stage1_candidates.json') as f:
-    candidates = json.load(f)
-
-# Topic-relevance guard: prefix-match so "prompts"/"prompting" match seed token "prompt"
-relevant = [k for k in candidates if tokens_overlap(tokens(k["keyword"]), seed_tokens)]
-print(f"RELEVANCE_FILTER: {len(candidates)} total → {len(relevant)} relevant (seed_tokens={seed_tokens})")
-
-# Primary pool: KD <= 30, vol >= 500, valid intent
-primary_pool = sorted(
-    [k for k in relevant
-     if k["keyword_difficulty"] <= 30
-     and k["search_volume"] >= 500
-     and k["intent"] in VALID_INTENTS],
-    key=score, reverse=True
-)
-
-# Secondary pool: KD <= 20, vol >= 500, valid intent (not already in primary)
-primary_kw_set = {k["keyword"].lower() for k in primary_pool}
-secondary_pool = sorted(
-    [k for k in relevant
-     if k["keyword_difficulty"] <= 20
-     and k["search_volume"] >= 500
-     and k["intent"] in VALID_INTENTS
-     and k["keyword"].lower() not in primary_kw_set],
-    key=score, reverse=True
-)
-
-selected_primary = primary_pool[:2]
-primary_kws = {k["keyword"].lower() for k in selected_primary}
-selected_secondary = [k for k in secondary_pool if k["keyword"].lower() not in primary_kws][:10]
-total = len(selected_primary) + len(selected_secondary)
-
-print(f"POOL: primary_pool={len(primary_pool)} secondary_pool={len(secondary_pool)}")
-print(f"SELECTED: primary={len(selected_primary)} secondary={len(selected_secondary)} total={total}")
-
-# Save state for use in longtail enforcement
-import json as _j2
-with open('data/stage1_state.json', 'w') as f:
-    _j2.dump({
-        "selected_primary": selected_primary,
-        "selected_secondary": selected_secondary,
-        "relevant": relevant,
-        "total": total
-    }, f)
-```
-
----
-
-## Step S1-6 — Retry with broader seeds (only if S1-5 total < 8 or no primary)
-
-Read `data/stage1_state.json`. If `total >= 8` AND `len(selected_primary) >= 1`, skip to Step S1-7.
-
-Otherwise, call `mcp__dataforseo__dataforseo_labs_google_keyword_suggestions` for each retry seed below (same parameters: location_code=2840, language_code="en", limit=50). Skip a seed if the seed_keyword already contains that pattern.
-
-Retry seeds:
-1. `"<seed_keyword> guide"`
-2. `"<seed_keyword> tutorial"`
-3. `"best <seed_keyword>"`
-4. `"how to <seed_keyword>"`
-5. `"<seed_keyword> for developers"` — skip if seed already contains "for developers"
-
-After all MCP calls complete, merge new candidates with existing `data/stage1_candidates.json` and re-run Step S1-5:
-
-```python
-import json
-
-with open('data/stage1_candidates.json') as f:
-    existing = json.load(f)
-
-# retry_candidates = list built from MCP retry responses (same extraction logic as S1-4)
-retry_candidates = [
-    # ... fill with data from retry MCP responses ...
-]
-
-seen = {k["keyword"].lower(): k for k in existing}
-for k in retry_candidates:
-    key = k["keyword"].lower()
-    if key not in seen:
-        seen[key] = k
-merged = list(seen.values())
-
-with open('data/stage1_candidates.json', 'w') as f:
-    json.dump(merged, f, indent=2)
-print(f"RETRY_MERGED: {len(merged)} total ({len(merged) - len(existing)} new)")
-```
-
-Then re-run the Python block from Step S1-5 on the merged candidates.
-
----
-
-## Step S1-7 — Longtail enforcement
-
-```python
-import json, math
-
-with open('data/stage1_state.json') as f:
-    state = json.load(f)
-
-selected_primary = state["selected_primary"]
-selected_secondary = state["selected_secondary"]
-relevant = state["relevant"]
-total = state["total"]
-
-VALID_INTENTS = {"informational", "commercial", "commercial_investigation"}
-
-def is_longtail(kw):
-    return len(kw["keyword"].split()) >= 3 and kw["search_volume"] >= 500
-
-selected = selected_primary + selected_secondary
-longtails = [k for k in selected if is_longtail(k)]
-non_longtails = [k for k in selected if not is_longtail(k)]
-lt_count = len(longtails)
-
-min_lt = math.ceil(0.10 * total)
-max_lt = math.floor(0.20 * total)
-print(f"LONGTAIL_CHECK: count={lt_count} target=[{min_lt}, {max_lt}]")
-
-if lt_count < min_lt:
-    selected_kw_set = {k["keyword"].lower() for k in selected}
-    lt_candidates = sorted(
-        [k for k in relevant
-         if is_longtail(k)
-         and k["keyword"].lower() not in selected_kw_set
-         and k.get("intent", "informational") in VALID_INTENTS],
-        key=lambda k: k["search_volume"], reverse=True
-    )
-    while lt_count < min_lt and lt_candidates:
-        non_lt_sorted = sorted(non_longtails, key=lambda k: k["search_volume"])
-        if not non_lt_sorted:
-            break
-        to_remove = non_lt_sorted[0]
-        to_add = lt_candidates.pop(0)
-        selected.remove(to_remove)
-        selected.append(to_add)
-        non_longtails.remove(to_remove)
-        longtails.append(to_add)
-        lt_count += 1
-        print(f"  LONGTAIL_ADD: +'{to_add['keyword']}' (vol={to_add['search_volume']}) -'{to_remove['keyword']}'")
-
-elif lt_count > max_lt:
-    selected_kw_set = {k["keyword"].lower() for k in selected}
-    short_candidates = sorted(
-        [k for k in relevant
-         if not is_longtail(k)
-         and k["keyword"].lower() not in selected_kw_set
-         and k.get("intent", "informational") in VALID_INTENTS],
-        key=lambda k: k["search_volume"], reverse=True
-    )
-    while lt_count > max_lt and short_candidates:
-        lt_sorted = sorted(longtails, key=lambda k: k["search_volume"])
-        to_remove = lt_sorted[0]
-        to_add = short_candidates.pop(0)
-        selected.remove(to_remove)
-        selected.append(to_add)
-        longtails.remove(to_remove)
-        non_longtails.append(to_add)
-        lt_count -= 1
-        print(f"  LONGTAIL_TRIM: -'{to_remove['keyword']}' +'{to_add['keyword']}' (vol={to_add['search_volume']})")
-
-# Rebuild primary/secondary preserving original classification
-primary_kw_set = {k["keyword"].lower() for k in selected_primary}
-final_primary = [k for k in selected if k["keyword"].lower() in primary_kw_set]
-final_secondary = [k for k in selected if k["keyword"].lower() not in primary_kw_set]
-
-print(f"LONGTAIL_FINAL: lt_count={lt_count} total={len(selected)} primary={len(final_primary)} secondary={len(final_secondary)}")
-
-import json as _j3
-with open('data/stage1_state.json', 'w') as f:
-    _j3.dump({
-        "selected_primary": final_primary,
-        "selected_secondary": final_secondary,
-        "total": len(selected),
-        "lt_count": lt_count,
-        "min_lt": min_lt,
-        "max_lt": max_lt
-    }, f)
-```
-
----
-
-## Step S1-8 — Insufficient keywords check
-
-```python
-import json, datetime
-
-with open('data/stage1_state.json') as f:
-    state = json.load(f)
-
-total = state["total"]
-selected_primary = state["selected_primary"]
-lt_count = state["lt_count"]
-min_lt = state["min_lt"]
-
-with open('data/pipeline-b-topics.json') as f:
-    topics_data = json.load(f)
-_topic = next(t for t in topics_data if t['id'] == TOPIC_ID)
-slug = _topic['slug']
-
-if total < 8 or not selected_primary:
-    for t in topics_data:
-        if t['id'] == TOPIC_ID:
-            t['status'] = 'insufficient_keywords'
-            break
-    with open('data/pipeline-b-topics.json', 'w') as f:
-        json.dump(topics_data, f, indent=2)
-
-    with open('data/pipeline-b-runs.log', 'a') as f:
-        f.write(json.dumps({
-            "run_at": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
-            "stage": "stage1", "topic_id": TOPIC_ID, "slug": slug,
-            "status": "insufficient_keywords",
-            "primary_found": len(selected_primary), "total_found": total,
-            "error": f"Only {total} qualifying keywords found after retry (need 8+)"
-        }) + "\n")
-
-    print(f"STAGE1_FAILED: insufficient_keywords — {total} qualifying keywords for topic_id={TOPIC_ID}")
+if not cluster:
+    print(f"STAGE1_FAILED: cluster_id={CLUSTER_ID} not found in clusters table")
     exit(1)
 
-if lt_count < min_lt:
-    print(f"STAGE1_FAILED: insufficient_longtail — only {lt_count} longtail keywords (need {min_lt}+) for topic_id={TOPIC_ID}")
+cid, primary_kw, category, intent, p_count, s_count, lt_count, total_vol, status = cluster
+
+if status != 'viable':
+    print(f"STAGE1_FAILED: cluster_id={CLUSTER_ID} status='{status}', expected 'viable'")
     exit(1)
 
-print(f"SELECTION_OK: primary={len(selected_primary)} secondary={len(state['selected_secondary'])} total={total} longtail={lt_count}")
+print(f"CLUSTER: id={cid} primary_kw='{primary_kw}' category='{category}' status={status} total_vol={total_vol}")
 ```
 
 ---
 
-## Step S1-9 — Insert into keywords.db
+## Step S1-2 — Load keywords from cluster
 
 ```python
-import sqlite3, datetime, json
+import sqlite3
 
-with open('data/stage1_state.json') as f:
-    state = json.load(f)
+conn = sqlite3.connect('data/keywords.db')
+pool_rows = conn.execute(
+    'SELECT id, keyword, volume, kd, intent, word_count FROM keyword_pool WHERE cluster_id = ?',
+    (CLUSTER_ID,)
+).fetchall()
+conn.close()
 
-selected_primary = state["selected_primary"]
-selected_secondary = state["selected_secondary"]
-lt_count = state["lt_count"]
-total = state["total"]
+print(f"S1-2: {len(pool_rows)} keywords in cluster")
+```
 
-with open('data/pipeline-b-topics.json') as f:
-    _topics = json.load(f)
-_t = next(t for t in _topics if t['id'] == TOPIC_ID)
-slug = _t['slug']
-title = _t['topic']
+---
+
+## Step S1-3 — Select 8–12 keywords
+
+Select in this order of priority:
+
+1. **Primary keywords** (2–3): `kd < 30`, `volume >= 500`, sorted by volume DESC. Take top 3.
+2. **Secondary keywords** (6–10): `kd < 20`, `volume >= 500`, not already in primary set, sorted by volume DESC.
+3. **Long-tail top-up** (≥1): `word_count >= 3`, not already selected. Must represent 10–20% of final set.
+
+Target total: 10 keywords (2 primary + 7 secondary + 1 long-tail). Accept 8–12.
+
+```python
+def score(row):
+    return (row[2] * 0.5) + ((30 - row[3]) * 10)
+
+primaries = sorted(
+    [r for r in pool_rows if r[3] < 30 and r[2] >= 500],
+    key=score, reverse=True
+)[:3]
+primary_set = {r[1].lower() for r in primaries}
+
+secondaries = sorted(
+    [r for r in pool_rows if r[3] < 20 and r[2] >= 500 and r[1].lower() not in primary_set],
+    key=score, reverse=True
+)[:10]
+secondary_set = {r[1].lower() for r in secondaries}
+
+selected = primaries + secondaries
+selected_set = primary_set | secondary_set
+
+# Long-tail top-up: ensure ≥1 long-tail (word_count>=3) is in selected
+lt_in_selected = sum(1 for r in selected if r[5] >= 3)
+if lt_in_selected == 0:
+    lt_candidates = [r for r in pool_rows if r[5] >= 3 and r[1].lower() not in selected_set and r[2] >= 500]
+    lt_candidates.sort(key=lambda r: r[2], reverse=True)
+    if lt_candidates:
+        selected.append(lt_candidates[0])
+        print(f"  LONGTAIL_ADD: +'{lt_candidates[0][1]}'")
+
+total = len(selected)
+if total < 8:
+    print(f"STAGE1_FAILED: only {total} qualifying keywords in cluster_id={CLUSTER_ID} (need 8+)")
+    exit(1)
+
+print(f"S1-3: selected {total} keywords — primary={len(primaries)} secondary={len(secondaries)} longtail={sum(1 for r in selected if r[5]>=3)}")
+```
+
+---
+
+## Step S1-4 — Synthesize title/slug/description
+
+You (Claude) generate these values directly — no external API call needed.
+
+Using `primary_focus` and `secondary_kws` from S1-3, generate:
+
+- **title**: 50–70 characters, compelling, includes primary keyword naturally
+- **slug**: lowercase kebab-case, 3–6 words, derived from title
+- **description**: 140–160 characters, includes primary keyword in first 20 words, ends with a value hook
+
+```python
+primary_focus = primaries[0][1] if primaries else primary_kw
+secondary_kws = [r[1] for r in secondaries[:5]]
+
+print(f"S1-4 INPUTS: primary='{primary_focus}' secondary={secondary_kws} category='{category}'")
+```
+
+Now assign your generated values:
+
+```python
+# GENERATE these three values based on the inputs above
+title = "<your generated title>"
+slug = "<your generated slug>"
+description = "<your generated description>"
+```
+
+Validate immediately after generating:
+
+```python
+import re
+
+assert len(title) >= 30, f"STAGE1_FAILED: title too short ({len(title)} chars)"
+slug = slug.lower().strip().replace(' ', '-')
+
+if len(description) < 140 or len(description) > 160:
+    print(f"S1-4 WARNING: description is {len(description)} chars — regenerate to hit 140–160")
+    # Regenerate description now, staying in the 140–160 range, then reassign
+
+if primary_focus.lower() not in description[:100].lower():
+    print(f"S1-4 WARNING: primary keyword not in first 100 chars of description — fix now")
+
+print(f"S1-4: title='{title}' ({len(title)} chars)")
+print(f"S1-4: slug='{slug}'")
+print(f"S1-4: description='{description}' ({len(description)} chars)")
+```
+
+---
+
+## Step S1-5 — Slug uniqueness check
+
+```python
+import sqlite3, os
+
+# Check registry.db
+reg_path = 'agents/content-team/registry.db'
+if os.path.exists(reg_path):
+    reg = sqlite3.connect(reg_path)
+    if reg.execute('SELECT 1 FROM posts WHERE slug = ?', (slug,)).fetchone():
+        # Append suffix
+        suffix = 2
+        base_slug = slug
+        while reg.execute('SELECT 1 FROM posts WHERE slug = ?', (slug,)).fetchone():
+            slug = f"{base_slug}-{suffix}"
+            suffix += 1
+        print(f"S1-5: slug collision — renamed to '{slug}'")
+    reg.close()
+
+# Check keyword_sets for existing slug
+conn = sqlite3.connect('data/keywords.db')
+if conn.execute('SELECT 1 FROM keyword_sets WHERE slug = ?', (slug,)).fetchone():
+    suffix = 2
+    base_slug = slug
+    while conn.execute('SELECT 1 FROM keyword_sets WHERE slug = ?', (slug,)).fetchone():
+        slug = f"{base_slug}-{suffix}"
+        suffix += 1
+    print(f"S1-5: keyword_sets slug collision — renamed to '{slug}'")
+conn.close()
+
+print(f"S1-5: slug='{slug}' is unique")
+```
+
+---
+
+## Step S1-6 — Insert keyword_sets row
+
+```python
+import sqlite3, datetime
 
 now = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
+total_kws = len(selected)
+primary_count_final = len(primaries)
+secondary_count_final = total_kws - primary_count_final
 
 conn = sqlite3.connect('data/keywords.db')
 cursor = conn.execute(
     """INSERT INTO keyword_sets
-       (topic_id, slug, title, research_run_at, total_keywords, primary_count, secondary_count, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 'ready')""",
-    (TOPIC_ID, slug, title, now, total, len(selected_primary), len(selected_secondary))
+       (topic_id, slug, title, research_run_at, total_keywords, primary_count, secondary_count, status, cluster_id, category)
+       VALUES (0, ?, ?, ?, ?, ?, ?, 'ready', ?, ?)""",
+    (slug, title, now, total_kws, primary_count_final, secondary_count_final, CLUSTER_ID, category)
 )
 keyword_set_id = cursor.lastrowid
+conn.commit()
+conn.close()
 
-for kw in selected_primary:
+print(f"S1-6: keyword_set_id={keyword_set_id} slug='{slug}' category='{category}' status='ready'")
+```
+
+---
+
+## Step S1-7 — Insert keywords rows
+
+```python
+import sqlite3
+
+conn = sqlite3.connect('data/keywords.db')
+
+primary_ids = {r[1].lower() for r in primaries}
+for row in selected:
+    kw_type = 'primary' if row[1].lower() in primary_ids else 'secondary'
     conn.execute(
         """INSERT OR IGNORE INTO keywords
            (keyword_set_id, topic_id, slug, keyword, keyword_type, search_volume, keyword_difficulty, cpc, intent)
-           VALUES (?, ?, ?, ?, 'primary', ?, ?, ?, ?)""",
-        (keyword_set_id, TOPIC_ID, slug, kw["keyword"],
-         kw["search_volume"], kw["keyword_difficulty"], kw.get("cpc", 0.0), kw.get("intent", "informational"))
-    )
-
-for kw in selected_secondary:
-    conn.execute(
-        """INSERT OR IGNORE INTO keywords
-           (keyword_set_id, topic_id, slug, keyword, keyword_type, search_volume, keyword_difficulty, cpc, intent)
-           VALUES (?, ?, ?, ?, 'secondary', ?, ?, ?, ?)""",
-        (keyword_set_id, TOPIC_ID, slug, kw["keyword"],
-         kw["search_volume"], kw["keyword_difficulty"], kw.get("cpc", 0.0), kw.get("intent", "informational"))
+           VALUES (?, 0, ?, ?, ?, ?, ?, 0.0, ?)""",
+        (keyword_set_id, slug, row[1], kw_type, row[2], int(row[3]), row[4] or 'informational')
     )
 
 conn.commit()
 conn.close()
 
-print(f"DB_INSERT_OK: keyword_set_id={keyword_set_id} topic_id={TOPIC_ID} total={total} longtail={lt_count}")
+print(f"S1-7: {len(selected)} keywords inserted for keyword_set_id={keyword_set_id}")
 ```
 
 ---
 
-## Step S1-10 — Update topic status
+## Step S1-8 — Mark cluster as used
 
 ```python
-import json
+import sqlite3
 
-with open('data/pipeline-b-topics.json') as f:
-    topics_data = json.load(f)
+conn = sqlite3.connect('data/keywords.db')
+conn.execute(
+    "UPDATE clusters SET status='used', used_by_slug=?, keyword_set_id=? WHERE id=?",
+    (slug, keyword_set_id, CLUSTER_ID)
+)
+conn.commit()
+conn.close()
 
-for t in topics_data:
-    if t['id'] == TOPIC_ID:
-        t['status'] = 'keywords_ready'
-        t['keyword_set_id'] = keyword_set_id
-        break
-
-with open('data/pipeline-b-topics.json', 'w') as f:
-    json.dump(topics_data, f, indent=2)
-
-print(f"TOPIC_STATUS: topic_id={TOPIC_ID} → keywords_ready (keyword_set_id={keyword_set_id})")
+print(f"S1-8: cluster_id={CLUSTER_ID} → status='used' used_by_slug='{slug}'")
 ```
 
 ---
 
-## Step S1-11 — Cleanup temp files
+## Step S1-9 — Log to run log
 
-```bash
-rm -f data/stage1_candidates.json data/stage1_state.json
+```python
+import json, datetime
+
+entry = {
+    "run_at": datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
+    "stage": "stage1",
+    "cluster_id": CLUSTER_ID,
+    "keyword_set_id": keyword_set_id,
+    "slug": slug,
+    "category": category,
+    "primary_count": primary_count_final,
+    "secondary_count": secondary_count_final,
+    "total_keywords": total_kws,
+    "status": "success"
+}
+with open('data/pipeline-b-runs.log', 'a') as f:
+    f.write(json.dumps(entry) + "\n")
 ```
 
 ---
 
 ## Output
 
-Print this result block (orchestrator does not parse this for hybrid mode, but log it for inspection):
+Print this result block (orchestrator parses these lines):
 
 ```
 STAGE1_RESULT: success
 KEYWORD_SET_ID: <id>
-TOPIC_ID: <id>
+CLUSTER_ID: <id>
 SLUG: <slug>
+CATEGORY: <one of 3>
 PRIMARY_COUNT: <n>
 SECONDARY_COUNT: <n>
 TOTAL_KEYWORDS: <n>
 LONGTAIL_COUNT: <n>
-PRIMARY_KEYWORDS: <kw1 (vol: N, diff: N)>, <kw2 (vol: N, diff: N)>
 ```
 
 ## Verification checklist (after running)
 
-- [ ] `data/keywords.db` has 1 row in `keyword_sets` with `topic_id=TOPIC_ID`, `status='ready'`
-- [ ] `keywords` table has 8–12 rows for this `keyword_set_id`
-- [ ] All keywords have `search_volume >= 500`
-- [ ] Primary keywords: `keyword_difficulty <= 30`
-- [ ] Secondary keywords: `keyword_difficulty <= 20`
-- [ ] All keywords share ≥1 token (≥4 chars) with seed phrase
-- [ ] Longtail count satisfies `min_lt <= lt_count <= max_lt`
+- [ ] `keyword_sets` has 1 new row with `status='ready'`, `cluster_id=CLUSTER_ID`, `category` set
+- [ ] `keywords` has 8–12 rows for this `keyword_set_id`
+- [ ] Primary keywords: `keyword_difficulty < 30`, `search_volume >= 500`
+- [ ] Secondary keywords: `keyword_difficulty < 20`, `search_volume >= 500`
+- [ ] At least 1 long-tail keyword (`word_count >= 3`)
+- [ ] `clusters` row `status='used'`, `used_by_slug=<slug>`
+- [ ] Description is 140–160 chars with primary KW in first 100 chars
