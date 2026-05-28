@@ -23,7 +23,7 @@ from agents.publish.gsc_ping import ping_url
 STAGING_DIR = Path("content-staging")
 DEVNOOK_DIR = Path(os.environ.get("DEVNOOK_PATH", "../devnook"))
 CONTENT_DIR = DEVNOOK_DIR / "src/content"
-DB_PATH = Path("agents/content-team/registry.db")
+DB_PATH = Path("data/registry.db")
 BASE_URL = "https://devnook.dev"
 
 def get_category_url_prefix(category: str, slug: str, language: str = None) -> str:

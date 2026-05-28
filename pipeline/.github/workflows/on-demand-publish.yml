@@ -1,4 +1,4 @@
-name: On-Demand Publish
+﻿name: On-Demand Publish
 
 on:
   workflow_dispatch:
@@ -58,6 +58,6 @@ jobs:
 
       - name: Commit and push content workspace changes
         run: |
-          git add content-staging/ agents/content-team/registry.db
+          git add content-staging/ data/registry.db
           git commit -m "chore: on-demand publish - ${{ github.event.inputs.count }} posts [skip ci]" || echo "Nothing to commit"
           git push || echo "Nothing to push"

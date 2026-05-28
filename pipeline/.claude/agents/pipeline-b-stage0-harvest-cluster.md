@@ -1,6 +1,6 @@
----
+﻿---
 name: pipeline-b-stage0-harvest-cluster
-description: Pipeline B Stage 0 — keyword harvest + embed + cluster (LOCAL MCP only). Reads seed buckets, fetches keywords via DataForSEO MCP, embeds via Gemini text-embedding-004, clusters via agglomerative clustering, scores and writes viable clusters to data/keywords.db. Idempotent — safe to re-run.
+description: Pipeline B Stage 0 — keyword harvest + embed + cluster (LOCAL MCP only). Reads seed buckets, fetches keywords via DataForSEO MCP, embeds via Gemini text-embedding-004, clusters via agglomerative clustering, scores and writes viable clusters to data/registry.db. Idempotent — safe to re-run.
 model: claude-sonnet-4-6
 ---
 
@@ -18,7 +18,7 @@ Agent(subagent_type="general-purpose",
 
 ---
 
-You are Pipeline B Stage 0 — Keyword Harvest + Cluster. Your job is to populate `data/keywords.db` with a pool of viable keyword clusters that Stage 1 can consume. You do NOT write content. You do NOT call Stage 1.
+You are Pipeline B Stage 0 — Keyword Harvest + Cluster. Your job is to populate `data/registry.db` with a pool of viable keyword clusters that Stage 1 can consume. You do NOT write content. You do NOT call Stage 1.
 
 ## Inputs
 
@@ -51,7 +51,7 @@ Run the migration in Python to ensure tables exist:
 ```python
 import sqlite3
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 
 conn.execute('''
 CREATE TABLE IF NOT EXISTS keyword_pool (
@@ -144,7 +144,7 @@ accumulated_cost = 0.0
 buckets_processed = 0
 keywords_inserted = 0
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 
 # Load already-known keywords to skip re-fetching
 existing_keywords = {r[0].lower() for r in conn.execute('SELECT keyword FROM keyword_pool')}
@@ -225,7 +225,7 @@ Select all rows from `keyword_pool` where `embedding IS NULL`. Batch into groups
 ```python
 import sqlite3, struct, os
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 to_embed = conn.execute(
     'SELECT id, keyword FROM keyword_pool WHERE embedding IS NULL'
 ).fetchall()
@@ -255,7 +255,7 @@ else:
         )
         embeddings = [e.values for e in result.embeddings]  # list of float lists
 
-        conn = sqlite3.connect('data/keywords.db')
+        conn = sqlite3.connect('data/registry.db')
         for row_id, embedding in zip(ids, embeddings):
             blob = struct.pack(f'{len(embedding)}f', *embedding)
             conn.execute('UPDATE keyword_pool SET embedding = ? WHERE id = ?', (blob, row_id))
@@ -280,7 +280,7 @@ from sklearn.cluster import AgglomerativeClustering
 
 DISTANCE_THRESHOLD = 0.18  # tunable constant
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 rows = conn.execute(
     'SELECT id, keyword, volume, kd, seed_bucket, word_count, embedding FROM keyword_pool WHERE cluster_id IS NULL AND embedding IS NOT NULL'
 ).fetchall()
@@ -351,7 +351,7 @@ import sqlite3, datetime
 
 VALID_CATEGORIES = ["Comparisons", "AI & Productivity", "Tools & Workflows"]
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 viable_count = 0
 insufficient_count = 0
 viable_by_category = {c: 0 for c in VALID_CATEGORIES}

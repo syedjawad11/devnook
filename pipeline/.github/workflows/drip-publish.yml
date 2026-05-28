@@ -1,4 +1,4 @@
-name: Drip Publish
+﻿name: Drip Publish
 
 on:
   # schedule:
@@ -74,6 +74,6 @@ jobs:
       - name: Commit and push content workspace changes
         if: steps.check_changes.outputs.has_changes == 'true'
         run: |
-          git add content-staging/ agents/content-team/registry.db
+          git add content-staging/ data/registry.db
           git commit -m "chore: publish $(date '+%Y-%m-%d') drip posts [skip ci]"
           git push

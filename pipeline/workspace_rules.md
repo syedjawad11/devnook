@@ -1,4 +1,4 @@
-# DevNook — Workspace Rules & Manual Run Guide
+﻿# DevNook — Workspace Rules & Manual Run Guide
 
 > Reference doc for working across the three workspaces. Copy this into the content
 > workspace (or keep open in a tab) when running manual content jobs.
@@ -21,7 +21,7 @@ repo is a destination; Antigravity is a source.
 ## Post Lifecycle (registry status → physical location)
 
 ```
-queued     → row in agents/content-team/registry.db
+queued     → row in data/registry.db
 drafted    → agents/content-team/drafts/{slug}.md          (Writer / Ingest output)
 approved   → still in drafts/, registry flag flipped       (after review or QA pass)
 staged     → content-staging/{slug}.md                     (FIFO queue, oldest mtime first)
@@ -143,7 +143,7 @@ through the same `staged` → `published` gate.
 
 ```bash
 # Status check (registry counts by status + content type)
-python -c "import sqlite3; db=sqlite3.connect('agents/content-team/registry.db'); [print(r) for r in db.execute('SELECT status, content_type, COUNT(*) FROM posts GROUP BY 1,2')]"
+python -c "import sqlite3; db=sqlite3.connect('data/registry.db'); [print(r) for r in db.execute('SELECT status, content_type, COUNT(*) FROM posts GROUP BY 1,2')]"
 
 # Stage all approved drafts
 python agents/content-team/staging.py

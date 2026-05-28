@@ -1,4 +1,4 @@
----
+﻿---
 name: pipeline-b-stage3-qa-publish
 description: Pipeline B Stage 3 — QA validation and publish. Reads draft from agents/content-team/drafts/<slug>.md, runs hard-fail QA checks, runs npm run build, git commits + pushes to devnook, updates registry.db. Supports blog and cheatsheets content collections.
 model: claude-sonnet-4-6
@@ -123,7 +123,7 @@ if re.search(r'^# ', body, re.MULTILINE):
 # 6. Primary keyword in title
 # Read primary keyword from keywords.db
 import sqlite3
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 primary_kws = conn.execute(
     """SELECT k.keyword FROM keywords k
        JOIN keyword_sets ks ON k.keyword_set_id = ks.id
@@ -190,7 +190,7 @@ if internal_count > 8:
 languages_links = [l for l in internal_links if '/languages/' in l[1]]
 if languages_links:
     import sqlite3 as _sql2
-    reg = _sql2.connect('agents/content-team/registry.db')
+    reg = _sql2.connect('data/registry.db')
     for anchor, url in languages_links:
         parts = url.strip('/').split('/')
         if len(parts) >= 2:
@@ -209,7 +209,7 @@ if ext_count < min_external:
 
 # 14. Slug not already published
 import sqlite3 as _sql3
-reg2 = _sql3.connect('agents/content-team/registry.db')
+reg2 = _sql3.connect('data/registry.db')
 existing_slug = reg2.execute("SELECT 1 FROM posts WHERE slug = ?", (SLUG,)).fetchone()
 reg2.close()
 if existing_slug:
@@ -331,7 +331,7 @@ DEVNOOK_COMMIT_SHA="$LOCAL_SHA"
 ```python
 import sqlite3, datetime
 
-reg = sqlite3.connect('agents/content-team/registry.db')
+reg = sqlite3.connect('data/registry.db')
 
 # Read frontmatter values needed for insert
 fm_title = fm.get('title', '')
@@ -341,7 +341,7 @@ fm_wc = fm.get('actual_word_count', word_count)
 today = datetime.date.today().isoformat()
 
 # Read primary keyword again
-conn3 = sqlite3.connect('data/keywords.db')
+conn3 = sqlite3.connect('data/registry.db')
 pk_row = conn3.execute(
     """SELECT k.keyword FROM keywords k
        JOIN keyword_sets ks ON k.keyword_set_id = ks.id

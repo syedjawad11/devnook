@@ -1,4 +1,4 @@
----
+﻿---
 name: pipeline-b-stage23-runner
 description: Pipeline B Stage 2+3 Runner — picks the next keyword_set with status='ready' from keywords.db, runs Stage 2 (writer), then Stage 3 (QA + publish). One article per invocation. Designed for CCR daily routine. Does NOT run Stage 0 or Stage 1.
 model: claude-sonnet-4-6
@@ -63,7 +63,7 @@ If `DN` is empty: print `RUNNER_FAILED: could not locate devnook checkout` and s
 ```python
 import sqlite3
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 row = conn.execute(
     """SELECT id, slug, title, category, content_collection FROM keyword_sets
        WHERE status = 'ready'
@@ -123,7 +123,7 @@ Inputs: TOPIC_ID=0, SLUG=<SLUG from B2>, WORKSPACE_DIR=<WS>, DEVNOOK_DIR=<DN>, C
 import json, datetime, sqlite3
 
 # Mark keyword_set as used
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 conn.execute("UPDATE keyword_sets SET status='used' WHERE id = ?", (KEYWORD_SET_ID,))
 conn.commit()
 
@@ -155,7 +155,7 @@ print(f"LOG_OK: run logged")
 ## Step B5 — Commit updated keywords.db to workspace
 
 ```bash
-git add data/keywords.db data/pipeline-b-runs.log
+git add data/registry.db data/pipeline-b-runs.log
 git -c user.email=claude@anthropic.com -c user.name=Claude \
     commit -m "pipeline-b: mark keyword_set_id=$KEYWORD_SET_ID used ($SLUG)" || true
 git push origin HEAD || true

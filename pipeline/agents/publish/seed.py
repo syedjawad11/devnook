@@ -1,6 +1,6 @@
-import sqlite3
+﻿import sqlite3
 
-DB_PATH = "agents/content-team/registry.db"
+DB_PATH = "data/registry.db"
 
 sql = """
 INSERT INTO posts (slug, title, description, category, language, concept, template_id, keyword, opportunity_score, status) VALUES

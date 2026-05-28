@@ -1,10 +1,10 @@
----
+﻿---
 name: pipeline-b-stage2-writer
-description: Pipeline B Stage 2 — content writer. Reads keywords from data/keywords.db for the given keyword_set_id, reads writing skill files, and produces a draft saved to agents/content-team/drafts/<slug>.md. Supports blog (2500+ words) and cheatsheet (800+ words) content collections.
+description: Pipeline B Stage 2 — content writer. Reads keywords from data/registry.db for the given keyword_set_id, reads writing skill files, and produces a draft saved to agents/content-team/drafts/<slug>.md. Supports blog (2500+ words) and cheatsheet (800+ words) content collections.
 model: claude-sonnet-4-6
 ---
 
-You are Pipeline B Stage 2 — Content Writer. Your only job is to write one high-quality piece of content using the keywords stored in `data/keywords.db`. You do NOT publish. You do NOT QA.
+You are Pipeline B Stage 2 — Content Writer. Your only job is to write one high-quality piece of content using the keywords stored in `data/registry.db`. You do NOT publish. You do NOT QA.
 
 ## Inputs (provided by orchestrator)
 
@@ -30,7 +30,7 @@ cd "$WORKSPACE_DIR"
 ```python
 import sqlite3
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 
 kset = conn.execute(
     "SELECT id, topic_id, slug, title, status, content_collection FROM keyword_sets WHERE id = ? AND topic_id = ?",
@@ -89,7 +89,7 @@ Internalize all rules before proceeding.
 ```python
 import sqlite3 as _sqlite3
 
-reg = _sqlite3.connect('agents/content-team/registry.db')
+reg = _sqlite3.connect('data/registry.db')
 pub_rows = reg.execute(
     """SELECT slug, title, category FROM posts
        WHERE status = 'published'
@@ -315,7 +315,7 @@ else:
     print(f"TOPIC_STATUS: topics.json not found — skipping (cluster-driven pipeline)")
 
 # Mark keyword_set as used
-conn2 = _sql3.connect('data/keywords.db')
+conn2 = _sql3.connect('data/registry.db')
 conn2.execute("UPDATE keyword_sets SET status = 'used' WHERE id = ?", (KEYWORD_SET_ID,))
 conn2.commit()
 conn2.close()

@@ -1,4 +1,4 @@
-# DevNook Content Workspace — Claude Session Log
+﻿# DevNook Content Workspace — Claude Session Log
 
 > Content pipeline for devnook.dev. Always read this file first. Astro site lives at `../devnook/`.
 
@@ -77,7 +77,7 @@ Pick slug from `data/rewrite-queue.json` → `@seo-optimizer SLUG=...` → verif
 
 | Path | Purpose |
 |------|---------|
-| `agents/content-team/registry.db` | SQLite registry (~74+ published as of session #53) |
+| `data/registry.db` | SQLite registry (~74+ published as of session #53) |
 | `.claude/agents/pipeline-b-orchestrator.md` | Pipeline B orchestrator — full B1–B7 flow (topic → KW research → SERP → write → QA → publish → log) |
 | `data/pipeline-b-topics.json` | Pipeline B topic queue — 20 AI/Productivity topics, `status: pending/in_progress/done` |
 | `data/pipeline-b-runs.log` | Pipeline B run log — JSONL, one entry per run, created on first run |
@@ -164,7 +164,7 @@ GH_PAT=...                         # PAT for content workspace CI commits
 
 ```bash
 # Status check
-python -c "import sqlite3; db=sqlite3.connect('agents/content-team/registry.db'); [print(r) for r in db.execute('SELECT status, content_type, COUNT(*) FROM posts GROUP BY 1,2')]"
+python -c "import sqlite3; db=sqlite3.connect('data/registry.db'); [print(r) for r in db.execute('SELECT status, content_type, COUNT(*) FROM posts GROUP BY 1,2')]"
 
 # Manual publish (N posts)
 python agents/publish/publish.py --count N
@@ -269,7 +269,7 @@ Both workflows:
 - **Pipeline B orchestrator created**: `.claude/agents/pipeline-b-orchestrator.md` — self-contained agent (Sonnet 4.6) owning full B1–B7 flow: topic selection, DataForSEO keyword research (3 MCP calls: keyword_ideas, related_keywords, keyword_suggestions), SERP analysis (serp_organic_live_advanced top 5), article writing (2,500–3,500 words, mandatory FAQ + comparison table, 3–5 external links, 3–5 internal links), inline quality validation (max 2 retry cycles), auto-publish (write → npm run build → git commit+push → GSC submit), run log.
 - **Topic queue created**: `data/pipeline-b-topics.json` — 20 AI/Productivity topics (Claude Code, best AI coding assistants, prompt engineering, AI pair programming, AI debugging, etc.), all `status: "pending"`.
 - **Test cron scheduled**: One-shot at 14:30 Malta time (12:30 UTC, May 24) — `CronCreate` job ID `88805fdf`. **Session-only** — `durable: true` did not persist to disk; session must stay open until cron fires.
-- **Fallback manual invocation**: `@pipeline-b-orchestrator with DB_PATH=agents/content-team/registry.db TOPICS_FILE=data/pipeline-b-topics.json DEVNOOK_DIR=../devnook LOG_FILE=data/pipeline-b-runs.log`
+- **Fallback manual invocation**: `@pipeline-b-orchestrator with DB_PATH=data/registry.db TOPICS_FILE=data/pipeline-b-topics.json DEVNOOK_DIR=../devnook LOG_FILE=data/pipeline-b-runs.log`
 - **Key spec decisions**: keyword filter `vol ≥ 500, diff < 30` (relax to ≤45 if needed); scoring `vol*0.5 + (30-diff)*10`; blog category; template_id round-robin blog-v1–blog-v5; registry INSERT with `source='pipeline_b'`, `content_type='editorial'`, `status='published'`; `schema_org` dual-type `["BlogPosting","FAQPage"]`.
 
 ### Last Session (#54, 2026-05-24)

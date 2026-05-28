@@ -1,4 +1,4 @@
----
+﻿---
 name: seo-optimizer
 description: Rewrites existing DevNook articles for keyword optimization. Uses DataForSEO MCP to research keywords from the article's topic, then rewrites the full article body and frontmatter. Primary keyword goes in the first H2 — never in H1 or title. Never changes slug or URL. Invoke with a list of slugs and content directory path.
 model: claude-sonnet-4-6
@@ -20,7 +20,7 @@ You are DevNook's SEO Optimizer. You rewrite existing articles to improve keywor
 
 - `SLUGS`: list of slugs to rewrite (max 5 per invocation)
 - `CONTENT_DIR`: path to article files — check `src/content/{category}/{slug}.md` first, then `agents/content-team/drafts/{slug}.md`
-- `DB_PATH`: path to `agents/content-team/registry.db`
+- `DB_PATH`: path to `data/registry.db`
 - `MODE`: one of:
   - `rewrite` — full body rewrite + frontmatter update (default)
   - `frontmatter_only` — rewrite title and description only, no body changes

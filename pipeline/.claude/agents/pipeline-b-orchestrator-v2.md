@@ -1,4 +1,4 @@
----
+﻿---
 name: pipeline-b-orchestrator-v2
 description: Pipeline B Orchestrator v2 — CCR routine only. Reads first ready topic from keyword_sets DB (status='ready'), runs Stage 2 (writer) + Stage 3 (QA + publish). Stage 1 must run locally first to populate keywords.db. Exits NO_READY_TOPICS if no ready rows exist. Replaces pipeline-b-orchestrator.md.
 model: claude-sonnet-4-6
@@ -85,7 +85,7 @@ If `DN` is empty: fail with `"could not locate devnook checkout"`.
 import sqlite3, os
 
 # Query for first keyword_set with status='ready'
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 row = conn.execute(
     """SELECT id, topic_id, slug, title
        FROM keyword_sets
@@ -96,7 +96,7 @@ row = conn.execute(
 conn.close()
 
 if not row:
-    print("NO_READY_TOPICS: no keyword_sets with status='ready' in data/keywords.db")
+    print("NO_READY_TOPICS: no keyword_sets with status='ready' in data/registry.db")
     print("Run Stage 1 locally to prepare keywords before invoking this routine")
     exit(0)
 
@@ -104,10 +104,10 @@ KEYWORD_SET_ID, TOPIC_ID, SLUG, TITLE = row
 print(f"READY_TOPIC: topic_id={TOPIC_ID} slug={SLUG} keyword_set_id={KEYWORD_SET_ID} title='{TITLE}'")
 
 # Collision check: registry
-reg = sqlite3.connect('agents/content-team/registry.db')
+reg = sqlite3.connect('data/registry.db')
 if reg.execute("SELECT 1 FROM posts WHERE slug = ?", (SLUG,)).fetchone():
     reg.close()
-    conn = sqlite3.connect('data/keywords.db')
+    conn = sqlite3.connect('data/registry.db')
     conn.execute("UPDATE keyword_sets SET status = 'collision' WHERE id = ?", (KEYWORD_SET_ID,))
     conn.commit()
     conn.close()
@@ -117,7 +117,7 @@ reg.close()
 
 # Collision check: file system
 if os.path.exists(f"{DEVNOOK_DIR}/src/content/blog/{SLUG}.md"):
-    conn = sqlite3.connect('data/keywords.db')
+    conn = sqlite3.connect('data/registry.db')
     conn.execute("UPDATE keyword_sets SET status = 'collision' WHERE id = ?", (KEYWORD_SET_ID,))
     conn.commit()
     conn.close()
@@ -194,7 +194,7 @@ After Stage 3 success:
 import sqlite3, json, datetime
 
 # Verify registry row
-reg = sqlite3.connect('agents/content-team/registry.db')
+reg = sqlite3.connect('data/registry.db')
 row = reg.execute(
     "SELECT slug, status, source, actual_word_count FROM posts WHERE slug = ? AND source = 'pipeline_b'",
     (SLUG,)
@@ -206,7 +206,7 @@ if not row:
     exit(1)
 
 # Verify keyword_set marked used (should be set by Stage 2 Step S2-8)
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 kset_status = conn.execute(
     "SELECT status FROM keyword_sets WHERE id = ?", (KEYWORD_SET_ID,)
 ).fetchone()
@@ -214,7 +214,7 @@ conn.close()
 
 if not kset_status or kset_status[0] != 'used':
     # Stage 2 should have set this; force it now if missing
-    conn = sqlite3.connect('data/keywords.db')
+    conn = sqlite3.connect('data/registry.db')
     conn.execute("UPDATE keyword_sets SET status = 'used' WHERE id = ?", (KEYWORD_SET_ID,))
     conn.commit()
     conn.close()

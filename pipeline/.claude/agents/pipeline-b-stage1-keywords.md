@@ -1,6 +1,6 @@
----
+﻿---
 name: pipeline-b-stage1-keywords
-description: Pipeline B Stage 1 — cluster → keyword_set. Reads a viable cluster from data/keywords.db, selects 8–12 keywords, synthesizes title/slug/description via Gemini Flash, inherits category from cluster, writes keyword_sets + keywords rows. LOCAL ONLY (uses Gemini API). No DataForSEO calls. No topics.json reads.
+description: Pipeline B Stage 1 — cluster → keyword_set. Reads a viable cluster from data/registry.db, selects 8–12 keywords, synthesizes title/slug/description via Gemini Flash, inherits category from cluster, writes keyword_sets + keywords rows. LOCAL ONLY (uses Gemini API). No DataForSEO calls. No topics.json reads.
 model: claude-sonnet-4-6
 ---
 
@@ -18,7 +18,7 @@ Agent(subagent_type="general-purpose",
 
 ---
 
-You are Pipeline B Stage 1 — Cluster to Keyword Set. Your job is to take one viable cluster from `data/keywords.db`, select the best 8–12 keywords from it, synthesize a title/slug/description via Gemini Flash, and write the `keyword_sets` and `keywords` rows to the DB. You do NOT write content. You do NOT call DataForSEO.
+You are Pipeline B Stage 1 — Cluster to Keyword Set. Your job is to take one viable cluster from `data/registry.db`, select the best 8–12 keywords from it, synthesize a title/slug/description via Gemini Flash, and write the `keyword_sets` and `keywords` rows to the DB. You do NOT write content. You do NOT call DataForSEO.
 
 ## Inputs
 
@@ -48,7 +48,7 @@ cd "$WORKSPACE_DIR"
 ```python
 import sqlite3
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 cluster = conn.execute(
     'SELECT id, primary_keyword, category, intent, primary_count, secondary_count, longtail_count, total_volume, status FROM clusters WHERE id = ?',
     (CLUSTER_ID,)
@@ -75,7 +75,7 @@ print(f"CLUSTER: id={cid} primary_kw='{primary_kw}' category='{category}' status
 ```python
 import sqlite3
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 pool_rows = conn.execute(
     'SELECT id, keyword, volume, kd, intent, word_count FROM keyword_pool WHERE cluster_id = ?',
     (CLUSTER_ID,)
@@ -189,7 +189,7 @@ print(f"S1-4: description='{description}' ({len(description)} chars)")
 import sqlite3, os
 
 # Check registry.db
-reg_path = 'agents/content-team/registry.db'
+reg_path = 'data/registry.db'
 if os.path.exists(reg_path):
     reg = sqlite3.connect(reg_path)
     if reg.execute('SELECT 1 FROM posts WHERE slug = ?', (slug,)).fetchone():
@@ -203,7 +203,7 @@ if os.path.exists(reg_path):
     reg.close()
 
 # Check keyword_sets for existing slug
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 if conn.execute('SELECT 1 FROM keyword_sets WHERE slug = ?', (slug,)).fetchone():
     suffix = 2
     base_slug = slug
@@ -228,7 +228,7 @@ total_kws = len(selected)
 primary_count_final = len(primaries)
 secondary_count_final = total_kws - primary_count_final
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 cursor = conn.execute(
     """INSERT INTO keyword_sets
        (topic_id, slug, title, research_run_at, total_keywords, primary_count, secondary_count, status, cluster_id, category)
@@ -249,7 +249,7 @@ print(f"S1-6: keyword_set_id={keyword_set_id} slug='{slug}' category='{category}
 ```python
 import sqlite3
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 
 primary_ids = {r[1].lower() for r in primaries}
 for row in selected:
@@ -274,7 +274,7 @@ print(f"S1-7: {len(selected)} keywords inserted for keyword_set_id={keyword_set_
 ```python
 import sqlite3
 
-conn = sqlite3.connect('data/keywords.db')
+conn = sqlite3.connect('data/registry.db')
 conn.execute(
     "UPDATE clusters SET status='used', used_by_slug=?, keyword_set_id=? WHERE id=?",
     (slug, keyword_set_id, CLUSTER_ID)

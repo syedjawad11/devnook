@@ -8,3 +8,5 @@ __pycache__/
 *.db-journal
 *.db-wal
 *.db-shm
+agents/content-team/registry.db
+data/keywords.db
