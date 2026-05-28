@@ -9,3 +9,5 @@ agents/content-team/registry.db
 .gemini/
 .claude/
 audits/*.csv
+fix_frontmatter.py
+scratch_clean.py

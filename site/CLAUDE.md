@@ -16,23 +16,11 @@ Start each session from this file + MEMORY.md only.
 
 ## TODO (next session #61)
 
-1. **Run Stage 0 locally** — harvest keywords, embed via Gemini, cluster. Invoke:
-   ```python
-   Agent(subagent_type="general-purpose",
-         prompt=open(".claude/agents/pipeline-b-stage0-harvest-cluster.md").read()
-                + "\n\nWORKSPACE_DIR=C:\\Users\\Syed Jawad Hassan\\Desktop\\devnook_content_workspace")
-   ```
-   Requires `GOOGLE_API_KEY` env var for Gemini embeddings. Expect ~400–1000 keywords, ~20–50 clusters.
-2. **Verify Stage 0 output** — run these queries in `data/keywords.db`:
-   ```sql
-   SELECT status, COUNT(*) FROM clusters GROUP BY status;
-   SELECT category, COUNT(*) FROM clusters WHERE status='viable' GROUP BY category;
-   SELECT primary_keyword, category, total_volume FROM clusters WHERE status='viable' ORDER BY total_volume DESC LIMIT 5;
-   ```
-   If 0 viable: lower `DISTANCE_THRESHOLD` to `0.15`, `UPDATE keyword_pool SET cluster_id=NULL`, `DELETE FROM clusters`, re-run from S0-8.
-3. **Run full orchestrator** — `MAX_ARTICLES_PER_RUN=5`. Expect 5 articles published.
-4. **After first article is live**: cleanup — delete `data/pipeline-b-topics.json`, update `pipelineB.md` docs, archive legacy `pipeline-b-orchestrator.md` (v1).
-5. **Re-enable CCR routine** `trig_012dkTjBKiB8M9ASkKZ1c1Gk` — only after end-to-end run succeeds.
+1. **Day 1 routine PAUSED** — `trig_01E8rdMC6qNREuvBY8shLUfg` is disabled. `keyword_set_id=5` (`git-commands-cheat-sheet-developers`) is on hold because `git-commands-cheatsheet` already exists at `/cheatsheets/git-commands-cheatsheet`. Decide: (a) replace/update the existing cheatsheet, (b) repurpose the cluster for a different cheat sheet topic, or (c) delete keyword_set_id=5 and run Stage 1 on a fresh cluster.
+2. **Verify Day 2 run** (2026-05-29 ~14:00 UTC) — check `data/pipeline-b-runs.log` for `slug=react-vs-angular-vs-vue-comparison`; visit `https://devnook.dev/blog/react-vs-angular-vs-vue-comparison`. Routine: `trig_013SxsubDU4oN2FcJr7SYAyP`.
+3. **Fix keyword_set_id=4 before any next run** — `github-actions-guide-status-checkout-runners` (id=4) still has `status='ready'` but is already published. Runner will pick id=4 first. Fix: `UPDATE keyword_sets SET status='used' WHERE id=4`.
+4. **After Day 2 article live**: cleanup — delete `data/pipeline-b-topics.json`, archive legacy `pipeline-b-orchestrator.md` (v1).
+5. **Pipeline B next cycle** — run Stage 0 + Stage 1 locally to generate 3 more keyword_sets, then set up next CCR batch.
 
 ---
 
