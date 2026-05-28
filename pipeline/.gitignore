@@ -3,6 +3,8 @@ __pycache__/
 *.bak
 .claude/settings.json
 .claude/settings.local.json
+.claude/*.env
+*.env
 *.db-journal
 *.db-wal
 *.db-shm
