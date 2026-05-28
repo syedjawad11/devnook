@@ -2,6 +2,10 @@
 actual_word_count: 1278
 category: languages
 concept: promises
+linkAnchors:
+  - "javascript promises"
+  - "promises"
+  - "promises in javascript"
 description: Promises replaced callback hell. Understand the Promise lifecycle, chaining,
   error handling, and how async/await simplifies it all.
 difficulty: intermediate

@@ -2,6 +2,9 @@
 actual_word_count: 1258
 category: languages
 concept: closures
+linkAnchors:
+  - "javascript closures"
+  - "closures in javascript"
 description: "JavaScript closures keep variables alive after their outer function exits. Lexical scope, the var loop bug, memory leaks, and when to use them."
 difficulty: intermediate
 has_cross_language_analog: true

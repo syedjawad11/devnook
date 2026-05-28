@@ -4,6 +4,9 @@ description: "Practical, code-first look at file handling in Google Colab with w
 category: "languages"
 language: "python"
 concept: "file-handling-google-colab"
+linkAnchors:
+  - "python file handling google colab"
+  - "file handling google colab"
 difficulty: "beginner"
 template_id: "lang-v3"
 tags: ["python", "google-colab", "file-handling", "data-science"]

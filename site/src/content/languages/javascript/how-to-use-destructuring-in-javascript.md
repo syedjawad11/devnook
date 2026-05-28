@@ -5,6 +5,9 @@ published_date: "2026-04-22"
 category: "languages"
 language: "javascript"
 concept: "destructuring"
+linkAnchors:
+  - "javascript destructuring"
+  - "destructuring"
 template_id: "lang-v3"
 tags: ["javascript", "destructuring", "es6", "syntax"]
 difficulty: "beginner"

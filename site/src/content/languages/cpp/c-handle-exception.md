@@ -4,6 +4,10 @@ description: "Learn how to handle exceptions in C++ using try, catch, and throw.
 category: "languages"
 language: "cpp"
 concept: "c-handle-exception"
+linkAnchors:
+  - "cpp c handle exception"
+  - "c handle exception"
+  - "c++ exceptions"
 difficulty: "intermediate"
 template_id: "lang-v2"
 tags: ["cpp", "exception-handling", "try-catch", "raii", "error-handling"]

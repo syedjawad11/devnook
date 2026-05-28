@@ -4,6 +4,9 @@ description: "Learn how to write recursive functions in python to solve complex 
 category: languages
 language: "python"
 concept: "write-recursive-functions"
+linkAnchors:
+  - "python write recursive functions"
+  - "write recursive functions"
 difficulty: "intermediate"
 template_id: "lang-v2"
 tags: ["python", "recursion", "functions", "algorithms"]

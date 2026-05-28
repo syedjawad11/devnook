@@ -4,6 +4,10 @@ description: "Learn how class inheritance works in C++: syntax, access specifier
 category: "languages"
 language: "cpp"
 concept: "class-inheritance"
+linkAnchors:
+  - "cpp class inheritance"
+  - "class inheritance"
+  - "c++ inheritance"
 difficulty: "intermediate"
 template_id: "lang-v5"
 tags: ["cpp", "class-inheritance", "oop", "virtual-functions", "polymorphism"]

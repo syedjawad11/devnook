@@ -5,6 +5,9 @@ published_date: "2026-04-22"
 category: "languages"
 language: "kotlin"
 concept: "cli-tool"
+linkAnchors:
+  - "kotlin cli tool"
+  - "cli tool"
 template_id: "lang-v5"
 tags: ["kotlin", "cli-tool", "tutorial", "command-line"]
 difficulty: "intermediate"

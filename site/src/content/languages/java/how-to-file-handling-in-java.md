@@ -4,6 +4,8 @@ description: "Master file handling in Java. Learn to read, write, and manage fil
 category: "languages"
 language: "java"
 concept: "file-handling"
+linkAnchors:
+  - "java file handling"
 difficulty: "intermediate"
 template_id: "lang-v2"
 tags: ["java", "file-handling", "io", "nio"]

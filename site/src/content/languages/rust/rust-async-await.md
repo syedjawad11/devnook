@@ -2,6 +2,8 @@
 actual_word_count: 1720
 category: languages
 concept: async-await
+linkAnchors:
+  - "rust async await"
 description: Learn how async/await works in Rust with futures and executors. Master
   concurrent programming with practical examples and real-world patterns.
 difficulty: intermediate

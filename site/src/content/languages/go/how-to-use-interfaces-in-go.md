@@ -5,6 +5,9 @@ published_date: "2026-04-22"
 category: "languages"
 language: "go"
 concept: "interfaces"
+linkAnchors:
+  - "go interfaces"
+  - "interfaces"
 template_id: "lang-v2"
 tags: ["go", "interfaces", "abstraction", "polymorphism", "testing"]
 difficulty: "intermediate"

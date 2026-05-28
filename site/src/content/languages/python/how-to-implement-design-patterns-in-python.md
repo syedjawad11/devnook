@@ -1,6 +1,9 @@
 ---
 category: languages
 concept: design-patterns
+linkAnchors:
+  - "python design patterns"
+  - "design patterns"
 description: Learn how to implement design patterns in Python using first-class functions
   and modules. Covers Strategy, Observer, Singleton, and common pitfalls.
 difficulty: advanced

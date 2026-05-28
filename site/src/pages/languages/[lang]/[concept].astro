@@ -7,8 +7,8 @@ export async function getStaticPaths() {
   
   return languagePosts.map((entry) => ({
     params: {
-      lang: entry.data.language,
-      concept: entry.data.concept,
+      lang: entry.data.language.toLowerCase(),
+      concept: entry.data.concept.toLowerCase(),
     },
     props: { entry },
   }));

@@ -5,6 +5,9 @@ published_date: "2026-05-09"
 category: "languages"
 language: "kotlin"
 concept: "catch-exception"
+linkAnchors:
+  - "kotlin catch exception"
+  - "catch exception"
 template_id: "lang-v5"
 tags: ["kotlin", "exception-handling", "try-catch", "error-handling", "runCatching"]
 difficulty: "intermediate"

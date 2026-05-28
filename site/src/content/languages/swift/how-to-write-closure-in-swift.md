@@ -1,6 +1,8 @@
 ---
 category: languages
 concept: closures
+linkAnchors:
+  - "swift closures"
 description: Understand the core mechanics of closures in Swift, including capturing
   values, escaping contexts, and practical completion handlers.
 difficulty: intermediate

@@ -1,6 +1,11 @@
 ---
 category: languages
 concept: lambda-functions
+linkAnchors:
+  - "java lambda functions"
+  - "lambda functions"
+  - "java lambda"
+  - "lambda in java"
 description: Learn how to call and leverage lambda expressions in Java to eliminate
   anonymous class boilerplate, pass behavior efficiently, and write functional-style
   code.

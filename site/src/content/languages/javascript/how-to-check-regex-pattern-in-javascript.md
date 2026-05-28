@@ -4,6 +4,9 @@ description: "Learn how to check regex patterns in JavaScript efficiently using 
 category: "languages"
 language: "javascript"
 concept: "check-regex-pattern"
+linkAnchors:
+  - "javascript check regex pattern"
+  - "check regex pattern"
 difficulty: "intermediate"
 template_id: "lang-v1"
 tags: ["javascript", "check-regex-pattern", "validation", "regex"]

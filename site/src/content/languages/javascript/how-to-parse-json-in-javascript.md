@@ -1,6 +1,9 @@
 ---
 category: languages
 concept: json-parsing
+linkAnchors:
+  - "javascript json parsing"
+  - "json parsing"
 description: Master JSON parsing in JavaScript using JSON.parse(). Learn techniques
   for safely handling API payloads, dates, and deep cloning issues.
 difficulty: beginner

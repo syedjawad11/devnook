@@ -1,6 +1,8 @@
 ---
 category: languages
 concept: environment-variables
+linkAnchors:
+  - "php environment variables"
 description: Master the secure usage of environment variables in PHP. Learn how to
   configure .env files, use getenv(), and protect sensitive credentials.
 difficulty: beginner

@@ -4,6 +4,9 @@ description: "Struggling with raw JSON strings in Ruby? Learn how to parse JSON 
 category: "languages"
 language: "ruby"
 concept: "parse-json"
+linkAnchors:
+  - "ruby parse json"
+  - "parse json"
 difficulty: "beginner"
 template_id: "lang-v2"
 tags: ["ruby", "json", "data-parsing", "api"]

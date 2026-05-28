@@ -4,6 +4,9 @@ description: "Learn how to catch errors in C++ using try-catch blocks, custom ex
 category: languages
 language: "cpp"
 concept: "catch-error"
+linkAnchors:
+  - "cpp catch error"
+  - "catch error"
 difficulty: "intermediate"
 template_id: "lang-v1"
 tags: ["cpp", "exception-handling", "error-handling", "try-catch", "runtime-errors"]

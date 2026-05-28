@@ -2,6 +2,9 @@
 actual_word_count: 1115
 category: languages
 concept: interfaces-vs-types
+linkAnchors:
+  - "typescript interfaces vs types"
+  - "interfaces vs types"
 description: Both interface and type define object shapes in TypeScript, but they're
   not identical. Learn when to use each one.
 difficulty: intermediate

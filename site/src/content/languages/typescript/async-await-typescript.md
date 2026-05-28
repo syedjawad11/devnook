@@ -2,6 +2,9 @@
 actual_word_count: 1680
 category: languages
 concept: async-await
+linkAnchors:
+  - "typescript async await"
+  - "typescript async/await"
 description: How TypeScript handles async await with type safety and clean syntax.
   Compare to Python, JavaScript, Rust, and C# with examples.
 difficulty: intermediate

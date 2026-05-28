@@ -5,6 +5,10 @@ published_date: "2026-05-09"
 category: "languages"
 language: "csharp"
 concept: "exception-handling"
+linkAnchors:
+  - "csharp exception handling"
+  - "exception handling"
+  - "c# exception handling"
 template_id: "lang-v1"
 tags: ["csharp", "exception-handling", "error-handling", "try-catch", "dotnet"]
 difficulty: "beginner"

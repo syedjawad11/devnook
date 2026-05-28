@@ -1,6 +1,8 @@
 ---
 category: languages
 concept: environment-variables
+linkAnchors:
+  - "java environment variables"
 description: Learn how to read and manage environment variables in Java safely to
   keep secrets secure and separate configuration from your code.
 difficulty: beginner

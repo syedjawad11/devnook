@@ -1,6 +1,9 @@
 ---
 category: languages
 concept: dictionary-comprehension
+linkAnchors:
+  - "python dictionary comprehension"
+  - "dictionary comprehension"
 description: Master Python dictionary comprehension to build, filter, and transform
   dicts with concise Pythonic syntax, plus performance tips and advanced patterns.
 difficulty: intermediate

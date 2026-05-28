@@ -5,6 +5,10 @@ published_date: "2026-04-22"
 category: "languages"
 language: "rust"
 concept: "pattern-matching"
+linkAnchors:
+  - "rust pattern matching"
+  - "pattern matching"
+  - "pattern matching in rust"
 template_id: "lang-v4"
 tags: ["rust", "pattern-matching", "comparison", "control-flow"]
 difficulty: "intermediate"

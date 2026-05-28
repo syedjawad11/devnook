@@ -152,6 +152,18 @@ queued → outlined → drafted → linked → approved → staged → published
 
 **Critical:** Never derive language post URLs from filenames. Always use `concept` from registry.
 
+### Slug conventions (enforced by schema)
+
+| Field | Rule | Example |
+|-------|------|---------|
+| `language` | Must be one of the 12 allowed values | `go`, `python`, `javascript` |
+| `concept` | Lowercase kebab-case (`/^[a-z0-9-]+$/`) | `goroutines`, `async-await` |
+| `slug` (blog/guides) | Lowercase kebab-case | `react-vs-angular-vs-vue-comparison` |
+
+Allowed language values: `python`, `javascript`, `typescript`, `go`, `rust`, `java`, `csharp`, `php`, `ruby`, `swift`, `kotlin`, `cpp`
+
+Any file with `language: "google-forms"` or other non-enum value will cause `astro build` to fail immediately.
+
 ---
 
 ## Build Plugins

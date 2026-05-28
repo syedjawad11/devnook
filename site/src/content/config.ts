@@ -1,13 +1,15 @@
 import { z, defineCollection } from 'astro:content';
 
+const LANGUAGE_ENUM = ['python','javascript','typescript','go','rust','java','csharp','php','ruby','swift','kotlin','cpp'] as const;
+
 const languagesCollection = defineCollection({
   type: 'content',
   schema: z.object({
     title: z.string(),
     description: z.string(),
     category: z.literal('languages'),
-    language: z.string(),
-    concept: z.string(),
+    language: z.enum(LANGUAGE_ENUM),
+    concept: z.string().regex(/^[a-z0-9-]+$/, 'concept must be lowercase kebab-case'),
     template_id: z.string(),
     tags: z.array(z.string()),
     related_posts: z.array(z.string()),
@@ -15,6 +17,7 @@ const languagesCollection = defineCollection({
     published_date: z.string(),
     og_image: z.string(),
     word_count_target: z.number().optional(),
+    linkAnchors: z.array(z.string()).optional(),
   }),
 });
 
@@ -31,6 +34,7 @@ const guidesCollection = defineCollection({
     published_date: z.string(),
     og_image: z.string(),
     word_count_target: z.number().optional(),
+    linkAnchors: z.array(z.string()).optional(),
   }),
 });
 
@@ -40,7 +44,7 @@ const cheatsheetsCollection = defineCollection({
     title: z.string(),
     description: z.string(),
     category: z.literal('cheatsheets'),
-    language: z.string().optional(),
+    language: z.enum(LANGUAGE_ENUM).optional(),
     template_id: z.string(),
     tags: z.array(z.string()),
     related_posts: z.array(z.string()),
@@ -65,6 +69,7 @@ const blogCollection = defineCollection({
     published_date: z.string(),
     og_image: z.string(),
     word_count_target: z.number().optional(),
+    linkAnchors: z.array(z.string()).optional(),
   }),
 });
 

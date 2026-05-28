@@ -156,13 +156,14 @@ function humanizeSlug(slug) {
 
 /**
  * Return true for phrases too short/generic to be useful anchors.
- * Rule: fewer than 2 words AND fewer than 6 characters.
- * Examples filtered: "Go" (2 chars, 1 word), "C" (1 char).
- * Examples kept: "Python" (6 chars), "javascript array" (2 words).
+ * Rule: fewer than 2 words AND 1 character or fewer.
+ * Only filters single-character tokens like "C". Language names like
+ * "go", "rust", "java" are intentionally kept so they can be registered
+ * as anchors pointing to language index pages.
  */
 function isTooShort(phrase) {
   const words = phrase.trim().split(/\s+/);
-  return words.length < 2 && phrase.length < 6;
+  return words.length < 2 && phrase.length <= 1;
 }
 
 /**

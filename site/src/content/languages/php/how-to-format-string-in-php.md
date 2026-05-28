@@ -4,6 +4,8 @@ description: "Learn how to format string in php using built-in functions like sp
 category: languages
 language: "php"
 concept: "format-string"
+linkAnchors:
+  - "php format string"
 difficulty: "beginner"
 template_id: "lang-v2"
 tags: ["php", "format-string", "sprintf", "string-interpolation"]

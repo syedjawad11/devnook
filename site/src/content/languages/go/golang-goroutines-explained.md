@@ -2,6 +2,10 @@
 actual_word_count: 1219
 category: languages
 concept: goroutines
+linkAnchors:
+  - "go goroutines"
+  - "goroutines"
+  - "golang goroutines"
 description: Goroutines are Go's secret weapon for concurrent code. Learn go keyword,
   channels, WaitGroups, and when goroutines beat threads.
 difficulty: intermediate

@@ -5,6 +5,9 @@ published_date: "2026-05-02"
 category: "languages"
 language: "go"
 concept: "use-lambda-function"
+linkAnchors:
+  - "go use lambda function"
+  - "use lambda function"
 template_id: "lang-v2"
 tags: ["go", "use-lambda-function", "anonymous-function", "closures", "higher-order-functions"]
 difficulty: "intermediate"

@@ -5,6 +5,9 @@ published_date: "2026-05-09"
 category: "languages"
 language: "cpp"
 concept: "close-file"
+linkAnchors:
+  - "cpp close file"
+  - "close file"
 template_id: "lang-v5"
 tags: ["cpp", "file-handling", "raii", "tutorial"]
 difficulty: "intermediate"

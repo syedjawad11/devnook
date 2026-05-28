@@ -5,6 +5,9 @@ published_date: "2026-05-09"
 category: languages
 language: "java"
 concept: "url-encoder-decoder"
+linkAnchors:
+  - "java url encoder decoder"
+  - "url encoder decoder"
 template_id: "lang-v5"
 tags: ["java", "url-encoding", "web-development", "tutorial"]
 difficulty: "intermediate"

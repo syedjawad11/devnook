@@ -1,6 +1,9 @@
 ---
 category: languages
 concept: data-class
+linkAnchors:
+  - "kotlin data class"
+  - "data class"
 description: Discover how to cleanly model object structures and state using Kotlin's
   Data Classes to eradicate extensive boilerplate and boilerplate property methods.
 difficulty: beginner

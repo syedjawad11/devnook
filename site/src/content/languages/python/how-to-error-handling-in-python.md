@@ -4,6 +4,9 @@ description: "Learn how to master error handling in Python. Discover try-except 
 category: "languages"
 language: "python"
 concept: "error-handling"
+linkAnchors:
+  - "python error handling"
+  - "error handling"
 difficulty: "intermediate"
 template_id: "lang-v2"
 tags: ["python", "error-handling", "exceptions", "debugging"]

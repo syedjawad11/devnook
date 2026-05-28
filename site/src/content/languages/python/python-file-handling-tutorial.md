@@ -3,6 +3,8 @@ related_content: []
 actual_word_count: 1880
 category: languages
 concept: file-handling
+linkAnchors:
+  - "python file handling"
 description: Learn how to perform file handling in Python, including reading, writing,
   and appending to files with practical code examples. Master I/O operations.
 difficulty: beginner

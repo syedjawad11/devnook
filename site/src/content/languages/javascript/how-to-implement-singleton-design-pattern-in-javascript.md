@@ -1,6 +1,9 @@
 ---
 category: languages
 concept: singleton-pattern
+linkAnchors:
+  - "javascript singleton pattern"
+  - "singleton pattern"
 description: Master the Singleton design pattern in JavaScript to manage global state,
   coordinate resource-heavy classes, and ensure exactly one class instance exists.
 difficulty: advanced

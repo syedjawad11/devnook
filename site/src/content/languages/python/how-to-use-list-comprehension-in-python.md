@@ -5,6 +5,10 @@ published_date: "2026-04-22"
 category: "languages"
 language: "python"
 concept: "list-comprehension"
+linkAnchors:
+  - "python list comprehension"
+  - "list comprehension"
+  - "list comprehensions"
 template_id: "lang-v1"
 tags: ["python", "list-comprehension", "functional-programming", "data-processing"]
 difficulty: "beginner"

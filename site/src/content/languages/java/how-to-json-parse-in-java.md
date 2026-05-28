@@ -5,6 +5,9 @@ published_date: "2026-05-02"
 category: "languages"
 language: "java"
 concept: "json-parse"
+linkAnchors:
+  - "java json parse"
+  - "json parse"
 template_id: "lang-v5"
 tags: ["java", "json", "jackson", "parsing", "tutorial"]
 difficulty: "intermediate"

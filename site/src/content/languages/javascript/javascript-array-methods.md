@@ -2,6 +2,10 @@
 actual_word_count: 1407
 category: languages
 concept: array-methods
+linkAnchors:
+  - "javascript array methods"
+  - "array methods"
+  - "array methods in javascript"
 description: Master the functional array methods that make JavaScript elegant. Real
   examples with map, filter, reduce, find, and flatMap.
 difficulty: intermediate

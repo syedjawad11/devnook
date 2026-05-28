@@ -4,6 +4,8 @@ description: "Learn what environment variables are and how to use them effective
 category: "languages"
 language: "rust"
 concept: "environment-variables"
+linkAnchors:
+  - "rust environment variables"
 difficulty: "intermediate"
 template_id: "lang-v1"
 tags: ["rust", "environment-variables", "configuration", "security"]

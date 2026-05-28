@@ -1,6 +1,10 @@
 ---
 category: languages
 concept: http-requests
+linkAnchors:
+  - "cpp http requests"
+  - "http requests"
+  - "c++ http requests"
 description: Learn how to send HTTP GET and POST requests in C++ using popular libraries
   like libcurl and Cpr, including performance and edge cases.
 difficulty: intermediate

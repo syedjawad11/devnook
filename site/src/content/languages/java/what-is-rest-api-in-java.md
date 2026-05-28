@@ -5,6 +5,9 @@ published_date: "2026-05-02"
 category: "languages"
 language: "java"
 concept: "rest-api"
+linkAnchors:
+  - "java rest api"
+  - "rest api"
 template_id: "lang-v1"
 tags: ["java", "rest-api", "spring-boot", "web-development", "backend"]
 difficulty: "intermediate"

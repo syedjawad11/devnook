@@ -5,6 +5,9 @@ published_date: "2026-05-02"
 category: "languages"
 language: "typescript"
 concept: "write-lambda-function"
+linkAnchors:
+  - "typescript write lambda function"
+  - "write lambda function"
 template_id: "lang-v1"
 tags: ["typescript", "write-lambda-function", "arrow-function", "functional-programming", "callbacks"]
 difficulty: "beginner"

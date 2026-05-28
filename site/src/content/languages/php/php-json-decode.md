@@ -2,6 +2,9 @@
 actual_word_count: 1140
 category: languages
 concept: json-decode
+linkAnchors:
+  - "php json decode"
+  - "json decode"
 description: Learn how to JSON decode in PHP using json_decode(). See practical examples,
   error handling, and best practices for parsing JSON strings.
 difficulty: beginner

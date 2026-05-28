@@ -5,6 +5,9 @@ published_date: "2026-05-02"
 category: "languages"
 language: "rust"
 concept: "close-console"
+linkAnchors:
+  - "rust close console"
+  - "close console"
 template_id: "lang-v3"
 tags: ["rust", "close-console", "process-exit", "windows-subsystem", "cross-platform"]
 difficulty: "intermediate"

@@ -4,6 +4,8 @@ description: "Learn how to format strings in Kotlin efficiently using string tem
 category: "languages"
 language: "kotlin"
 concept: "format-string"
+linkAnchors:
+  - "kotlin format string"
 difficulty: "beginner"
 template_id: "lang-v2"
 tags: ["kotlin", "format-string", "strings", "templates"]

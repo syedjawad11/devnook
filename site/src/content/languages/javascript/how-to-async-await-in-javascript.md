@@ -4,6 +4,9 @@ description: "Learn how to use async and await in JavaScript to write clean, non
 category: languages
 language: "javascript"
 concept: "async-await"
+linkAnchors:
+  - "javascript async await"
+  - "async/await in javascript"
 difficulty: "intermediate"
 template_id: "lang-v1"
 tags: ["javascript", "async-await", "promises", "concurrency"]
