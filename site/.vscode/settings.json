@@ -6,6 +6,5 @@
             "icon": "terminal-bash"
         }
     },
-    "claudeCode.allowDangerouslySkipPermissions": true,
     "claudeCode.preferredLocation": "panel"
 }
