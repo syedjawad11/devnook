@@ -1,8 +1,8 @@
 # DevNook — Dev Workspace
 
 > Always read this file first at the start of a new session.
-> Content pipeline lives in `../devnook_content_workspace/` — no pipeline code or registry here.
-> Detailed pipeline architecture → `docs/ARCHITECTURE.md`
+> Content pipeline lives in `../pipeline/` — no pipeline code or registry here.
+> Detailed pipeline architecture → `../docs/ARCHITECTURE.md`
 
 ## Session start
 
@@ -10,11 +10,14 @@ Do not auto-read: `docs/archives/`, `docs/session-history.md`. Start from this f
 
 ---
 
-## TODO (session #61)
+## TODO (session #62)
 
 1. **Day 1 routine PAUSED** — `trig_01E8rdMC6qNREuvBY8shLUfg` disabled. `keyword_set_id=5` (`git-commands-cheat-sheet-developers`) conflicts with existing `/cheatsheets/git-commands-cheatsheet`. Decide: (a) update existing, (b) repurpose cluster, or (c) delete id=5 and run Stage 0 on fresh cluster.
-2. **Verify Day 2 run** (2026-05-29 ~14:00 UTC) — check `data/pipeline-b-runs.log` for `slug=react-vs-angular-vs-vue-comparison`; visit `https://devnook.dev/blog/react-vs-angular-vs-vue-comparison`. Routine: `trig_013SxsubDU4oN2FcJr7SYAyP`.
-3. **Redesign stages in progress** — `docs/devnook-redesign-stages.md`. Stages 1–4 complete; Stage 5 done this session.
+2. **Verify Day 2 run** (2026-05-29 ~14:00 UTC) — check `../pipeline/data/pipeline-b-runs.log` for `slug=react-vs-angular-vs-vue-comparison`; visit `https://devnook.dev/blog/react-vs-angular-vs-vue-comparison`. Routine: `trig_013SxsubDU4oN2FcJr7SYAyP`.
+3. **Redesign stages in progress** — `docs/devnook-redesign-stages.md`. Stages 1–8 complete. Next: Stage 9 — Pipeline core rebuild.
+4. **Cloudflare Pages** — update build settings: Root dir = `site`, output dir = `site/dist`. See `../docs/ARCHITECTURE.md`.
+5. **Archive devnook-content** GitHub repo (`syedjawad11/devnook-content`) — run `gh repo archive syedjawad11/devnook-content --yes` when ready.
+6. **GitHub secret** `DEVNOOK_REPO_PAT` no longer needed in monorepo — can be removed from repo secrets.
 
 ---
 
@@ -22,7 +25,7 @@ Do not auto-read: `docs/archives/`, `docs/session-history.md`. Start from this f
 
 **DevNook** (devnook.dev) — developer resource site. ~91 posts + 18 client-side browser tools.
 **Stack:** Astro + Cloudflare Pages. `main` branch auto-deploys on every push.
-**Content:** Published by `../devnook_content_workspace/` via PAT — no pipeline code lives here.
+**Content:** Published by `../pipeline/agents/publish/publish.py` — no pipeline code lives here.
 
 ---
 
@@ -78,7 +81,7 @@ Spawn with: `Agent(prompt=open('agents/subagent-prompts/builder.md').read(), ...
 | Auto internal links plugin (rehype, build-time) | `src/plugins/auto-internal-links/index.mjs`; language concept URLs use `frontmatter.language`+`frontmatter.concept`, NOT filename |
 | Use `@astrojs/sitemap@3.2.1` not custom | v3.7+ incompatible with Astro 4.x; generates `sitemap-0.xml` (0-indexed) |
 | Related posts auto-derived at render time | `PostLayout.astro` builds related list from `getCollection()` — never from hand-written `## Related` sections. `frontmatter.related_posts` unused; leave as `[]`. |
-| Content pipeline is external | No registry, staging, or publish scripts here. `src/content/` written by `../devnook_content_workspace/agents/publish/publish.py`. |
+| Content pipeline is external | No registry, staging, or publish scripts here. `src/content/` written by `../pipeline/agents/publish/publish.py`. |
 | Language post URLs use `concept`, not filename | Correct path: `/languages/{lang}/{concept}`. `publish.py` has `validate_language_links()` guard. |
 | Auto-internal-links covers all categories | Scans full `contentDir` — guides, blog, cheatsheets, languages. Not language-only. |
 | Related callouts plugin (session 32) | Injects up to 3 `<aside class="related-callout">` nodes at interior H2s. Per-post opt-out: `excludeRelatedCallouts: true`. |
