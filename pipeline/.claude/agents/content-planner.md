@@ -59,7 +59,7 @@ Read these files before starting work:
 
 ## Constraints
 
-- **NEVER** queue `category = 'languages'` posts. Languages category is owned by Antigravity.
+- **NEVER** queue `category = 'languages'` posts. Language posts are handled by Pipeline B only.
 - **NEVER** call external APIs (Anthropic SDK, Gemini, OpenAI). Use only WebSearch and your built-in LLM capability.
 - **Never** queue more than BATCH_SIZE posts in one invocation.
 - `content_type` must always be `'editorial'`, `source` must always be `'claude_code'`.
