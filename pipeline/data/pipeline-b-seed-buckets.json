@@ -1,0 +1,14 @@
+{
+  "buckets": [
+    { "seed": "ai coding assistants",   "category": "AI & Productivity" },
+    { "seed": "docker commands",         "category": "Tools & Workflows" },
+    { "seed": "git commands",            "category": "Tools & Workflows" },
+    { "seed": "github actions",          "category": "Tools & Workflows" },
+    { "seed": "react vs angular",        "category": "Comparisons"       },
+    { "seed": "bash scripting",          "category": "Tools & Workflows" },
+    { "seed": "cursor ide",              "category": "AI & Productivity" }
+  ],
+  "max_keywords_per_bucket": 200,
+  "filters": { "min_volume": 500, "max_kd": 30 },
+  "dataforseo_cost_cap_usd": 1.00
+}

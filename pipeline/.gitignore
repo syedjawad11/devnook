@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.bak
+.claude/settings.json
+.claude/settings.local.json
+.claude/*.env
+*.env
+*.db-journal
+*.db-wal
+*.db-shm
+agents/content-team/registry.db
+data/keywords.db

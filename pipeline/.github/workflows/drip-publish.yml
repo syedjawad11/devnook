@@ -1,0 +1,79 @@
+﻿name: Drip Publish
+
+on:
+  # schedule:
+  #   - cron: '0 8 * * *'   # PAUSED — content quality recovery in progress
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Number of posts to publish'
+        required: false
+        default: '2'
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout content workspace
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+
+      - name: Checkout devnook site
+        uses: actions/checkout@v4
+        with:
+          repository: syedjawad11/devnook
+          token: ${{ secrets.DEVNOOK_REPO_PAT }}
+          path: devnook
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure git
+        run: |
+          git config user.name "DevNook Publisher"
+          git config user.email "publisher@devnook.dev"
+          git -C devnook config user.name "DevNook Publisher"
+          git -C devnook config user.email "publisher@devnook.dev"
+
+      - name: Set publish count
+        id: set_count
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "count=${{ inputs.count || '2' }}" >> $GITHUB_OUTPUT
+          else
+            echo "count=2" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run drip publisher
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          DEVNOOK_PATH: devnook
+        run: |
+          python agents/publish/publish.py --count ${{ steps.set_count.outputs.count }}
+
+      - name: Check if content workspace has changes
+        id: check_changes
+        run: |
+          if git diff --quiet HEAD; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push content workspace changes
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git add content-staging/ data/registry.db
+          git commit -m "chore: publish $(date '+%Y-%m-%d') drip posts [skip ci]"
+          git push
