@@ -1,0 +1,12 @@
+# Root-level env files and secrets
+.env
+*.env
+.mcp.json
+
+# Claude Code local settings (not project settings)
+.claude/settings.local.json
+.claude/*.env
+
+# Python cache at root level
+__pycache__/
+*.pyc

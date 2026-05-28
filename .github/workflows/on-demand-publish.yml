@@ -1,0 +1,53 @@
+name: On-Demand Publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Number of posts to publish'
+        required: true
+        default: '20'
+        type: string
+      category:
+        description: 'Category filter (or "all")'
+        required: false
+        default: 'all'
+        type: string
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout monorepo
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - run: pip install -r pipeline/requirements.txt
+
+      - name: Configure git
+        run: |
+          git config user.name "DevNook Publisher"
+          git config user.email "publisher@devnook.dev"
+
+      - name: Publish posts
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          DEVNOOK_PATH: site
+        run: |
+          python pipeline/agents/publish/publish.py \
+            --count ${{ github.event.inputs.count }} \
+            --category ${{ github.event.inputs.category }}
+
+      - name: Commit and push changes
+        run: |
+          git add pipeline/data/registry.db site/src/content/
+          git commit -m "chore: on-demand publish - ${{ github.event.inputs.count }} posts [skip ci]" || echo "Nothing to commit"
+          git push || echo "Nothing to push"

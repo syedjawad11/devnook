@@ -12,18 +12,20 @@ import argparse
 import re
 import shutil
 import sqlite3
-import subprocess
 import sys
 import os
 from pathlib import Path
 from datetime import date, datetime
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
+# Paths relative to pipeline/ regardless of where the script is invoked from
+PIPELINE_DIR = Path(__file__).resolve().parent.parent.parent
+sys.path.append(str(PIPELINE_DIR))
 from agents.publish.gsc_ping import ping_url
 
-STAGING_DIR = Path("content-staging")
-DEVNOOK_DIR = Path(os.environ.get("DEVNOOK_PATH", "../devnook"))
+STAGING_DIR = PIPELINE_DIR / "content-staging"
+DEVNOOK_DIR = Path(os.environ.get("DEVNOOK_PATH", str(PIPELINE_DIR.parent / "site")))
 CONTENT_DIR = DEVNOOK_DIR / "src/content"
-DB_PATH = Path("data/registry.db")
+DB_PATH = PIPELINE_DIR / "data/registry.db"
 BASE_URL = "https://devnook.dev"
 
 def get_category_url_prefix(category: str, slug: str, language: str = None) -> str:
@@ -208,19 +210,7 @@ def publish(count: int, category_filter: str = "all"):
             except Exception as e:
                 print(f"  [X] GSC failed for {url}: {e}")
 
-    # Commit and push new posts to the devnook repo
-    devnook = str(DEVNOOK_DIR)
-    today = date.today().isoformat()
-    subprocess.run(["git", "add", "src/content/"], cwd=devnook)
-    result = subprocess.run(
-        ["git", "commit", "-m", f"chore: publish {today} drip posts"],
-        cwd=devnook,
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode == 0:
-        subprocess.run(["git", "push"], cwd=devnook)
-        print(f"\ndevnook: committed and pushed {len(files)} posts.")
+    print(f"\nDone. {len(files)} posts moved to {CONTENT_DIR}. Commit handled by caller.")
 
 def main():
     parser = argparse.ArgumentParser()
