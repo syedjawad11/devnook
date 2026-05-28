@@ -14,7 +14,7 @@ Do not auto-read: `docs/archives/`, `docs/session-history.md`. Start from this f
 
 1. **Day 1 routine PAUSED** — `trig_01E8rdMC6qNREuvBY8shLUfg` disabled. `keyword_set_id=5` (`git-commands-cheat-sheet-developers`) conflicts with existing `/cheatsheets/git-commands-cheatsheet`. Decide: (a) update existing, (b) repurpose cluster, or (c) delete id=5 and run Stage 0 on fresh cluster.
 2. **Verify Day 2 run** (2026-05-29 ~14:00 UTC) — check `../pipeline/data/pipeline-b-runs.log` for `slug=react-vs-angular-vs-vue-comparison`; visit `https://devnook.dev/blog/react-vs-angular-vs-vue-comparison`. Routine: `trig_013SxsubDU4oN2FcJr7SYAyP`.
-3. **Redesign stages in progress** — `docs/devnook-redesign-stages.md`. Stages 1–8 complete. Next: Stage 9 — Pipeline core rebuild.
+3. **Redesign stages in progress** — `docs/devnook-redesign-stages.md`. Stages 1–9 complete. Next: Stage 10 — Language stage-0 (revive volume engine).
 4. **Cloudflare Pages** — update build settings: Root dir = `site`, output dir = `site/dist`. See `../docs/ARCHITECTURE.md`.
 5. **Archive devnook-content** GitHub repo (`syedjawad11/devnook-content`) — run `gh repo archive syedjawad11/devnook-content --yes` when ready.
 6. **GitHub secret** `DEVNOOK_REPO_PAT` no longer needed in monorepo — can be removed from repo secrets.

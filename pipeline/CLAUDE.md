@@ -9,11 +9,12 @@ Do not open drafts, `data/registry.db` directly, or session history logs unless 
 
 ---
 
-## TODO (session #61)
+## TODO (session #62)
 
 1. **Day 1 routine PAUSED** — `trig_01E8rdMC6qNREuvBY8shLUfg` disabled. `keyword_set_id=5` (`git-commands-cheat-sheet-developers`) conflicts with `/cheatsheets/git-commands-cheatsheet`. Decide: (a) update existing cheatsheet, (b) repurpose cluster, or (c) delete id=5 and run Stage 0 on a fresh cluster.
-2. **Verify Day 2 run** (2026-05-29 ~14:00 UTC) — check `data/pipeline-b-runs.log` for `slug=react-vs-angular-vs-vue-comparison`. Routine: `trig_013SxsubDU4oN2FcJr7SYAyP`.
-3. **Pipeline B next cycle** — run Stage 0 locally first to generate viable clusters before re-enabling CCR routine.
+2. **Stage 9 complete** — `pipeline/core/` built. Run: `python -m pipeline.core.runner --slug <slug>`. Requires `pip install -r requirements.txt`.
+3. **GSC ping not wired** — `GOOGLE_SERVICE_ACCOUNT_JSON` secret needs to be set in GitHub Actions repo secrets (`syedjawad11/devnook`). See `agents/publish/gsc_ping.py`.
+4. **Stage 10 next** — Language stage-0: validate ~600 concept×language seeds, build ordered queue via DataForSEO `keyword_suggestions/live`.
 
 ---
 
@@ -96,7 +97,7 @@ Pick slug from `data/rewrite-queue.json` → `@seo-optimizer SLUG=...` → verif
 
 ## Registry Schema (key columns)
 
-See `../devnook/docs/ARCHITECTURE.md` for full schema including `clusters`, `keyword_pool`, `keyword_sets`.
+See `../site/docs/ARCHITECTURE.md` for full schema including `clusters`, `keyword_pool`, `keyword_sets`.
 
 ```sql
 posts (
@@ -108,7 +109,7 @@ posts (
   concept TEXT,
   template_id TEXT,
   keyword TEXT,
-  status TEXT,            -- queued → drafted → approved → staged → published | rejected
+  status TEXT,            -- queued → outlined → drafted → linked → approved → published | rejected
   content_type TEXT,      -- programmatic | editorial
   source TEXT,
   published_at TEXT,
@@ -125,7 +126,7 @@ posts (
 | `content-style-system.md` is single source of truth | All writing agents must read it before writing. Approved voices: terse-senior, thoughtful-explainer, tutorial-guide. |
 | Pipeline B 2,500-word hard floor | QA hard-fail below 2,500 words |
 | No `## Related` sections in post body | PostLayout.astro auto-derives related list. `strip_related_section()` in publish.py is the safety net. |
-| No API-based Python LLM calls | All LLM work goes through `@agent-name` subagent invocations |
+| `pipeline/core/` uses Anthropic API directly | `outline.py` and `write.py` call `anthropic.Anthropic()`. Requires `ANTHROPIC_API_KEY`. Agent prompts still used for ad-hoc work. |
 | Meta description minimum 120 chars | Always verify with `len()` — agent self-reported counts unreliable |
 | Frontmatter values with `: ` must be quoted | Colon+space in unquoted values breaks YAML parse at Astro build time |
 | No H1 in markdown body | PostLayout.astro renders title as `<h1>`; body `# Title` = duplicate H1 |
@@ -145,13 +146,41 @@ GH_PAT=...                         # PAT for content workspace CI commits
 
 ---
 
+## Pipeline Core (Stage 9+)
+
+`pipeline/core/` — Python modules replacing the agent-prompt pipeline tail.
+
+Status lifecycle: `queued → outlined → drafted → linked → approved → published`
+
+```bash
+# Full pipeline run on a queued post
+python -m pipeline.core.runner --slug my-slug
+
+# Dry run (validate only — no API calls, no writes)
+python -m pipeline.core.runner --slug my-slug --dry-run
+
+# Resume from a specific stage
+python -m pipeline.core.runner --slug my-slug --from-stage write
+
+# Single stage
+python -m pipeline.core.runner --slug my-slug --stage qa
+
+# Seed a test post into the queue
+python -m pipeline.core.runner --seed-post --slug test-slug \
+  --title "My Title" --category blog --keyword "primary keyword" --template blog-v5
+```
+
+Run from `pipeline/` root. Requires `pip install -r requirements.txt`.
+
+---
+
 ## How to Run
 
 ```bash
 # Status check
 python -c "import sqlite3; db=sqlite3.connect('data/registry.db'); [print(r) for r in db.execute('SELECT status, content_type, COUNT(*) FROM posts GROUP BY 1,2')]"
 
-# Manual publish (N posts)
+# Manual publish (N posts) — legacy drip publisher
 python agents/publish/publish.py --count N
 ```
 
