@@ -149,7 +149,7 @@ CREATE INDEX idx_lang_opp_score
 
 -- Row counts
 -- clusters: 7 rows
--- editorial_opportunity: 4681 rows
+-- editorial_opportunity: 4681 rows (1626 skipped: Python/JS/TS clusters + language-bleed; 252 primary pending, 408 secondary pending)
 -- fetched_seeds: 269 rows
 -- keyword_pool: 68 rows
 -- keyword_sets: 5 rows
