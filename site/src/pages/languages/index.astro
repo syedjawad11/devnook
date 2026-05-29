@@ -10,12 +10,12 @@ const languages = Object.keys(LANGUAGE_NAMES).map(slug => ({
   slug,
   name: LANGUAGE_NAMES[slug],
   postCount: allLanguagePosts.filter(p => p.data.language === slug).length,
-}));
+})).filter(lang => lang.postCount >= 5);
 ---
 
 <BaseLayout
   title="Programming Languages — DevNook"
-  description="Learn programming concepts across 12 popular languages: Python, JavaScript, TypeScript, Go, Rust, Java, C#, PHP, Ruby, Swift, Kotlin, and C++."
+  description="Learn programming concepts in Python, JavaScript, Java, C++, and more — deep-dive tutorials and concept guides for working developers."
 >
   <div class="languages-index">
     <header class="page-header">

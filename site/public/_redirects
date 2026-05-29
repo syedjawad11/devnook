@@ -4,3 +4,10 @@
 
 # Google Forms post (google-forms is not a programming language; file never existed on disk)
 /languages/google-forms/close-response/ /languages/ 301
+
+# Stage 12 — Cannibalization merges (2026-05-29)
+# C++ exception handling: catch-error (lang-v1) merged into c-handle-exception (lang-v2)
+/languages/cpp/catch-error/ /languages/cpp/c-handle-exception/ 301
+
+# JSON formatter: thin tool-landing guide merged into comprehensive validator best-practices
+/guides/json-formatter-guide/ /guides/json-formatter-validator-best-practices/ 301
