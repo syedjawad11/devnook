@@ -12,15 +12,19 @@
 - [ ] `category` not one of: languages, guides, blog, cheatsheets, tools
 
 ### Content Quality
-- [ ] Word count below minimum for content type (see seo-writing-rules.md)
+- [ ] Word count below minimum for content type (see seo-writing-rules.md — editorial min 2,500; all others min 1,500)
 - [ ] Zero code blocks in a language post or guide
 - [ ] Fewer than 3 internal links
 - [ ] More than 8 internal links
 - [ ] Any internal link pointing to a non-existent slug in registry.db
-- [ ] Zero external links (every article must have 1–2 external links to authoritative sources — MDN, official language docs, W3C, Wikipedia, or reputable vendor docs)
+- [ ] Zero external links (every article must have 1–2 external links to authoritative sources — MDN, official language docs, W3C, Wikipedia, or reputable vendor/editorial sources)
+- [ ] External link pointing to a non-authoritative, commercial, or irrelevant source
+- [ ] Schema markup missing from frontmatter or injected JSON-LD block (every article requires schema — see seo-writing-rules.md)
+- [ ] Primary keyword does not appear in any H2 heading
 - [ ] Contains any banned phrase from devnook-brand-voice.md
 - [ ] Title is identical to an existing post in registry.db
 - [ ] First 8 words of title match an existing post
+- [ ] Passive voice used pervasively (>30% of sentences) — active voice required
 
 ### Duplicate Detection
 - [ ] Slug already exists in registry.db (exact match = immediate reject)
@@ -39,6 +43,9 @@
 - No H3 subsections (acceptable for short posts)
 - Title over 65 characters (may truncate in SERPs)
 - Meta description between 130–140 chars (tight but ok)
+- Image `alt` attribute empty or missing (flag every instance with the image filename)
+- Fewer than 6 secondary keyword variants used naturally in the body
+- Passive voice count: 15–30% of sentences (moderate concern — flag for writer review)
 
 ## Similarity Check Implementation
 ```python
@@ -62,11 +69,14 @@ The QA agent writes a structured result to registry.db for each post:
 ```json
 {
   "slug": "python-list-comprehensions",
-  "qa_status": "approved",  // or "rejected" or "warning"
+  "qa_status": "approved",
   "qa_timestamp": "2024-01-15T10:30:00Z",
   "word_count": 1247,
   "similarity_score": 0.23,
   "internal_links": 4,
+  "external_links": 1,
+  "schema_present": true,
+  "h2_has_primary_kw": true,
   "rejections": [],
   "warnings": ["title_length: 68 chars"]
 }

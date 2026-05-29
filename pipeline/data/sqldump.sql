@@ -21,6 +21,23 @@ INSERT INTO "clusters" VALUES(6,'git commands cheat sheet','Tools & Workflows','
 INSERT INTO "clusters" VALUES(7,'react vs angular vs vue','Comparisons','informational',6,6,6,4320,'used','react-vs-angular-vs-vue-comparison',7,'2026-05-27 20:36:01');
 INSERT INTO "clusters" VALUES(8,'scripting in bash','Tools & Workflows','informational',12,1,10,36520,'insufficient',NULL,NULL,'2026-05-27 20:36:01');
 INSERT INTO "clusters" VALUES(9,'cursor ide','AI & Productivity','informational',5,1,3,24400,'insufficient',NULL,NULL,'2026-05-27 20:36:01');
+CREATE TABLE editorial_opportunity (
+          id               INTEGER PRIMARY KEY AUTOINCREMENT,
+          topic_seed       TEXT NOT NULL,
+          cluster_label    TEXT,
+          keyword          TEXT NOT NULL,
+          volume           INTEGER DEFAULT 0,
+          kd               REAL DEFAULT 0,
+          tier             TEXT DEFAULT 'pending'
+                           CHECK(tier IN ('primary','secondary','fallback',
+                                         'low-confidence','pending')),
+          source           TEXT DEFAULT 'matrix',
+          opportunity_score REAL DEFAULT 0,
+          status           TEXT DEFAULT 'pending'
+                           CHECK(status IN ('pending','queued','skipped')),
+          fetched_at       TEXT DEFAULT (datetime('now')),
+          UNIQUE(keyword)
+        );
 CREATE TABLE fetched_seeds (seed TEXT PRIMARY KEY, fetched_at TEXT DEFAULT (datetime('now')));
 INSERT INTO "fetched_seeds" VALUES('json formatter online','2026-04-12 15:05:33');
 INSERT INTO "fetched_seeds" VALUES('base64 encode decode','2026-04-12 15:05:33');
@@ -880,6 +897,9 @@ INSERT INTO "template_counters" VALUES('tool-exp-v3',1,'2026-04-12 19:40:27');
 INSERT INTO "template_counters" VALUES('tool-exp-v4',0,NULL);
 CREATE INDEX idx_lang_opp_score
         ON language_opportunity(has_demand, opportunity_score DESC)
+    ;
+CREATE INDEX idx_edit_opp_tier
+        ON editorial_opportunity(tier, opportunity_score DESC)
     ;
 DELETE FROM "sqlite_sequence";
 INSERT INTO "sqlite_sequence" VALUES('pipeline_runs',16);

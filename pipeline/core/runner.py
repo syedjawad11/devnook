@@ -182,7 +182,7 @@ def main() -> None:
     parser.add_argument("--stage", default=None, choices=STAGE_ORDER, help="Run a single stage")
     parser.add_argument("--json", action="store_true", help="Output results as JSON")
     # Profile mode — query pre-populated opportunity tables
-    parser.add_argument("--profile", choices=["language"], help="Show ordered opportunity briefs")
+    parser.add_argument("--profile", choices=["language", "editorial"], help="Show ordered opportunity briefs")
     parser.add_argument("--limit", type=int, default=5, help="Number of briefs for --profile output")
     # Seed mode
     parser.add_argument("--seed-post", action="store_true", help="Seed a new post into queue")
@@ -238,6 +238,34 @@ def main() -> None:
             print(f"  {i}. {b['language']} / {b['concept']}")
             print(
                 f"     keyword: \"{b['canonical_keyword']}\""
+                f"  vol={b['volume']}{kd_str}"
+                f"  opp={b['opportunity_score']}"
+            )
+        sys.exit(0)
+
+    if args.profile == "editorial":
+        from pipeline.core.stage0_editorial import list_briefs, count_by_tier
+        counts = count_by_tier(db_path)
+        total = sum(counts.values())
+        if total == 0:
+            print("editorial_opportunity table is empty.")
+            print("Run @pipeline-b-stage0-editorial agent (LOCAL session, DataForSEO MCP required).")
+            sys.exit(1)
+        briefs = list_briefs(db_path, limit=args.limit)
+        if not briefs:
+            print(
+                f"No editorial opportunities with viable tier yet ({total} rows).\n"
+                "Re-run @pipeline-b-stage0-editorial to fetch volumes."
+            )
+            sys.exit(1)
+        tier_summary = ", ".join(f"{k}={v}" for k, v in sorted(counts.items()))
+        print(f"\nTop {len(briefs)} editorial opportunities (tier order + score):")
+        print(f"Tier counts: {tier_summary}\n")
+        for i, b in enumerate(briefs, 1):
+            kd_str = f" kd={b['kd']:.0f}" if b["kd"] else ""
+            print(f"  {i}. [{b['tier']}] {b['cluster_label']} — \"{b['keyword']}\"")
+            print(
+                f"     seed: \"{b['topic_seed']}\""
                 f"  vol={b['volume']}{kd_str}"
                 f"  opp={b['opportunity_score']}"
             )
