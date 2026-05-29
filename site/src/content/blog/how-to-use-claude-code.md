@@ -2,7 +2,7 @@
 title: "Claude Code: How to Use It for Software Development"
 description: "Claude Code is Anthropic's AI coding assistant for the terminal. Learn how to install it, master key commands, and build a faster development workflow."
 category: blog
-subcategory: "AI & Productivity"
+subcategory: "AI Dev Tooling"
 template_id: blog-v5
 tags: [claude-code, ai-coding-assistant, anthropic, developer-tools, ai-productivity]
 related_posts: []

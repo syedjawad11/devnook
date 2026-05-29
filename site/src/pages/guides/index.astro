@@ -10,6 +10,12 @@ const sortedGuides = guides.sort((a, b) => {
   return dateB.getTime() - dateA.getTime();
 });
 
+const cheatsheets = (await getCollection('cheatsheets')).sort((a, b) => {
+  const dateA = new Date(a.data.published_date || '1970-01-01');
+  const dateB = new Date(b.data.published_date || '1970-01-01');
+  return dateB.getTime() - dateA.getTime();
+});
+
 const title = 'Developer Guides — DevNook';
 const description = 'In-depth guides and tutorials for developers. Learn programming concepts, best practices, and advanced techniques.';
 ---
@@ -37,6 +43,25 @@ const description = 'In-depth guides and tutorials for developers. Learn program
       <div class="empty-state">
         <p>No guides available yet. Check back soon!</p>
       </div>
+    )}
+
+    {cheatsheets.length > 0 && (
+      <section class="reference-section">
+        <h2 class="section-heading">Reference Sheets</h2>
+        <p class="section-subtitle">Quick-reference syntax cards and command lists.</p>
+        <div class="guides-grid">
+          {cheatsheets.map((sheet) => (
+            <PostCard
+              title={sheet.data.title}
+              description={sheet.data.description}
+              href={`/cheatsheets/${sheet.slug}/`}
+              tags={sheet.data.tags}
+              date={sheet.data.published_date}
+              category={sheet.data.category}
+            />
+          ))}
+        </div>
+      </section>
     )}
   </div>
 </BaseLayout>
@@ -82,6 +107,26 @@ const description = 'In-depth guides and tutorials for developers. Learn program
   .empty-state p {
     font-size: 1.125rem;
     margin: 0;
+  }
+
+  .reference-section {
+    margin-top: var(--space-10);
+    padding-top: var(--space-8);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .section-heading {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0 0 var(--space-2) 0;
+    letter-spacing: -0.01em;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+    color: var(--color-text-muted);
+    margin: 0 0 var(--space-6) 0;
   }
 
   @media (max-width: 768px) {

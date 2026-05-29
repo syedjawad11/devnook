@@ -2,7 +2,7 @@
 title: "Best AI Coding Assistants for Developers in 2026"
 description: "The best AI coding assistants for developers in 2026: GitHub Copilot, Cursor, Codeium, Tabnine, Amazon Q, and more — features, pricing, and IDE support compared"
 category: blog
-subcategory: "AI & Productivity"
+subcategory: "AI Dev Tooling"
 template_id: blog-v3
 tags: [ai-tools, developer-tools, productivity, github-copilot, code-completion]
 related_posts: []

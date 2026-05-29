@@ -2,6 +2,7 @@
 title: "ChatGPT vs Claude for Developers: 2026 Comparison"
 description: "ChatGPT vs Claude for developers compared head-to-head. Code generation, debugging, API access, and pricing — which AI assistant wins in 2026?"
 category: blog
+subcategory: "Comparisons"
 template_id: blog-v1
 tags: [ai-tools, chatgpt, claude, ai-coding-assistant, developer-productivity]
 related_posts: []
