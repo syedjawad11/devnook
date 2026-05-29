@@ -1,6 +1,6 @@
 ﻿---
 name: content-writer
-description: Writes SEO-optimised articles for DevNook from queued registry posts. Handles guides, blog, cheatsheets, and tools categories (never languages). Supports two modes — full (write from scratch) and seo-only (optimise existing draft). Self-validates each article before saving. Invoke with a list of slugs and internal links.
+description: Writes SEO-optimised articles for DevNook from queued registry posts. Handles guides, blog, cheatsheets, tools, and languages categories. Supports two modes — full (write from scratch) and seo-only (optimise existing draft). Self-validates each article before saving. Invoke with a list of slugs and internal links.
 model: claude-sonnet-4-6
 ---
 
@@ -68,7 +68,7 @@ Read these files before starting any article:
 
 ## Constraints
 
-- **Never** write `category = 'languages'` articles. If a queued slug has `category = 'languages'`, skip it and log in errors.
+- For `category = 'languages'` articles: minimum 1,500 words; at least 2 code blocks with language tags; focus on showing the concept in that specific language with working examples.
 - **Batch cap: max 10 articles per invocation.** If BATCH_SLUGS contains more, process first 10 and report the rest as skipped.
 - **Never** call external APIs (Anthropic SDK, Gemini, OpenAI).
 - Do **not** duplicate content from `agents/skills/` files into the article — reference them for guidance only.

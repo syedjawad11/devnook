@@ -181,6 +181,9 @@ def main() -> None:
     parser.add_argument("--from-stage", default="outline", choices=STAGE_ORDER)
     parser.add_argument("--stage", default=None, choices=STAGE_ORDER, help="Run a single stage")
     parser.add_argument("--json", action="store_true", help="Output results as JSON")
+    # Profile mode — query pre-populated opportunity tables
+    parser.add_argument("--profile", choices=["language"], help="Show ordered opportunity briefs")
+    parser.add_argument("--limit", type=int, default=5, help="Number of briefs for --profile output")
     # Seed mode
     parser.add_argument("--seed-post", action="store_true", help="Seed a new post into queue")
     parser.add_argument("--title", default="")
@@ -212,6 +215,33 @@ def main() -> None:
         )
         if not args.slug:
             return
+
+    if args.profile == "language":
+        from pipeline.core.stage0_language import list_briefs, count_status
+        counts = count_status(db_path)
+        total = counts.get("_total", 0)
+        if total == 0:
+            print("language_opportunity table is empty.")
+            print("Run @pipeline-b-stage0-language agent (LOCAL session, DataForSEO MCP required).")
+            sys.exit(1)
+        briefs = list_briefs(db_path, limit=args.limit)
+        if not briefs:
+            print(
+                f"No language opportunities with demand yet "
+                f"({total} rows, 0 with has_demand=1).\n"
+                "Re-run @pipeline-b-stage0-language to fetch volumes."
+            )
+            sys.exit(1)
+        print(f"\nTop {len(briefs)} language opportunities (ordered by opportunity score):\n")
+        for i, b in enumerate(briefs, 1):
+            kd_str = f" kd={b['kd']:.0f}" if b["kd"] else ""
+            print(f"  {i}. {b['language']} / {b['concept']}")
+            print(
+                f"     keyword: \"{b['canonical_keyword']}\""
+                f"  vol={b['volume']}{kd_str}"
+                f"  opp={b['opportunity_score']}"
+            )
+        sys.exit(0)
 
     if not args.slug:
         parser.print_help()

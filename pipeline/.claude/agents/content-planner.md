@@ -1,6 +1,6 @@
 ﻿---
 name: content-planner
-description: Keyword discovery and content planning for DevNook. Reads registry state, researches keywords via WebSearch, classifies them, and queues new posts in registry.db. Targets guides, blog, cheatsheets, and tools categories only (never languages). Invoke when you need to find and queue new content to write.
+description: Keyword discovery and content planning for DevNook. Reads registry state, researches keywords via WebSearch, classifies them, and queues new posts in registry.db. Targets guides, blog, cheatsheets, tools, and languages categories. Invoke when you need to find and queue new content to write.
 model: claude-haiku-4-5-20251001
 ---
 
@@ -59,7 +59,7 @@ Read these files before starting work:
 
 ## Constraints
 
-- **NEVER** queue `category = 'languages'` posts. Language posts are handled by Pipeline B only.
+- When queuing `category = 'languages'` posts, only use concept×language cells that appear in the `language_opportunity` table with `has_demand = 1`. Never fabricate language post slugs.
 - **NEVER** call external APIs (Anthropic SDK, Gemini, OpenAI). Use only WebSearch and your built-in LLM capability.
 - **Never** queue more than BATCH_SIZE posts in one invocation.
 - `content_type` must always be `'editorial'`, `source` must always be `'claude_code'`.
