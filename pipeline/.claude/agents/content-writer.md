@@ -68,6 +68,15 @@ Read these files before starting any article:
 
 ## Constraints
 
+- **HARD RULE — Language post keyword targeting**: For `category = 'languages'` articles, before writing, run:
+  ```sql
+  SELECT keywords_json FROM language_opportunity WHERE canonical_keyword = ?
+  ```
+  using the post's `keyword` field as the bind value. If `keywords_json` is populated (JSON array of 8–12 objects with `keyword`, `volume`, `kd`, `score` fields), these are the MANDATORY target keywords for the article:
+  - Every keyword in the list must appear at least once naturally in the article body
+  - At least 3 of the keywords must appear verbatim in H2 or H3 headings
+  - Spread keywords across sections — do not cluster them in one paragraph
+  - **Never write a language post without checking `keywords_json` first.** If it is NULL, flag as a data gap and write targeting the canonical keyword only (temporary fallback — not the preferred path).
 - For `category = 'languages'` articles: minimum 1,500 words; at least 2 code blocks with language tags; focus on showing the concept in that specific language with working examples.
 - **Batch cap: max 10 articles per invocation.** If BATCH_SLUGS contains more, process first 10 and report the rest as skipped.
 - **Never** call external APIs (Anthropic SDK, Gemini, OpenAI).

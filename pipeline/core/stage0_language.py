@@ -55,12 +55,19 @@ def run_migration(db_path: Path) -> None:
           kd               REAL DEFAULT 0,
           opportunity_score REAL DEFAULT 0,
           has_demand       INTEGER DEFAULT 0,
+          keywords_json    TEXT,
           status           TEXT DEFAULT 'pending'
                            CHECK(status IN ('pending','queued','skipped')),
           fetched_at       TEXT DEFAULT (datetime('now')),
           UNIQUE(language, concept)
         )
     """)
+    # Add keywords_json to existing DBs that predate this column
+    try:
+        conn.execute("ALTER TABLE language_opportunity ADD COLUMN keywords_json TEXT")
+        conn.commit()
+    except Exception:
+        pass  # Column already exists
     conn.execute("""
         CREATE INDEX IF NOT EXISTS idx_lang_opp_score
         ON language_opportunity(has_demand, opportunity_score DESC)
@@ -94,6 +101,24 @@ def upsert_opportunity(
                has_demand        = excluded.has_demand,
                fetched_at        = excluded.fetched_at""",
         (language, concept, canonical_keyword, volume, kd, opportunity_score, has_demand),
+    )
+    conn.commit()
+    conn.close()
+
+
+def upsert_keywords_json(
+    db_path: Path,
+    language: str,
+    concept: str,
+    keywords_json: str,
+) -> None:
+    """Store the selected 8-12 keyword targets for a concept×language cell."""
+    conn = sqlite3.connect(str(db_path))
+    conn.execute(
+        """UPDATE language_opportunity
+           SET keywords_json = ?
+           WHERE language = ? AND concept = ?""",
+        (keywords_json, language, concept),
     )
     conn.commit()
     conn.close()

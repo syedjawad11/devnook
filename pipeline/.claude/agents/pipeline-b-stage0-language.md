@@ -81,12 +81,18 @@ conn.execute("""
       kd               REAL DEFAULT 0,
       opportunity_score REAL DEFAULT 0,
       has_demand       INTEGER DEFAULT 0,
+      keywords_json    TEXT,
       status           TEXT DEFAULT 'pending'
                        CHECK(status IN ('pending','queued','skipped')),
       fetched_at       TEXT DEFAULT (datetime('now')),
       UNIQUE(language, concept)
     )
 """)
+try:
+    conn.execute("ALTER TABLE language_opportunity ADD COLUMN keywords_json TEXT")
+    conn.commit()
+except Exception:
+    pass  # Column already exists
 conn.execute("""
     CREATE INDEX IF NOT EXISTS idx_lang_opp_score
     ON language_opportunity(has_demand, opportunity_score DESC)
@@ -198,6 +204,86 @@ conn.commit()
 conn.close()
 print(f"SL-2: upserted {inserted} cells")
 ```
+
+---
+
+## Step SL-2b — Keyword expansion (MANDATORY for cells with has_demand=1)
+
+**Hard rule: every language post must have 8–12 keyword targets selected by lowest KD + highest volume.**
+
+For each cell where `has_demand = 1` AND `keywords_json IS NULL`, fetch keyword ideas from DataForSEO and select the best 8–12 keyword targets.
+
+### Why this step is mandatory
+
+A single canonical keyword (e.g. "python string formatting") does not capture the full semantic space a well-written article should cover. By targeting 8–12 low-KD, high-volume related keywords, each language article earns rankings across a cluster of intent-matched queries — not just one.
+
+### Execution
+
+```python
+import sqlite3, json
+
+conn = sqlite3.connect('data/registry.db')
+cells_needing_kws = conn.execute(
+    """SELECT language, concept, canonical_keyword
+       FROM language_opportunity
+       WHERE has_demand = 1 AND keywords_json IS NULL
+       ORDER BY opportunity_score DESC"""
+).fetchall()
+conn.close()
+
+print(f"SL-2b: {len(cells_needing_kws)} cells need keyword expansion")
+```
+
+For each cell, call `mcp__dataforseo__dataforseo_labs_google_keyword_ideas`:
+
+```python
+# result = mcp__dataforseo__dataforseo_labs_google_keyword_ideas(
+#     keywords=[canonical_keyword],
+#     location_name="United States",
+#     language_code="en"
+# )
+#
+# Each item in result has: 'keyword', 'search_volume', 'keyword_difficulty'
+# Filter: search_volume > 0
+# Rank by: opportunity_score = search_volume * (100 - keyword_difficulty) / 100  DESC
+# Take top 8–12 (aim for 10; accept 8 minimum if fewer qualify)
+```
+
+Selection rule (hard — no exceptions):
+- `search_volume > 0` required
+- Sort by `search_volume * (100 - keyword_difficulty) / 100` descending
+- Take the top 8–12 — this automatically favours **lowest KD with highest volume**
+- Always include the original `canonical_keyword` in the list if not already selected
+
+Store result:
+
+```python
+import sqlite3, json
+
+# selected = [
+#     {"keyword": "python f-string", "volume": 2400, "kd": 8, "score": 2208.0},
+#     {"keyword": "python string format", "volume": 1900, "kd": 12, "score": 1672.0},
+#     ...
+# ]
+
+selected_json = json.dumps(selected)
+
+conn = sqlite3.connect('data/registry.db')
+conn.execute(
+    "UPDATE language_opportunity SET keywords_json = ? WHERE language = ? AND concept = ?",
+    (selected_json, language, concept)
+)
+conn.commit()
+conn.close()
+```
+
+### Batching
+
+Process cells in batches to avoid rate limits. One API call per cell (keyword ideas takes one seed keyword at a time). After each batch of 10 cells, print progress.
+
+### Idempotency
+
+Skip cells where `keywords_json IS NOT NULL` — already expanded. Safe to re-run.
 
 ---
 
