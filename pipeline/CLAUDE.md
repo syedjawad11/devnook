@@ -9,9 +9,9 @@ Do not open drafts, `data/registry.db` directly, or session history logs unless 
 
 ---
 
-## TODO (session #65, 2026-05-29)
+## TODO (session #66, 2026-05-29)
 
-1. **Stage 12 next** — Content triage: review `editorial_opportunity` primary tier (252 keywords), pick best 10–20 to queue into `posts` for writing.
+1. **Stage 14 next** — Editorial content queue: pick best 10–20 from `editorial_opportunity` primary tier (252 keywords) and queue into `posts` for writing via `pipeline.core.runner`.
 2. **Pipeline B routine DISABLED** — `keyword_set_id=6` (`git-commands-cheat-sheet-developers`) conflicts with `/cheatsheets/git-commands-cheatsheet`. Decide: (a) update existing cheatsheet, (b) repurpose cluster, or (c) delete id=6 and re-seed. Re-enable routine after a `keyword_sets` row with `status='ready'` is confirmed.
 3. **GSC ping not wired** — `GOOGLE_SERVICE_ACCOUNT_JSON` secret needs to be set in GitHub Actions repo secrets (`syedjawad11/devnook`). See `agents/publish/gsc_ping.py`.
 4. **Editorial language rule** — Never queue Python/JS/TS language syntax topics as editorial content. Those belong to `/languages/` programmatic section. Python + JS/TS clusters already skipped in `editorial_opportunity`.
