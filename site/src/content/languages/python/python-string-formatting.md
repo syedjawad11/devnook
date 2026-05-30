@@ -184,8 +184,7 @@ The **`%` operator** is the oldest style, inherited from the C language. You wil
 ```python
 name = "Maria"
 balance = 1234.56
-print("Hello %s, your balance is $%.2f" % (name, balance))
-# Hello Maria, your balance is $1,234.56
+print("Hello %s, your balance is $%.2f" % (name, balance))   # -> Hello Maria, your balance is $1234.56
 ```
 
 Here `%s` means "insert a string" and `%.2f` means "insert a float with 2 decimals". It works, but it is harder to read and easy to get wrong, so prefer f-strings for anything new.
