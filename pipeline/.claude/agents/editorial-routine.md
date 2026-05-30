@@ -394,8 +394,9 @@ git -c user.email=claude@anthropic.com -c user.name=Claude \
 LOCAL_SHA=$(git rev-parse HEAD)
 echo "LOCAL_SHA=$LOCAL_SHA"
 
-# Push
-PUSH_OUT=$(git push 2>&1)
+# Push — explicit remote + ref. Bare `git push` fails in the CCR sandbox
+# because the cloned branch has no configured upstream (no push.default target).
+PUSH_OUT=$(git push origin HEAD 2>&1)
 PUSH_EXIT=$?
 
 if [ $PUSH_EXIT -ne 0 ]; then
