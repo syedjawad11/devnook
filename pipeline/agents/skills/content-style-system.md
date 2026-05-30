@@ -17,6 +17,26 @@ Before you write a single word, check the **Forbidden Language** section (Sectio
 
 ---
 
+## Beginner-First Writing Principle (all article types)
+
+Every DevNook article — language posts and editorial posts alike — must start from the reader's perspective, not the expert's. Write as if the reader is smart but has never encountered this specific concept before.
+
+**The structure: always simple → complex.** Open every article by answering "what is this?" and "why does it matter?" in plain language, before showing code, protocol details, or technical comparisons. A reader who understands the *what* and *why* can absorb the *how*. A reader hit with jargon upfront bounces.
+
+**Reference tone:** RealPython and GeeksforGeeks. Both open with a plain definition + motivation, then progress through examples from minimal to realistic. Both assume the reader is learning, not debugging production.
+
+**Specific rules:**
+- Do NOT open with a TL;DR comparison table — beginners don't yet know what they're comparing.
+- Do NOT open a "concept A vs concept B" article assuming the reader already understands both A and B.
+- Do NOT dump protocol headers, RFC numbers, or error codes in the first section without explaining what they are first.
+- DO open with an analogy, a concrete everyday scenario, or a plain one-sentence definition.
+- DO explain what the concept IS before showing how to use it.
+- DO build code examples: minimal runnable example first → realistic example second → advanced patterns last.
+
+This principle applies regardless of voice chosen. A `tutorial-guide` article that opens with expert-level technicalities fails this check even if the sentence structure is correct.
+
+---
+
 ## Section 1 — Language Post Section Set (18 sections)
 
 Use this section set ONLY for posts under `/languages/{lang}/{concept}/`.

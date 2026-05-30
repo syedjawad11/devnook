@@ -111,11 +111,14 @@ for k, v in list(url_map.items())[:10]:
 
 ## Step ER-4 — Select voice + structure
 
+**All editorial posts must follow the Beginner-First Writing Principle from `content-style-system.md`:** start by explaining what the topic IS and why it matters before jumping into technical details. Do NOT open with a TL;DR comparison table or assume the reader already understands both sides of a comparison. Build from simple to complex.
+
 From `content-style-system.md`:
 
-- Comparison topics (`vs`, `or`, `difference between`): → `terse-senior`
+- Comparison topics (`vs`, `or`, `difference between`): → `thoughtful-explainer` (explain each concept in plain terms before comparing — do not assume the reader already knows both sides)
 - How-to / guide topics (`how to`, `logs`, `commands`): → `tutorial-guide`
 - Concept explainers (`what is`, `explained`, `overview`): → `thoughtful-explainer`
+- **`terse-senior`** is reserved for cheatsheet/reference-style articles only; avoid it for explanatory or comparison content.
 
 Select: 1 opening + 1 closing + 2–5 body sections = 5–8 total H2 sections.
 
