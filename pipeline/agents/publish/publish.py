@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 DevNook Drip Publisher
-Moves posts from /content-staging/ to /src/content/ and pings GSC.
+Moves posts from /content-staging/ to /src/content/.
 
 Usage:
   python agents/publish/publish.py --count 3
@@ -20,7 +20,6 @@ from datetime import date, datetime
 # Paths relative to pipeline/ regardless of where the script is invoked from
 PIPELINE_DIR = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(PIPELINE_DIR))
-from agents.publish.gsc_ping import ping_url
 
 STAGING_DIR = PIPELINE_DIR / "content-staging"
 DEVNOOK_DIR = Path(os.environ.get("DEVNOOK_PATH", str(PIPELINE_DIR.parent / "site")))
@@ -193,22 +192,17 @@ def publish(count: int, category_filter: str = "all"):
         # Update registry
         update_registry(slug, str(dest_path))
         
-        # Build URL for GSC ping — use concept for language posts (not filename slug)
+        # Build the live URL — use concept for language posts (not filename slug)
         url_slug = meta["concept"] if meta["category"] == "languages" and meta["concept"] else slug
         url = get_category_url_prefix(meta["category"], url_slug, meta.get("language"))
         published_urls.append(url)
-    
-    # Ping GSC for all published URLs (skipped if GOOGLE_SERVICE_ACCOUNT_JSON not set)
-    if not os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON"):
-        print("\nSkipping GSC ping — GOOGLE_SERVICE_ACCOUNT_JSON not configured.")
-    else:
-        print(f"\nPinging Google Search Console ({len(published_urls)} URLs)...")
+
+    # Google discovers new posts via the sitemap (auto-generated on each build).
+    # For priority posts, request indexing manually in GSC URL inspection.
+    if published_urls:
+        print(f"\nLive URLs ({len(published_urls)}):")
         for url in published_urls:
-            try:
-                ping_url(url)
-                print(f"  >> GSC: {url}")
-            except Exception as e:
-                print(f"  [X] GSC failed for {url}: {e}")
+            print(f"  {url}")
 
     print(f"\nDone. {len(files)} posts moved to {CONTENT_DIR}. Commit handled by caller.")
 

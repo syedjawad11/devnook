@@ -49,19 +49,6 @@ def _strip_related_section(text: str) -> tuple[str, bool]:
     return cleaned, modified
 
 
-def _ping_gsc(url: str) -> str | None:
-    """Returns None on success, error string on failure."""
-    sa_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
-    if not sa_json:
-        return "GOOGLE_SERVICE_ACCOUNT_JSON not set"
-    try:
-        from agents.publish.gsc_ping import ping_url
-        ping_url(url)
-        return None
-    except Exception as e:
-        return str(e)
-
-
 def run(
     slug: str,
     db_path: Union[str, Path],
@@ -102,7 +89,6 @@ def run(
             details={
                 "dry_run": True,
                 "would_publish_to": str(dest_path),
-                "gsc_ping": "skipped (dry_run)",
             },
         ).to_dict()
 
@@ -127,14 +113,11 @@ def run(
         file_path=rel_path,
     )
 
-    # Build live URL
+    # Build live URL (Google discovers it via the auto-generated sitemap)
     if category == "languages" and language and concept:
         live_url = f"https://devnook.dev/languages/{language}/{concept}"
     else:
         live_url = f"https://devnook.dev/{category}/{slug}"
-
-    gsc_error = _ping_gsc(live_url)
-    gsc_status = "ok" if gsc_error is None else f"skipped: {gsc_error}"
 
     return StageResult(
         processed=1,
@@ -142,7 +125,6 @@ def run(
         details={
             "published_to": str(dest_path),
             "live_url": live_url,
-            "gsc_ping": gsc_status,
             "stripped_related_section": stripped,
         },
     ).to_dict()

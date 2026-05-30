@@ -9,12 +9,13 @@ Do not open drafts, `data/registry.db` directly, or session history logs unless 
 
 ---
 
-## TODO (session #66, 2026-05-29)
+## TODO (session #67, 2026-05-30)
 
-1. **Stage 14 next** — Editorial content queue: pick best 10–20 from `editorial_opportunity` primary tier (252 keywords) and queue into `posts` for writing via `pipeline.core.runner`.
-2. **Pipeline B routine DISABLED** — `keyword_set_id=6` (`git-commands-cheat-sheet-developers`) conflicts with `/cheatsheets/git-commands-cheatsheet`. Decide: (a) update existing cheatsheet, (b) repurpose cluster, or (c) delete id=6 and re-seed. Re-enable routine after a `keyword_sets` row with `status='ready'` is confirmed.
-3. **GSC ping not wired** — `GOOGLE_SERVICE_ACCOUNT_JSON` secret needs to be set in GitHub Actions repo secrets (`syedjawad11/devnook`). See `agents/publish/gsc_ping.py`.
-4. **Editorial language rule** — Never queue Python/JS/TS language syntax topics as editorial content. Those belong to `/languages/` programmatic section. Python + JS/TS clusters already skipped in `editorial_opportunity`.
+1. **Editorial routine HEALTHY** — daily editorial publisher (`trig_01Xc9GuTZmzJAQXXAD7KZXUs`, cron `0 23 * * *`) was a silent no-op because ER-9 used bare `git push` (fails in CCR sandbox — cloned branch has no upstream — and the failure handler rolled back + deleted the draft). **Fixed** 2026-05-30 (commit `73c54db`): ER-9 now uses `git push origin HEAD`. Verified end-to-end (commit `947a0bb` published `websockets-vs-http`, live 200). **Rule: every CCR publish routine MUST use `git push origin HEAD`, never bare `git push`.** Queue: **4 editorial posts remaining** (ids 95–98); next 23:00 UTC run picks id 95 `api-rate-limiting-guide`.
+2. **Stage 14 in progress** — Editorial content queue: 5 posts queued from `editorial_opportunity` primary tier; 1 published (id 94), 4 remaining. Top up the queue from the primary tier (252 keywords) when it runs low.
+3. **Pipeline B routine DISABLED** — `keyword_set_id=6` (`git-commands-cheat-sheet-developers`) conflicts with `/cheatsheets/git-commands-cheatsheet`. Decide: (a) update existing cheatsheet, (b) repurpose cluster, or (c) delete id=6 and re-seed. Re-enable routine after a `keyword_sets` row with `status='ready'` is confirmed.
+4. **GSC ping DECOMMISSIONED** (2026-05-30) — Google's Indexing/Sitemaps APIs do **not** support `sc-domain:` (DNS-verified domain) properties with service accounts; GSC also refuses to add an SA as a delegated owner on a domain property ("failed to add"). Removed: `gsc_ping.py`, ping logic in both `publish.py` files, `GOOGLE_SERVICE_ACCOUNT_JSON` secret + workflow env, google-auth/api-python-client deps, GCP SA `devnook-gsc-indexing`. **Indexing now relies on the auto-generated sitemap + manual "Request indexing" in GSC URL inspection for priority posts.** Do not re-attempt the Indexing API on a domain property.
+5. **Editorial language rule** — Never queue Python/JS/TS language syntax topics as editorial content. Those belong to `/languages/` programmatic section. Python + JS/TS clusters already skipped in `editorial_opportunity`.
 
 ---
 
@@ -86,7 +87,6 @@ Pick slug from `data/rewrite-queue.json` → `@seo-optimizer SLUG=...` → verif
 | `data/rewrite-queue.json` | SEO rewrite queue — all published language articles |
 | `.claude/agents/` | Native subagent prompt files (tracked in git) |
 | `agents/publish/publish.py` | Drip publisher — moves staging → devnook, commits, pushes |
-| `agents/publish/gsc_ping.py` | Google Search Console Indexing API |
 | `agents/skills/content-style-system.md` | Single source of truth — 720 lines: templates, voices, SEO rules, frontmatter spec |
 | `agents/skills/seo-writing-rules.md` | SEO writing rules |
 | `agents/skills/qa-rejection-criteria.md` | QA rejection criteria |
@@ -139,7 +139,6 @@ posts (
 ## Environment Variables
 
 ```bash
-GOOGLE_SERVICE_ACCOUNT_JSON=...    # GSC Indexing API — GitHub Actions secret
 DEVNOOK_REPO_PAT=...               # PAT with write access to devnook repo — GitHub Actions secret
 GH_PAT=...                         # PAT for content workspace CI commits
 ```

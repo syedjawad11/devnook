@@ -39,7 +39,6 @@ jobs:
 
       - name: Publish posts
         env:
-          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           DEVNOOK_PATH: site
         run: |
           python pipeline/agents/publish/publish.py \
