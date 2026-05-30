@@ -123,7 +123,7 @@ posts (
 
 | Rule | Impact |
 |------|--------|
-| `content-style-system.md` is single source of truth | All writing agents must read it before writing. Approved voices: terse-senior, thoughtful-explainer, tutorial-guide. |
+| `content-style-system.md` is single source of truth | All writing agents must read it before writing. Approved voices: thoughtful-explainer, tutorial-guide. |
 | Pipeline B 2,500-word hard floor | QA hard-fail below 2,500 words |
 | No `## Related` sections in post body | PostLayout.astro auto-derives related list. `strip_related_section()` in publish.py is the safety net. |
 | `pipeline/core/` uses Anthropic API directly | `outline.py` and `write.py` call `anthropic.Anthropic()`. Requires `ANTHROPIC_API_KEY`. Agent prompts still used for ad-hoc work. |

@@ -72,7 +72,7 @@ Open with a CONCRETE situation where a developer gets stuck without this concept
 **Use when:** Concept is abstract enough that showing code first would confuse (closures, ownership, lazy evaluation, generics, coroutines).
 **Skip when:** Concept is concrete and code-explainable in 5 lines.
 **Length:** 100–200 words.
-**Voice fits:** thoughtful-explainer. Not terse-senior, tutorial-guide.
+**Voice fits:** thoughtful-explainer.
 
 Open with an analogy the reader can picture before seeing code. State the technical concept in plain language. Signal the article will fill in the precision. Analogy must be original and topic-specific — avoid worn metaphors (closures = backpacks, async = restaurants).
 
@@ -87,7 +87,7 @@ Open with an analogy the reader can picture before seeing code. State the techni
 **Use when:** Topic is error-driven / debug intent.
 **Skip when:** Article is not about a specific error.
 **Length:** 30–60 words + error block.
-**Voice fits:** terse-senior.
+**Voice fits:** tutorial-guide.
 
 Quote the error VERBATIM in a code block first. Then 2 sentences stating the cause is usually not what the reader suspects.
 
@@ -106,7 +106,7 @@ Quote the error VERBATIM in a code block first. Then 2 sentences stating the cau
 **Use when:** Comparison-heavy article or reader is likely a scanner (paired with intent=reference).
 **Skip when:** Article is conceptual or builds toward a verdict requiring context.
 **Length:** 60–100 words. May include 2–4 bullets.
-**Voice fits:** terse-senior.
+**Voice fits:** thoughtful-explainer.
 
 State the conclusion first. The rest of the article justifies it.
 
@@ -150,7 +150,7 @@ Explain WHY the language did it this way. What problem were the designers solvin
 **Use when:** Topic is syntax-heavy and reader needs each part explained (paired with is_syntax_heavy=true).
 **Skip when:** Topic is conceptual, not syntactic.
 **Length:** 200–400 words. 1–2 annotated examples (~10 lines each).
-**Voice fits:** tutorial-guide, terse-senior.
+**Voice fits:** tutorial-guide.
 
 Walk through the syntax piece by piece. Use an annotated code example as the anchor, refer back to specific parts by line. Include ONE non-obvious detail — a quirk, parser exception, or precedence trap.
 
@@ -200,7 +200,7 @@ Start with a minimal/broken version. Each subsequent block adds one thing and im
 **Use when:** Pairing this concept's code against an alternative clarifies its purpose.
 **Skip when:** No clear alternative exists.
 **Length:** 2 code blocks + 100–150 words.
-**Voice fits:** terse-senior, thoughtful-explainer.
+**Voice fits:** thoughtful-explainer.
 
 Show the same task implemented two ways: with this concept and without. Explain what changes — not just in line count but in readability, performance, or correctness. This is different from before/after: the alternative isn't worse, just a different choice.
 
@@ -214,7 +214,7 @@ Show the same task implemented two ways: with this concept and without. Explain 
 **Use when:** Topic has well-known traps that bite repeatedly.
 **Skip when:** Topic is straightforward enough that gotchas would be padding.
 **Length:** 200–350 words. Format as 2–3 labelled traps.
-**Voice fits:** terse-senior.
+**Voice fits:** tutorial-guide.
 
 List 2–3 specific traps. For each: name it, show the broken case in code or scenario, explain why it bites, give the fix in one sentence. Use concrete code examples and cite community reports or GitHub issue patterns — not personal anecdotes.
 
@@ -248,7 +248,7 @@ Give 2–3 concrete situations where this concept is the wrong tool. Be specific
 **Use when:** Performance is decision-relevant for this concept.
 **Skip when:** Performance is universally fine for this concept.
 **Length:** 200–350 words.
-**Voice fits:** terse-senior, thoughtful-explainer.
+**Voice fits:** thoughtful-explainer.
 
 Discuss performance characteristics that actually matter. Big-O if relevant. Hidden costs the developer might not see. When perf becomes a problem and what to do about it. Don't invent numbers — if citing a benchmark, source it or qualify it ("benchmarked on Node 20, ~10–20% overhead in tight loops"). Vague claims ("it's faster") are AI-tells.
 
@@ -260,7 +260,7 @@ Discuss performance characteristics that actually matter. Big-O if relevant. Hid
 **Use when:** The concept's textbook usage differs from how it's actually used in production codebases.
 **Skip when:** Textbook and production usage are the same.
 **Length:** 250–400 words.
-**Voice fits:** thoughtful-explainer, terse-senior.
+**Voice fits:** thoughtful-explainer.
 
 Show 1–2 patterns that production code uses but tutorials rarely cover — how the concept appears in a typical framework codebase, how teams structure code around it, naming conventions. Cite specific frameworks or well-known codebases where possible. If you can't cite specifics, skip this section.
 
@@ -457,33 +457,9 @@ Summarise the 1–2 most actionable takeaways in plain language. Then give a cle
 Three approved voices. One is selected per article. Maintain it throughout — voice drift is the second-biggest AI fingerprint after structural uniformity.
 
 **Dropped voices (do not use):**
+- `terse-senior` — skips the what/why foundation that beginner and intermediate readers need; assumes the reader already knows the concept. Not suitable for any DevNook article type, including cheatsheets and reference content.
 - `opinionated-commentator` — built on first-person rhetorical stances incompatible with no-personal-experience policy.
 - `empathetic-debugger` — built on "I've been there" war stories which are first-person experiential claims.
-
----
-
-### `terse-senior`
-
-The terse senior engineer. Writes like they're answering a colleague's Slack message — short sentences, plain verbs, no preamble. Believes most explanation is filler.
-
-**Sentence shape:** Short to medium (8–18 words). Frequent fragments. Almost no subordinate clauses. Direct subject-verb-object. Few hedges.
-
-**Vocabulary:** Plain Anglo-Saxon verbs (use, run, get, make, fix, ship). Domain terms used precisely. No filler adjectives. Acronyms used without expansion when domain-standard.
-
-**Register:** No first person. Third person dominant. Imperative common ("call this, return that"). Second person occasional ("you'd want...").
-
-**Good:**
-- "Use `Array.find()`. Returns the element or undefined."
-- "Three reasons this breaks. First..."
-- "Don't reach for reduce here — a for loop is clearer."
-
-**Bad:**
-- "There are several reasons why this might break..."
-- "It's worth noting that Array.find() is a useful method..."
-
-**Best for:** Reference content, how-to articles, syntax-focused pieces, error articles.
-
-**Voice integrity check:** Any sentence over 25 words → cut it in half.
 
 ---
 
@@ -664,7 +640,7 @@ sections_used:                        # list of section IDs used — required fo
   - "code-minimal"
   - "prac-gotchas"
   - "close-next"
-voice: "thoughtful-explainer"         # terse-senior | thoughtful-explainer | tutorial-guide
+voice: "thoughtful-explainer"         # thoughtful-explainer | tutorial-guide
 word_count: 0                         # actual count, filled after writing
 published_date: "YYYY-MM-DD"          # set by publisher agent
 og_image: "og-default"               # build pipeline regenerates

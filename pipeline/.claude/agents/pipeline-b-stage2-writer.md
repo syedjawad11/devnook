@@ -122,11 +122,10 @@ for k, v in list(url_map.items())[:10]:
 
 From `agents/skills/content-style-system.md` (AI/Productivity post set):
 
-- Read the 3 available voices: `thoughtful-explainer`, `terse-senior`, `tutorial-guide`
+- Read the 2 available voices: `thoughtful-explainer`, `tutorial-guide`
 - Select the best voice for this topic based on its nature:
   - How-to / step-by-step → `tutorial-guide`
-  - Deep analysis / explainer → `thoughtful-explainer`
-  - Opinionated takes, quick tips → `terse-senior`
+  - Deep analysis / explainer, opinionated takes, comparisons → `thoughtful-explainer`
 - Read the 12 section templates for AI/Productivity posts
 - Select: 1 opening + 1 closing + 1–2 core + 2–5 body sections = 5–8 total H2 sections
 

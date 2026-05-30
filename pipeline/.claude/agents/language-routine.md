@@ -165,7 +165,6 @@ From `content-style-system.md` Language set:
 - Syntax-heavy / reference topics → `tutorial-guide` (preferred) or `thoughtful-explainer`
 - Abstract concept topics → `thoughtful-explainer`
 - Error/debug-driven topics → `tutorial-guide`
-- **`terse-senior` is NOT recommended for language posts** — it skips the what/why foundation that beginner and intermediate readers need.
 
 Pick 6–10 H2 sections from the Language section set (one opening, body sections, an
 FAQ, a closing). Rotate phrasings — do not reuse the same H2 wording as other posts on

@@ -118,7 +118,6 @@ From `content-style-system.md`:
 - Comparison topics (`vs`, `or`, `difference between`): → `thoughtful-explainer` (explain each concept in plain terms before comparing — do not assume the reader already knows both sides)
 - How-to / guide topics (`how to`, `logs`, `commands`): → `tutorial-guide`
 - Concept explainers (`what is`, `explained`, `overview`): → `thoughtful-explainer`
-- **`terse-senior`** is reserved for cheatsheet/reference-style articles only; avoid it for explanatory or comparison content.
 
 Select: 1 opening + 1 closing + 2–5 body sections = 5–8 total H2 sections.
 
