@@ -28,5 +28,5 @@ so publish.py knows where to write content.
 | Setting | Value |
 |---------|-------|
 | Build command | `npm run build` |
-| Build output dir | `site/dist` |
 | Root directory | `site` |
+| Build output dir | `dist` (relative to Root dir — NOT `site/dist`, which resolves to `site/site/dist` and fails the build) |

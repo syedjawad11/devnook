@@ -9,19 +9,23 @@
 
 ---
 
-## Two-Repo Layout (until Stage 8 merge)
+## Monorepo Layout
+
+Site and pipeline live in one repo (`syedjawad11/devnook`) since the Stage 8 merge.
 
 ```
-devnook/                        ← Astro site (this repo)
-  src/content/                  ← Published posts (written by pipeline)
-  src/plugins/                  ← Build-time rehype plugins
-  agents/subagent-prompts/      ← Dev subagent prompts
-
-devnook_content_workspace/      ← Content pipeline (separate repo)
-  .claude/agents/               ← Pipeline subagent prompts
-  agents/publish/publish.py     ← Drip publisher
-  content-staging/              ← Staging queue (FIFO)
-  data/registry.db              ← SQLite registry
+devnook/
+├── site/                       ← Astro site (this sub-project)
+│   ├── src/content/            ← Published posts (written by the pipeline)
+│   ├── src/plugins/            ← Build-time rehype/remark plugins
+│   ├── agents/subagent-prompts/← Dev subagent prompts
+│   └── docs/ARCHITECTURE.md    ← this file
+├── pipeline/                   ← Content pipeline (formerly devnook_content_workspace)
+│   ├── .claude/agents/         ← Pipeline subagent prompts
+│   ├── agents/publish/publish.py ← Drip publisher
+│   └── data/registry.db        ← SQLite registry
+├── docs/                       ← Monorepo overview (ARCHITECTURE.md) + STATUS.md
+└── CLAUDE.md                   ← root nav
 ```
 
 The pipeline pushes finished posts to `devnook/src/content/` via a PAT-authenticated git push.

@@ -22,11 +22,11 @@ cd pipeline && python agents/publish/publish.py --count 2
 
 ## Key wiring
 
-- **Cloudflare Pages** builds from `site/`, output dir `site/dist`
+- **Cloudflare Pages** builds from `site/` (Root dir = `site`, output dir = `dist`). Full settings + the `site/dist` gotcha → [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - **GitHub Actions** workflows: `.github/workflows/` (drip-publish, on-demand-publish)
 - **publish.py** reads `DEVNOOK_PATH=site` (set by CI; set it locally if running manually)
 - **Registry DB**: `pipeline/data/registry.db`
 
-## Active work
+## Current state
 
-Check `site/CLAUDE.md` TODO block and `pipeline/CLAUDE.md` for per-sub-project tasks.
+Operational state — active routines, content queue, pending one-off tasks — lives in one place: [`docs/STATUS.md`](docs/STATUS.md). The `CLAUDE.md` files hold durable instructions only.

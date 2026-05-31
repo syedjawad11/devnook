@@ -1,21 +1,12 @@
 # DevNook Content Workspace
 
 > Content pipeline for devnook.dev. Always read this file first.
-> Astro site lives at `../devnook/`. Architecture details → `../devnook/docs/ARCHITECTURE.md`.
+> Astro site lives at `../site/`. Architecture: monorepo overview → [`../docs/ARCHITECTURE.md`](../docs/ARCHITECTURE.md); detailed site architecture → [`../site/docs/ARCHITECTURE.md`](../site/docs/ARCHITECTURE.md).
+> Current operational state (routines, queue, tasks) → [`../docs/STATUS.md`](../docs/STATUS.md).
 
 ## Session start
 
 Do not open drafts, `data/registry.db` directly, or session history logs unless explicitly asked.
-
----
-
-## TODO (session #67, 2026-05-30)
-
-1. **Editorial routine HEALTHY** — daily editorial publisher (`trig_01Xc9GuTZmzJAQXXAD7KZXUs`, cron `0 23 * * *`) was a silent no-op because ER-9 used bare `git push` (fails in CCR sandbox — cloned branch has no upstream — and the failure handler rolled back + deleted the draft). **Fixed** 2026-05-30 (commit `73c54db`): ER-9 now uses `git push origin HEAD`. Verified end-to-end (commit `947a0bb` published `websockets-vs-http`, live 200). **Rule: every CCR publish routine MUST use `git push origin HEAD`, never bare `git push`.** Queue: **4 editorial posts remaining** (ids 95–98); next 23:00 UTC run picks id 95 `api-rate-limiting-guide`.
-2. **Stage 14 in progress** — Editorial content queue: 5 posts queued from `editorial_opportunity` primary tier; 1 published (id 94), 4 remaining. Top up the queue from the primary tier (252 keywords) when it runs low.
-3. **Pipeline B routine DISABLED** — `keyword_set_id=6` (`git-commands-cheat-sheet-developers`) conflicts with `/cheatsheets/git-commands-cheatsheet`. Decide: (a) update existing cheatsheet, (b) repurpose cluster, or (c) delete id=6 and re-seed. Re-enable routine after a `keyword_sets` row with `status='ready'` is confirmed.
-4. **GSC ping DECOMMISSIONED** (2026-05-30) — Google's Indexing/Sitemaps APIs do **not** support `sc-domain:` (DNS-verified domain) properties with service accounts; GSC also refuses to add an SA as a delegated owner on a domain property ("failed to add"). Removed: `gsc_ping.py`, ping logic in both `publish.py` files, `GOOGLE_SERVICE_ACCOUNT_JSON` secret + workflow env, google-auth/api-python-client deps, GCP SA `devnook-gsc-indexing`. **Indexing now relies on the auto-generated sitemap + manual "Request indexing" in GSC URL inspection for priority posts.** Do not re-attempt the Indexing API on a domain property.
-5. **Editorial language rule** — Never queue Python/JS/TS language syntax topics as editorial content. Those belong to `/languages/` programmatic section. Python + JS/TS clusters already skipped in `editorial_opportunity`.
 
 ---
 
@@ -25,7 +16,7 @@ This workspace owns the full content pipeline for devnook.dev:
 
 - **Pipeline B** — keyword-first, cluster-driven: Stage 0 (harvest) → Stage 1 (keywords) → Stage 2 (write) → Stage 3 (QA+publish)
 - **SEO Optimizer** — rewrites published articles using DataForSEO keyword research
-- **Publisher** — staged posts → `../devnook/src/content/` + git push
+- **Publisher** — staged posts → `../site/src/content/` + git push
 
 ---
 
@@ -91,7 +82,7 @@ Pick slug from `data/rewrite-queue.json` → `@seo-optimizer SLUG=...` → verif
 | `agents/skills/seo-writing-rules.md` | SEO writing rules |
 | `agents/skills/qa-rejection-criteria.md` | QA rejection criteria |
 | `content-staging/` | Staging queue (FIFO, registry insertion order) |
-| `../devnook/src/content/` | Published content destination |
+| `../site/src/content/` | Published content destination |
 
 ---
 
@@ -133,6 +124,9 @@ posts (
 | No `/languages/` URL fabrication | Never write a `/languages/` URL unless exact path verified from registry. Use `concept`, not filename slug. |
 | External links: 1–2 per article | Zero external links = automatic QA rejection |
 | `publish.py` uses `shutil.move()` | Deletes from `content-staging/` on move; `content-staging/` MUST be in `git add` in CI workflows |
+| Never queue Python/JS/TS language syntax as editorial | Those belong to the `/languages/` programmatic section; Python + JS/TS clusters are already skipped in `editorial_opportunity` |
+| Indexing = sitemap + manual GSC only | The Indexing API does not work on `sc-domain:` domain properties with a service account; do not re-attempt it |
+| Every CCR publish routine uses `git push origin HEAD` | Bare `git push` fails in the CCR sandbox (cloned branch has no upstream) and silently rolls back the publish |
 
 ---
 
