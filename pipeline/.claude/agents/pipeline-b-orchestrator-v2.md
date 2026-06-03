@@ -249,7 +249,7 @@ Return only this JSON at the end of a successful run:
   "word_count": 0,
   "keyword_set_id": <id>,
   "status": "published",
-  "live_url": "https://devnook.dev/blog/<slug>",
+  "live_url": "https://devnook.dev/blog/<slug>/",
   "build_passed": true,
   "devnook_commit_sha": "<sha>",
   "resolved_devnook_dir": "<absolute path>",

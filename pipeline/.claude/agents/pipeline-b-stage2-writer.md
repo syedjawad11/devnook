@@ -188,7 +188,7 @@ Always include both `BlogPosting` + `FAQPage`:
   "datePublished": "<YYYY-MM-DD>",
   "author": {"@type": "Organization", "name": "DevNook"},
   "publisher": {"@type": "Organization", "name": "DevNook", "url": "https://devnook.dev"},
-  "url": "https://devnook.dev/blog/<slug>",
+  "url": "https://devnook.dev/blog/<slug>/",
   "mainEntity": [
     {"@type": "Question", "name": "<Q1>", "acceptedAnswer": {"@type": "Answer", "text": "<A1>"}},
     {"@type": "Question", "name": "<Q2>", "acceptedAnswer": {"@type": "Answer", "text": "<A2>"}},

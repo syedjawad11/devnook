@@ -139,7 +139,7 @@ log_entry = {
     "category": CATEGORY,
     "content_collection": CONTENT_COLLECTION,
     "status": "published",
-    "live_url": f"https://devnook.dev/{CONTENT_COLLECTION}/{SLUG}",
+    "live_url": f"https://devnook.dev/{CONTENT_COLLECTION}/{SLUG}/",
     "word_count": WORD_COUNT,
     "devnook_commit_sha": DEVNOOK_COMMIT_SHA,
     "remaining_ready": remaining
@@ -171,7 +171,7 @@ KEYWORD_SET_ID: <id>
 SLUG: <slug>
 CATEGORY: <category>
 CONTENT_COLLECTION: <blog|cheatsheets>
-LIVE_URL: https://devnook.dev/<collection>/<slug>
+LIVE_URL: https://devnook.dev/<collection>/<slug>/
 WORD_COUNT: <n>
 DEVNOOK_COMMIT_SHA: <sha>
 REMAINING_READY: <n>

@@ -12,8 +12,11 @@ function devnookUrlBuilder({ filePath, frontmatter, contentDir }) {
     const concept = String(frontmatter.concept).toLowerCase();
     return `/languages/${lang}/${concept}/`;
   }
-  if (frontmatter.permalink) return frontmatter.permalink;
-  if (frontmatter.url) return frontmatter.url;
+  // Normalize explicit overrides to the canonical trailing-slash form so
+  // internal links never point at the no-slash variant (which 301-redirects).
+  const withTrailingSlash = (u) => (u.endsWith('/') ? u : u + '/');
+  if (frontmatter.permalink) return withTrailingSlash(frontmatter.permalink);
+  if (frontmatter.url) return withTrailingSlash(frontmatter.url);
   let rel = path.relative(contentDir, filePath)
     .replace(/\.(md|mdx)$/i, '')
     .replace(/[\\/]index$/, '');

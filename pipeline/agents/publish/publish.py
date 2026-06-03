@@ -28,10 +28,15 @@ DB_PATH = PIPELINE_DIR / "data/registry.db"
 BASE_URL = "https://devnook.dev"
 
 def get_category_url_prefix(category: str, slug: str, language: str = None) -> str:
-    """Generate the live URL for a post."""
+    """Generate the live URL for a post.
+
+    URLs always end with a trailing slash to match the site's canonical form
+    (Astro builds directory-style routes; Cloudflare 301-redirects the no-slash
+    variant). Submitting the no-slash form to GSC produces "Page with redirect".
+    """
     if category == "languages" and language:
-        return f"{BASE_URL}/languages/{language}/{slug}"
-    return f"{BASE_URL}/{category}/{slug}"
+        return f"{BASE_URL}/languages/{language}/{slug}/"
+    return f"{BASE_URL}/{category}/{slug}/"
 
 def get_staged_files(count: int, category_filter: str = "all") -> list:
     """Get the oldest staged files from content-staging in registry insertion order (FIFO).

@@ -461,7 +461,7 @@ log_entry = {
     "concept": CONCEPT,
     "word_count": word_count,
     "status": "published",
-    "live_url": f"https://devnook.dev/languages/{LANGUAGE}/{CONCEPT}",
+    "live_url": f"https://devnook.dev/languages/{LANGUAGE}/{CONCEPT}/",
     "devnook_commit_sha": DEVNOOK_COMMIT_SHA
 }
 with open(f'{REPO_ROOT}/pipeline/data/pipeline-b-runs.log', 'a') as f:
@@ -478,7 +478,7 @@ LANGUAGE_RESULT: success
 SLUG: <slug>
 LANGUAGE: <language>
 CONCEPT: <concept>
-LIVE_URL: https://devnook.dev/languages/<language>/<concept>
+LIVE_URL: https://devnook.dev/languages/<language>/<concept>/
 WORD_COUNT: <n>
 DEVNOOK_COMMIT_SHA: <sha>
 ```

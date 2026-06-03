@@ -387,7 +387,7 @@ Attempt GSC submission if MCP is available:
 
 ```python
 _cc_gsc = CONTENT_COLLECTION if 'CONTENT_COLLECTION' in dir() else 'blog'
-live_url = f"https://devnook.dev/{_cc_gsc}/{SLUG}"
+live_url = f"https://devnook.dev/{_cc_gsc}/{SLUG}/"
 # mcp__gsc__submit_url  url: live_url
 ```
 
@@ -430,7 +430,7 @@ log_entry = {
     "word_count": word_count,
     "status": "published",
     "content_collection": CONTENT_COLLECTION if 'CONTENT_COLLECTION' in dir() else 'blog',
-    "live_url": f"https://devnook.dev/{CONTENT_COLLECTION if 'CONTENT_COLLECTION' in dir() else 'blog'}/{SLUG}",
+    "live_url": f"https://devnook.dev/{CONTENT_COLLECTION if 'CONTENT_COLLECTION' in dir() else 'blog'}/{SLUG}/",
     "build_passed": True,
     "gsc_submitted": False,
     "devnook_commit_sha": DEVNOOK_COMMIT_SHA,
@@ -462,7 +462,7 @@ git push origin HEAD || true
 STAGE3_RESULT: success
 SLUG: <slug>
 CONTENT_COLLECTION: <blog|cheatsheets>
-LIVE_URL: https://devnook.dev/<collection>/<slug>
+LIVE_URL: https://devnook.dev/<collection>/<slug>/
 WORD_COUNT: <n>
 BUILD_PASSED: true
 DEVNOOK_COMMIT_SHA: <sha>

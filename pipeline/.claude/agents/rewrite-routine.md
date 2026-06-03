@@ -483,7 +483,7 @@ log_entry = {
     "old_word_count": OLD_WC,
     "word_count": word_count,
     "status": "rewritten",
-    "live_url": f"https://devnook.dev/languages/{LANGUAGE}/{CONCEPT}",
+    "live_url": f"https://devnook.dev/languages/{LANGUAGE}/{CONCEPT}/",
     "devnook_commit_sha": DEVNOOK_COMMIT_SHA
 }
 with open(f'{REPO_ROOT}/pipeline/data/pipeline-b-runs.log', 'a') as f:
@@ -500,7 +500,7 @@ REWRITE_RESULT: success
 SLUG: <slug>
 LANGUAGE: <language>
 CONCEPT: <concept>
-LIVE_URL: https://devnook.dev/languages/<language>/<concept>
+LIVE_URL: https://devnook.dev/languages/<language>/<concept>/
 OLD_WORD_COUNT: <n>
 WORD_COUNT: <n>
 DEVNOOK_COMMIT_SHA: <sha>

@@ -113,11 +113,13 @@ def run(
         file_path=rel_path,
     )
 
-    # Build live URL (Google discovers it via the auto-generated sitemap)
+    # Build live URL (Google discovers it via the auto-generated sitemap).
+    # Trailing slash is required: it's the site's canonical form, and the
+    # no-slash variant 301-redirects — submitting it yields "Page with redirect".
     if category == "languages" and language and concept:
-        live_url = f"https://devnook.dev/languages/{language}/{concept}"
+        live_url = f"https://devnook.dev/languages/{language}/{concept}/"
     else:
-        live_url = f"https://devnook.dev/{category}/{slug}"
+        live_url = f"https://devnook.dev/{category}/{slug}/"
 
     return StageResult(
         processed=1,

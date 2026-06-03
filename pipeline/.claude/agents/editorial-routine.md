@@ -175,7 +175,7 @@ Always include both BlogPosting + FAQPage:
   "datePublished": "<YYYY-MM-DD>",
   "author": {"@type": "Organization", "name": "DevNook"},
   "publisher": {"@type": "Organization", "name": "DevNook", "url": "https://devnook.dev"},
-  "url": "https://devnook.dev/<category>/<slug>",
+  "url": "https://devnook.dev/<category>/<slug>/",
   "mainEntity": [
     {"@type": "Question", "name": "<Q1>", "acceptedAnswer": {"@type": "Answer", "text": "<A1>"}},
     {"@type": "Question", "name": "<Q2>", "acceptedAnswer": {"@type": "Answer", "text": "<A2>"}},
@@ -446,7 +446,7 @@ log_entry = {
     "category": CATEGORY,
     "word_count": word_count,
     "status": "published",
-    "live_url": f"https://devnook.dev/{CATEGORY}/{SLUG}",
+    "live_url": f"https://devnook.dev/{CATEGORY}/{SLUG}/",
     "devnook_commit_sha": DEVNOOK_COMMIT_SHA
 }
 
@@ -464,7 +464,7 @@ print(f"LOG_OK: entry appended")
 EDITORIAL_RESULT: success
 SLUG: <slug>
 CATEGORY: <blog|guides>
-LIVE_URL: https://devnook.dev/<category>/<slug>
+LIVE_URL: https://devnook.dev/<category>/<slug>/
 WORD_COUNT: <n>
 DEVNOOK_COMMIT_SHA: <sha>
 ```
