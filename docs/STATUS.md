@@ -4,7 +4,7 @@
 > one-off tasks. The `CLAUDE.md` files hold durable instructions only and point here.
 > Keep this file current; when an item is done, remove it (git history is the record).
 
-**Last updated:** 2026-05-31
+**Last updated:** 2026-06-03
 
 ---
 
@@ -52,6 +52,14 @@ Verify against the DB (from `pipeline/`):
 
 ## Recently completed (rolling — prune freely)
 
+- 2026-06-03 — Fixed "Page with redirect" (GSC): canonical URLs are directory-style
+  (trailing slash); the no-slash variant 301-redirects. Switched all URL emitters to
+  the trailing-slash form (commit `503a3a8`): `publish.py` + `core/publish.py` live_url,
+  `astro.config.mjs` permalink/url frontmatter normalization, and all three cloud routine
+  prompts (editorial/language/rewrite) + Pipeline B prompts — schema.org JSON-LD `url`,
+  live_url logging, and `LIVE_URL` output. Routines load prompts from the repo at each
+  fire, so the fix takes effect on the next scheduled run; no trigger recreation needed.
+  **Convention going forward:** every devnook URL emitted must end with `/`.
 - 2026-05-31 — Archived legacy repo `syedjawad11/devnook-content` and removed the local
   `devnook_content_workspace/` folder (superseded by `pipeline/`).
 - 2026-05-30 — Editorial routine ER-9 `git push origin HEAD` fix verified
