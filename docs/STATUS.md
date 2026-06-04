@@ -4,7 +4,7 @@
 > one-off tasks. The `CLAUDE.md` files hold durable instructions only and point here.
 > Keep this file current; when an item is done, remove it (git history is the record).
 
-**Last updated:** 2026-06-03
+**Last updated:** 2026-06-04
 
 ---
 
@@ -29,8 +29,8 @@ Routine "how it works" / gotchas are documented in memory
 
 | Section | Queued | Notes |
 |---------|--------|-------|
-| Editorial | 4 posts (ids 95–98) | Next 23:00 UTC run picks id 95 `api-rate-limiting-guide`. Top up from `editorial_opportunity` primary tier (252 keywords) when low. |
-| Language | 5 posts (ids 99–103) | — |
+| Editorial | 3 posts (ids 104, 106, 107) | Next 23:00 UTC run picks id 104 `what-is-cross-join-in-sql`, then 106 `stack-vs-heap-memory`, 107 `what-are-indexes-in-sql`. Top up from `editorial_opportunity` primary tier when low. |
+| Language | — | id 105 `typescript-tuples` was published manually to `/languages/typescript/tuples/` on 2026-06-04 (pulled from the editorial queue; TS syntax belongs in `/languages/`, not editorial). |
 | Rewrite | 5 thinnest posts seeded | From `language_rewrite_queue`. |
 
 Verify against the DB (from `pipeline/`):
@@ -52,6 +52,12 @@ Verify against the DB (from `pipeline/`):
 
 ## Recently completed (rolling — prune freely)
 
+- 2026-06-04 — Published `typescript-tuples` to `/languages/typescript/tuples/` (manual,
+  not via routine). It had been mistakenly seeded into the editorial queue (id 105); TS
+  syntax topics belong in the programmatic `/languages/` section per `pipeline/CLAUDE.md`.
+  Registry row 105 converted in place (category→languages, content_type→programmatic,
+  status→published); editorial queue dropped from 4 to 3 (ids 104, 106, 107). Build passed
+  (120 pages), all internal links resolve.
 - 2026-06-03 — Fixed "Page with redirect" (GSC): canonical URLs are directory-style
   (trailing slash); the no-slash variant 301-redirects. Switched all URL emitters to
   the trailing-slash form (commit `503a3a8`): `publish.py` + `core/publish.py` live_url,
