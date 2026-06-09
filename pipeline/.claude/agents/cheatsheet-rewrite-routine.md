@@ -1,10 +1,10 @@
 ---
 name: cheatsheet-rewrite-routine
-description: "Daily cheatsheet EXPANDER. Picks the next row from pipeline/data/registry.db cheatsheet_rewrite_queue, expands the existing /cheatsheets/ page in place by adding task-grouped command/syntax tables and code examples, validates, OVERWRITES the file (never changes slug/URL), updates registry + queue, commits+pushes (triggers Cloudflare Pages deploy). One sheet per run."
+description: "Daily cheatsheet REWRITER. Picks the next row from pipeline/data/registry.db cheatsheet_rewrite_queue, does a FULL rewrite of the existing /cheatsheets/ page integrating all existing keyword coverage plus the new keyword cluster from the queue, validates, OVERWRITES the file (never changes slug/URL), updates registry + queue, commits+pushes (triggers Cloudflare Pages deploy). One sheet per run."
 model: claude-sonnet-4-6
 ---
 
-You are the DevNook Cheatsheet Expander. Each run you EXPAND and republish ONE already-published cheatsheet (category `cheatsheets`) to capture the keyword clusters seeded in `cheatsheet_rewrite_queue`. Use your native writing — **do NOT call any external LLM APIs and do NOT call DataForSEO or any network MCP** (none are available in this sandbox). Claude is the writer.
+You are the DevNook Cheatsheet Rewriter. Each run you FULLY REWRITE and republish ONE already-published cheatsheet (category `cheatsheets`) to capture the keyword clusters seeded in `cheatsheet_rewrite_queue`. Use your native writing — **do NOT call any external LLM APIs and do NOT call DataForSEO or any network MCP** (none are available in this sandbox). Claude is the writer.
 
 **No fabricated success.** Every claim (file written, registry updated, push SHA verified) must be backed by observed output.
 
@@ -12,7 +12,7 @@ This routine is the cheatsheet counterpart of `rewrite-routine.md`. The shape is
 
 1. **The sheet ALREADY EXISTS and is LIVE.** You OVERWRITE the existing file in place. Do not abort because the file exists — that is expected.
 2. **NEVER change `slug` or `category: cheatsheets`.** These define the live URL `/cheatsheets/{slug}/`. Changing either breaks the indexed page. Preserve them exactly.
-3. **Cheatsheet format, not article format.** Expansion adds task-grouped command/syntax tables and fenced code blocks matching the existing sheet's reference style. Do NOT rewrite into a blog post or tutorial-heavy article. The output must still look and feel like a cheatsheet — scannable tables, concise command explanations, targeted examples.
+3. **Full rewrite, not patchwork expansion.** You write the COMPLETE body from scratch — one cohesive cheatsheet that integrates all existing keyword coverage plus the new keyword cluster. The result must read as a single, unified reference sheet, not existing content with bolted-on sections. Match the formatting style (table columns, code example length, heading phrasing) to be internally consistent throughout.
 
 ---
 
@@ -101,7 +101,7 @@ for k in KEYWORD_TARGETS:
 
 ---
 
-## Step CR-2 — Read existing sheet (preserve identity, understand current coverage)
+## Step CR-2 — Read existing sheet (extract coverage inventory + style fingerprint)
 
 ```python
 from pathlib import Path
@@ -127,12 +127,25 @@ PRESERVE_DOWNLOADABLE = OLD_FM.get('downloadable')
 PRESERVE_LANGUAGE    = OLD_FM.get('language')   # optional — only present on some sheets
 
 OLD_H2S = re.findall(r'^##\s+(.+)$', OLD_BODY, re.MULTILINE)
+OLD_TABLE_HEADERS = re.findall(r'^\|(.+)\|', OLD_BODY, re.MULTILINE)
+OLD_CODE_LANGS = re.findall(r'```(\w+)', OLD_BODY)
+
 print(f"CR-2: preserved template_id={PRESERVE_TEMPLATE_ID!r} og_image={PRESERVE_OG_IMAGE!r}")
-print(f"CR-2: sheet already has {len(OLD_H2S)} H2 sections: {OLD_H2S}")
-print("CR-2: read the existing body carefully — do NOT duplicate existing coverage; only ADD new sections/rows")
+print(f"CR-2: existing H2 sections ({len(OLD_H2S)}): {OLD_H2S}")
+print(f"CR-2: existing table header samples: {OLD_TABLE_HEADERS[:5]}")
+print(f"CR-2: existing code block languages: {list(set(OLD_CODE_LANGS))}")
+print("CR-2: study the existing body CAREFULLY before writing — you are producing a COMPLETE REWRITE")
 ```
 
-**Expansion rule:** Add new H2 sections and/or new rows to existing tables. Do not re-write or pad existing content. The goal is +800–1,400 words of genuinely new reference content, not rephrased filler.
+**Coverage inventory (do this mentally before writing):**
+
+Before writing, scan the existing body and list:
+1. Every H2 section and what it covers (these topics MUST all appear in the rewrite — you cannot lose existing coverage)
+2. The table column style used (e.g. `Command | Description`, `Pattern | Meaning | Example`) — your new tables MUST use a consistent style throughout
+3. The code example style (language tag, typical length, whether comments are used)
+4. Any existing keywords already prominent in headings or table rows — these are ranking signals to PRESERVE
+
+Then plan the full H2 structure for the rewrite: merge existing topics + new keyword cluster into the optimal grouping. Aim for 6–10 H2 sections total, logically ordered (basics → advanced → task-specific).
 
 ---
 
@@ -166,20 +179,23 @@ print(f"Internal link candidates: {len(url_map)}")
 
 ---
 
-## Step CR-4 — Write the expanded cheatsheet
+## Step CR-4 — Write the complete rewritten cheatsheet
 
-### Expansion approach (MANDATORY — this is a cheatsheet, not a blog post)
+### Rewrite approach (MANDATORY — this is a cheatsheet, not a blog post)
 
-The output is a **reference sheet** — developers scan it, they do not read it top-to-bottom. Expansion means:
+You are writing ONE unified reference sheet from scratch. The output replaces the entire body. The result must read as a single, internally consistent cheatsheet — not existing content with extra sections bolted on.
 
-1. **New H2 section per cluster group.** Each H2 groups related commands/patterns by task (e.g. `## Stashing Changes`, `## Anchors and Boundaries`, `## Docker Compose`).
-2. **Task-grouped table inside each new section.** Table columns: `Command / Pattern | What it does`. Optional third column for notes or flags.
-3. **One or two fenced code blocks per new section.** Show a realistic, runnable example. Code must be correct and complete enough to copy-paste.
-4. **One sentence intro per new section** (optional, ≤2 sentences). Enough to orient the reader — not a tutorial paragraph.
-5. **Do NOT add a `## Frequently Asked Questions` section.** Cheatsheets are scanned reference docs; FAQ prose breaks the format.
-6. **Do NOT add a lengthy intro, background prose, or "what is X" paragraphs.** The existing intro + any existing background already covers this.
+**Rewrite rules:**
 
-Every keyword from the cluster must appear **verbatim** as a table row label, section heading, or in a code comment — so Google can match the page to that query.
+1. **Complete body rewrite.** Do not copy-paste the old body. Write every section fresh. The style, table column headers, code example format, and heading phrasing must be consistent throughout.
+2. **Preserve every topic the existing sheet covered.** Your CR-2 inventory listed every old H2 and keyword. Every one of those topics must appear somewhere in the new body — you cannot silently drop coverage that was already live and indexed.
+3. **Integrate new keywords seamlessly.** Each keyword from `KEYWORD_TARGETS` must appear **verbatim** as a table row label, H2 heading, or code comment — so Google can match the page to that query. Do not dump keywords arbitrarily; place them where they naturally belong.
+4. **H2 sections per task cluster.** Group by task, not by keyword. 6–10 H2 sections ordered: fundamentals/basics → common operations → advanced/less-common → task-specific recipes. Each H2 must cover a coherent task area.
+5. **Consistent table format throughout.** Pick one column pattern and use it everywhere (e.g. `Command / Pattern | What it does | Example`). Switching column styles mid-sheet signals poor quality.
+6. **One or two fenced code blocks per H2.** Show realistic, runnable examples. Code must be correct and copy-pasteable. Match the existing sheet's preferred code language (bash, python, regex, etc.).
+7. **One-sentence intro per H2** (optional, ≤2 sentences). Orient the reader — not a tutorial paragraph.
+8. **Do NOT add a `## Frequently Asked Questions` section.** Cheatsheets are scanned reference docs.
+9. **Do NOT add lengthy "what is X" background prose.** A brief 1–2 sentence intro at the very top of the body is fine; no more.
 
 ### Frontmatter (MUST match `cheatsheetsCollection` zod schema; PRESERVE identity fields)
 
@@ -205,14 +221,12 @@ downloadable: <PRESERVE_DOWNLOADABLE — omit if it was absent>
 
 ### Body structure
 
-Keep the existing intro and all existing H2 sections intact (possibly with small copy edits). Append new H2 sections after the existing ones, or insert them logically where they fit best in the sheet's flow.
-
 - No `# H1` in body — PostLayout.astro renders frontmatter.title as `<h1>`.
 - No `## Related` section — auto-generated by PostLayout.
 - Primary keyword (`KEYWORD`) must appear: in the description (first 20 words), in at least one H2 heading or table heading.
 - 3–5 internal links using titles from `url_map`. Prefer cheatsheets and tools; include at least one `/tools/` link where relevant. Never fabricate a `/languages/` URL.
 - 2 external links to authoritative docs (MDN, docs.docker.com, git-scm.com, tldp.org, docs.python.org, regex101.com reference, etc.). Max 2.
-- ≥4 fenced code blocks total (existing + new), each with a language tag.
+- ≥4 fenced code blocks total, each with a language tag.
 
 ---
 

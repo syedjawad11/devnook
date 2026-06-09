@@ -18,7 +18,7 @@ and publish via `git push origin HEAD`. Times in UTC; Malta is CEST (UTC+2).
 | Editorial publisher (`/blog/`, `/guides/`) | `trig_01Xc9GuTZmzJAQXXAD7KZXUs` | `0 23 * * *` (01:00 Malta) | ✅ Healthy | ER-9 `git push` bug fixed 2026-05-30 |
 | Language publisher (`/languages/`) | `trig_015wteVF9kPq2mNxR7sT4wXz` | `0 3 * * *` (05:00 Malta) | ✅ Active | URL = frontmatter `concept`, not filename |
 | Rewrite routine (thin `/languages/` posts) | `trig_01VJJqhYwLmK3nP8rT5vX2zQ` | `0 1 * * *` (03:00 Malta) | ✅ Active | Overwrites in place; never changes slug/concept |
-| Cheatsheet expander (`/cheatsheets/`) | pending — see below | `0 2 * * *` (04:00 Malta) | ⏳ Trigger not yet created | Agent: `pipeline/.claude/agents/cheatsheet-rewrite-routine.md`; queue: `cheatsheet_rewrite_queue`; 5 rows seeded |
+| Cheatsheet rewriter (`/cheatsheets/`) | `trig_01VVSqp7cL8c6N6VvScXLSg2` | `0 2 * * *` (04:00 Malta) | ✅ Active | Full rewrite approach (not append); agent reads prompt file from repo each run |
 | Pipeline B (keyword-first cluster) | `trig_012dkTjBKiB8M9ASkKZ1c1Gk` | `0 14 * * *` (16:00 Malta) | ⛔ Disabled | Re-enable only after a `keyword_sets` row is `status='ready'` |
 
 Routine "how it works" / gotchas are documented in memory
@@ -33,7 +33,7 @@ Routine "how it works" / gotchas are documented in memory
 | Editorial | 3 posts (ids 104, 106, 107) | Next 23:00 UTC run picks id 104 `what-is-cross-join-in-sql`, then 106 `stack-vs-heap-memory`, 107 `what-are-indexes-in-sql`. Top up from `editorial_opportunity` primary tier when low. |
 | Language | — | id 105 `typescript-tuples` was published manually to `/languages/typescript/tuples/` on 2026-06-04 (pulled from the editorial queue; TS syntax belongs in `/languages/`, not editorial). |
 | Rewrite | 5 thinnest posts seeded | From `language_rewrite_queue`. |
-| Cheatsheet expand | 5 sheets seeded (order 1–5) | `cheatsheet_rewrite_queue`: regex → docker → git → linux → python-string. Drains 1/day once trigger is live. |
+| Cheatsheet rewrite | 5 sheets queued (order 1–5) | `cheatsheet_rewrite_queue`: regex → docker → git → linux → python-string. Drain triggered: run 1 (regex) fired now; runs 2–5 scheduled at 23:45, 04:45, 09:45, 14:45 UTC (10 Jun). IDs: trig_016ixMLFvpxR66u5kKxehDmS / trig_01KFVotP7UozupcLQJYpoCzX / trig_015ZLwrp9VfxFYeV7XkkxiMd / trig_01H7J4LaCY2nowpVvhjj2onK |
 
 Verify against the DB (from `pipeline/`):
 `python -c "import sqlite3; print(sqlite3.connect('data/registry.db').execute(\"SELECT status, content_type, COUNT(*) FROM posts GROUP BY 1,2\").fetchall())"`
@@ -42,11 +42,6 @@ Verify against the DB (from `pipeline/`):
 
 ## Pending one-off tasks
 
-- [ ] **Create CCR trigger for cheatsheet expander** — go to Claude.ai, create a new
-  scheduled agent: model `claude-sonnet-4-6`, source `syedjawad11/devnook`,
-  prompt file `pipeline/.claude/agents/cheatsheet-rewrite-routine.md`, cron `0 2 * * *`
-  (02:00 UTC = 04:00 Malta). Reuse the rewrite routine's `environment_id`. No DataForSEO
-  needed. Once created, add the trigger ID to the routines table above.
 - [ ] **Resolve Pipeline B cluster conflict** — `keyword_set_id=6`
   (`git-commands-cheat-sheet-developers`) collides with the existing
   `/cheatsheets/git-commands-cheatsheet`. Decide: (a) update the existing cheatsheet,
