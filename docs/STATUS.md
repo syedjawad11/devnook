@@ -42,7 +42,8 @@ Verify against the DB (from `pipeline/`):
 
 ## Pending one-off tasks
 
-- [ ] **Run Phase 2 articles through pipeline** — 9 articles seeded as `status='queued'` in registry (2026-06-10). Run each via `python -m pipeline.core.runner --slug <slug>` from `pipeline/`. Order: html-reference-guide → markdown-cheatsheet → css-basics-cheatsheet → python-math-numbers → cpp-data-structures-stl → cpp-string-methods → cpp-loops-control-flow → java-data-structures → tmux-cheatsheet.
+- [ ] **Phase 2 plan — Steps 3 & 4 (next session)** — Steps 0 (seeding) and 1 (keyword insertion) are done. Step 2 (CCR agent + 9 triggers) completed 2026-06-10. Resume with steps 3 and 4 in the next session.
+- [ ] **Monitor Phase 2 CCR runs** — 9 one-shot triggers active. Test run (`html-reference-guide`, `trig_01632qYF7JLCL7zqPGktmogx`) fired 2026-06-10 ~19:02 UTC. URL when live: `https://devnook.dev/guides/html-reference-guide/`. Next scheduled: `markdown-cheatsheet` 2026-06-11 01:00 UTC. Verify each by checking git log after fire time.
 - [ ] **Remove `DEVNOOK_REPO_PAT` secret** from `syedjawad11/devnook` — no longer needed
   in the monorepo.
 
