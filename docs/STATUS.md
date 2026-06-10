@@ -19,7 +19,7 @@ and publish via `git push origin HEAD`. Times in UTC; Malta is CEST (UTC+2).
 | Language publisher (`/languages/`) | `trig_015wteVF9kPq2mNxR7sT4wXz` | `0 3 * * *` (05:00 Malta) | ✅ Active | URL = frontmatter `concept`, not filename |
 | Rewrite routine (thin `/languages/` posts) | `trig_01VJJqhYwLmK3nP8rT5vX2zQ` | `0 1 * * *` (03:00 Malta) | ✅ Active | Overwrites in place; never changes slug/concept |
 | Cheatsheet rewriter (`/cheatsheets/`) | `trig_01VVSqp7cL8c6N6VvScXLSg2` | `0 2 * * *` (04:00 Malta) | ✅ Active | Full rewrite approach (not append); confirmed working (regex run 2026-06-09) |
-| Pipeline B (keyword-first cluster) | `trig_012dkTjBKiB8M9ASkKZ1c1Gk` | `0 14 * * *` (16:00 Malta) | ⛔ Disabled | Re-enable only after a `keyword_sets` row is `status='ready'` |
+| Pipeline B (keyword-first cluster) | `trig_012dkTjBKiB8M9ASkKZ1c1Gk` | `0 14 * * *` (16:00 Malta) | ✅ Re-enabled | id=7 `react-vs-angular-vs-vue-comparison` is ready; id=5 git-commands collision fixed (marked skip 2026-06-10) |
 
 Routine "how it works" / gotchas are documented in memory
 (`project_editorial_routine`, `project_language_routine`, `project_rewrite_routine`).
@@ -42,11 +42,7 @@ Verify against the DB (from `pipeline/`):
 
 ## Pending one-off tasks
 
-- [ ] **Resolve Pipeline B cluster conflict** — `keyword_set_id=6`
-  (`git-commands-cheat-sheet-developers`) collides with the existing
-  `/cheatsheets/git-commands-cheatsheet`. Decide: (a) update the existing cheatsheet,
-  (b) repurpose the cluster, or (c) delete id=6 and re-seed. Re-enable the Pipeline B
-  routine once a `keyword_sets` row is `status='ready'`.
+- [ ] **Run Phase 2 articles through pipeline** — 9 articles seeded as `status='queued'` in registry (2026-06-10). Run each via `python -m pipeline.core.runner --slug <slug>` from `pipeline/`. Order: html-reference-guide → markdown-cheatsheet → css-basics-cheatsheet → python-math-numbers → cpp-data-structures-stl → cpp-string-methods → cpp-loops-control-flow → java-data-structures → tmux-cheatsheet.
 - [ ] **Remove `DEVNOOK_REPO_PAT` secret** from `syedjawad11/devnook` — no longer needed
   in the monorepo.
 
@@ -54,6 +50,7 @@ Verify against the DB (from `pipeline/`):
 
 ## Recently completed (rolling — prune freely)
 
+- 2026-06-10 — **Phase 2 seeded.** 9 new articles queued in registry (html-reference-guide, markdown-cheatsheet, css-basics-cheatsheet, python-math-numbers, cpp-data-structures-stl, cpp-string-methods, cpp-loops-control-flow, java-data-structures, tmux-cheatsheet). Pipeline B blocker resolved: keyword_set_id=5 marked skip.
 - 2026-06-10 — **Phase 1 Part 2 complete.** Expanded 3 tool pages with Quick Reference panels + SEO content (`7325c4c`). json-formatter: XML↔JSON converter tab + JSON Minify section (targets `json minify` KD2/$47 CPC, `xml to json` KD1). html-formatter: HTML Quick Reference panel + fixed longstanding CSS truncation (targets `html divider` KD4, `blink html` KD10). sql-formatter: SQL Quick Reference panel + fixed CSS truncation (targets `coalesce sql` KD10, `sql window functions` KD14, `group by sql` KD8).
 
 - 2026-06-09 — Cheatsheet rewrite routine confirmed working. `regex-cheatsheet` fully rewritten and live (`5d617dd`). Drain runs 2–5 scheduled to complete by 14:45 UTC Jun 10. Root cause of initial failed run: CCR was fired 9 min before the push landed on origin/main (merge conflict delayed the push to 18:46 UTC; CCR cloned at ~18:37 UTC). Second fire succeeded cleanly.
