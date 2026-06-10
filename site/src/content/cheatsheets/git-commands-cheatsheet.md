@@ -1,284 +1,378 @@
 ---
-category: cheatsheets
-content_type: editorial
-description: A complete Git commands cheat sheet covering init, clone, branch, merge,
-  rebase, stash, and more. Quick reference for beginners and pros.
-downloadable: true
-og_image: /og/cheatsheets/git-commands-cheatsheet.png
-published_date: '2026-04-20'
-related_posts:
-- /guides/http-status-codes-guide
-- /guides/curl-command-guide
-- /blog/sorting-algorithms-comparison
-related_tools:
-- /tools/diff-viewer
-- /tools/hash-generator
+title: "Git Commands Cheat Sheet"
+description: "The complete git commands cheat sheet: setup, staging, branching, merging, remotes, stashing, history, undoing, and recovery — all in one place."
+category: "cheatsheets"
+template_id: "cheatsheet-v2"
 tags:
-- git
-- version-control
-- cheatsheet
-- commands
-- developer-tools
-template_id: cheatsheet-v2
-title: Git Commands Cheat Sheet
-word_count_target: 800
+  - git
+  - version-control
+  - cheatsheet
+  - commands
+  - developer-tools
+related_posts: []
+related_tools: []
+published_date: "2026-06-10"
+og_image: "/og/cheatsheets/git-commands-cheatsheet.png"
+downloadable: true
 ---
 
-Git commands grouped by task — setup, daily workflow, branching, history, and recovery. Every command here is standard Git with no external dependencies. Sections cover initial configuration, staging and committing, branching, remote sync, history inspection, and recovery. Git's underlying model is a directed acyclic graph (DAG) of snapshots: every commit points to its parent(s), and the staging area is an explicit intermediate step between your working files and the permanent record. Scan this cheatsheet by workflow phase — jump to the section that matches what you are trying to do right now.
+Git commands grouped by workflow phase — setup, staging, branching, merging, remotes, stashing, history, and recovery. Every command is standard Git with no external dependencies. Git models history as a directed acyclic graph (DAG) of snapshots: commits point to their parents, branches are lightweight moveable pointers, and the staging area is an explicit intermediate layer between the working tree and permanent history. Scan the section headers and jump to the phase that matches what you are doing right now.
 
 ## Setup and Configuration
 
-These settings write to `~/.gitconfig` and apply globally to every repo on the machine — you only need to run them once per workstation. Use `--local` instead of `--global` to scope a setting to a single repository, which is useful when you contribute to a work project under a different email than your personal one.
+Global settings write to `~/.gitconfig` and apply to every repository on this machine. Use `--local` to scope a setting to a single repo — useful when work and personal projects need different author emails.
 
 ```bash
 git config --global user.name "Your Name"
 git config --global user.email "you@example.com"
-git config --global core.editor "code --wait"   # VS Code as default editor
+git config --global core.editor "code --wait"       # VS Code as default editor
 git config --global init.defaultBranch main
+git config --global pull.rebase false               # merge on pull (safer default)
+git config --global merge.conflictstyle diff3       # show base in conflict markers
+git config --global core.autocrlf input             # normalize line endings on macOS/Linux
 
-git config --list          # show all config values
-git config user.name       # show a single value
+git config --list                                   # view all active settings
+git config --list --show-origin                     # settings plus the file that set each one
+git config user.name                                # inspect a single value
+git config --global --unset core.editor             # remove a global setting
+git config --global alias.st status                 # alias: git st = git status
+git config --global alias.lg "log --oneline --graph --all"
 ```
 
 Initialize or clone a repository:
 
 ```bash
-git init                   # create new repo in current directory
-git init my-project        # create new repo in my-project/
+git init                                            # create repo in current directory
+git init my-project                                 # create repo in my-project/
 git clone https://github.com/user/repo.git
-git clone https://github.com/user/repo.git target-dir   # clone into specific folder
-git clone --depth 1 https://github.com/user/repo.git    # shallow clone (latest commit only)
+git clone https://github.com/user/repo.git my-dir   # clone into a named folder
+git clone --depth 1 https://github.com/user/repo.git    # shallow clone, latest commit only
+git clone --branch develop https://github.com/user/repo.git  # clone a specific branch
+git clone --bare https://github.com/user/repo.git   # bare clone (no working tree)
 ```
 
-## Daily Workflow
+## Git Commands for Daily Workflow
+
+Git's staging area (the index) is an explicit layer between the working tree and committed history. Stage only the changes that belong together — use `git add -p` to pick individual hunks when a file contains multiple unrelated edits.
 
 ### Staging and Committing
 
-Git's staging area (the index) lets you craft precise commits by selecting only the changes you intend to group together. Use `git add -p` for interactive patch selection when a single file contains multiple unrelated changes you want to split across separate commits. A commit is a permanent snapshot, not a diff — write messages in imperative mood ("Add login form") and keep the first line under 72 characters so it renders cleanly in log output.
-
 ```bash
-git status                 # show working tree status
-git status -s              # short format
+git status                                          # show working tree and index state
+git status -s                                       # short format (M = modified, ?? = untracked)
+git status --porcelain                              # machine-readable output for scripting
 
-git add file.txt           # stage a specific file
-git add src/               # stage a directory
-git add .                  # stage all changes in current directory
-git add -p                 # interactively stage hunks
+git add file.txt                                    # stage a specific file
+git add src/components/                             # stage an entire directory
+git add .                                           # stage all changes in current directory
+git add -p                                          # interactively select hunks to stage
+git add -u                                          # stage all tracked modified and deleted files
+git add -N file.txt                                 # intent-to-add (file appears in diff before staging)
 
-git commit -m "message"    # commit staged changes
-git commit -am "message"   # stage tracked files + commit in one step
-git commit --amend         # edit last commit message (only before pushing)
-git commit --amend --no-edit   # add staged changes to last commit, keep message
+git commit -m "Add login form"                      # commit staged changes
+git commit -am "Fix typo"                           # stage tracked files then commit in one step
+git commit --amend                                  # edit last commit message (before pushing only)
+git commit --amend --no-edit                        # add staged changes to last commit, keep message
+git commit --allow-empty -m "Trigger CI"            # empty commit (useful for pipeline triggers)
 ```
 
-### Viewing Changes
+Write commit messages in imperative mood ("Add login form") and keep the first line under 72 characters so it renders cleanly in `git log --oneline` and pull-request interfaces.
 
-`git diff` without arguments shows only unstaged changes — easy to forget when everything is already staged. Use `--staged` to see exactly what will land in the next commit, and `--stat` for a quick summary of affected files and line counts before diving into a full diff.
+### Comparing Changes
 
-```bash
-git diff                   # unstaged changes
-git diff --staged          # staged changes (what will be committed)
-git diff HEAD              # all changes since last commit
-git diff branch1..branch2  # diff between two branches
-git diff --stat            # summarize changes (files + line counts)
-```
-
-Use the [Diff Viewer tool](/tools/diff-viewer/) for a side-by-side visual comparison when reviewing changes between files.
-
-## Branching
-
-Branches in Git are lightweight pointers to commits — creating one costs almost nothing and switching between them is near-instant. This makes branches the primary unit of parallel work: open a branch for every feature, bug fix, or experiment, then merge or discard when done. Prefer `git switch` over `git checkout` for branch operations; it was introduced in Git 2.23 specifically to reduce checkout's overloaded behavior.
+`git diff` without arguments shows only unstaged changes. When everything is already staged, use `--staged` to preview what will actually land in the next commit.
 
 ```bash
-git branch                 # list local branches
-git branch -a              # list local + remote branches
-git branch feature/login   # create a branch
-git branch -d feature/login   # delete merged branch
-git branch -D feature/login   # force delete (unmerged OK)
-git branch -m old-name new-name   # rename branch
-
-git switch feature/login   # switch to branch (Git 2.23+)
-git switch -c feature/signup  # create and switch
-git checkout feature/login # older equivalent of git switch
-git checkout -b feature/signup  # older equivalent of git switch -c
+git diff                                            # unstaged changes (working tree vs index)
+git diff --staged                                   # staged changes (index vs last commit)
+git diff HEAD                                       # all changes since last commit
+git diff branch1..branch2                           # diff between two branch tips
+git diff branch1...branch2                          # diff since common ancestor
+git diff --stat                                     # changed files and line-count summary
+git diff --name-only                                # list changed file paths only
+git diff v1.0..v1.1 -- src/                        # diff between tags, scoped to a directory
 ```
 
-## Merging and Rebasing
+Use the [Diff Viewer tool](/tools/diff-viewer/) for a side-by-side visual comparison when reviewing changes outside the terminal.
 
-Merge preserves the full history topology, including the branch point and merge commit. Rebase rewrites commits onto a new base, producing a linear history that is easier to read in `git log`. Choose based on team convention — and never rebase branches that other people have already pulled, because rewriting shared commits forces everyone else to reconcile diverged history.
+## Branching and Switching
+
+Branches are lightweight moveable pointers — creating one is instantaneous and switching is near-instant. Use a branch for every feature, bug fix, or experiment; merge or discard when done. `git switch` (Git 2.23+) is the preferred command for branch operations; `git checkout` still works but its overloaded behavior makes it error-prone when switching is all you need.
 
 ```bash
-# Merge
-git merge feature/login              # merge into current branch
-git merge --no-ff feature/login      # force merge commit (no fast-forward)
-git merge --squash feature/login     # squash into single staged change
-git merge --abort                    # abort in-progress merge
+git branch                                          # list local branches
+git branch -a                                       # list local and remote tracking branches
+git branch -v                                       # each branch with its latest commit
+git branch -vv                                      # branches with upstream tracking info
+git branch feature/login                            # create a branch at HEAD
+git branch feature/login abc1234                    # create a branch at a specific commit
+git branch -d feature/login                         # delete a merged branch
+git branch -D feature/login                         # force-delete (even if unmerged)
+git branch -m old-name new-name                     # rename a branch locally
 
-# Rebase
-git rebase main                      # rebase current branch onto main
-git rebase -i HEAD~3                 # interactive rebase last 3 commits
-git rebase --onto main feature base  # transplant commits
-git rebase --abort                   # abort in-progress rebase
-git rebase --continue                # continue after resolving conflicts
+git switch feature/login                            # switch to a branch (Git 2.23+)
+git switch -c feature/signup                        # create and switch in one step
+git switch -c feature/signup origin/signup          # create local branch from remote tracking
+git checkout feature/login                          # legacy: switch to branch
+git checkout -b feature/signup                      # legacy: create and switch
 ```
 
-When to use each:
+## Merging, Rebasing, and Cherry-Picking
 
-| Situation | Prefer |
-|-----------|--------|
-| Feature branch → main on shared repo | Merge (preserves history) |
-| Cleaning up local commits before PR | Rebase -i (squash/reword) |
-| Keeping feature branch current | Rebase onto main |
-| Hotfix into multiple branches | Cherry-pick |
+Merge preserves complete history topology including branch points and merge commits. Rebase rewrites commits onto a new base for a linear history that is easier to follow. Never rebase a branch that others have already pulled — rewriting shared commits forces reconciliation on every other copy.
 
-## Remote Repositories
-
-Push, pull, and fetch are the bridge between your local repository and the remote. `git fetch` downloads new commits and refs without touching your working tree or current branch, making it safe to run at any time. `git pull` is a fetch followed by a merge (or rebase with `--rebase`), so running `fetch + review + merge` manually is often safer than a blind `pull` when you are unsure what changed upstream.
+**Merge commands:**
 
 ```bash
-git remote -v                        # list remotes
-git remote add origin https://...    # add remote
-git remote rename origin upstream    # rename remote
-git remote remove upstream           # remove remote
-git remote set-url origin https://... # change remote URL
-
-git fetch origin                     # download changes, don't merge
-git fetch --all                      # fetch all remotes
-git pull                             # fetch + merge
-git pull --rebase                    # fetch + rebase (cleaner history)
-
-git push origin main                 # push to remote
-git push -u origin feature/login     # push + set upstream tracking
-git push --force-with-lease          # safe force push (fails if remote changed)
-git push origin --delete feature/old # delete remote branch
+git merge feature/login                             # merge into current branch
+git merge --no-ff feature/login                     # always create a merge commit
+git merge --squash feature/login                    # squash all branch commits into one staged change
+git merge --abort                                   # cancel an in-progress merge
 ```
 
-## Stashing
-
-The stash is a stack — `git stash pop` applies and removes the latest entry, while `git stash apply` keeps it on the stack so you can re-apply later. Use `git stash push -m "descriptive name"` to label stashes when you are juggling multiple in-progress tasks, because the default `stash@{0}` numbering shifts every time you push, making unlabeled stashes hard to identify.
+**Rebase commands:**
 
 ```bash
-git stash                            # stash working directory changes
-git stash push -m "WIP: login form"  # stash with message
-git stash list                       # list stashes
-git stash pop                        # apply latest stash + remove it
-git stash apply stash@{2}            # apply specific stash, keep it
-git stash drop stash@{0}             # delete a stash
-git stash clear                      # delete all stashes
-git stash branch feature/stashed     # create branch from stash
+git rebase main                                     # rebase current branch onto main
+git rebase -i HEAD~3                                # interactive: squash, reword, reorder, drop
+git rebase --onto main feature base                 # transplant commits to a different base
+git rebase --abort                                  # cancel an in-progress rebase
+git rebase --continue                               # continue after resolving a conflict
 ```
 
-## Viewing History
-
-`git log`'s real power comes from combining flags: `--oneline --graph --all` renders an ASCII visualization of every branch and merge point at once. Use `--follow` when tracking a file that has been renamed — without it, `git log` stops at the rename boundary. For detailed archaeology, combine `--author`, `--since`, and `--grep` to narrow thousands of commits down to the handful you care about.
+**Cherry-pick commands:**
 
 ```bash
-git log                              # full log
-git log --oneline                    # one line per commit
-git log --oneline --graph --all      # ASCII branch graph
-git log -n 10                        # last 10 commits
-git log --author="Name"              # filter by author
-git log --since="2 weeks ago"        # filter by date
-git log --grep="fix"                 # filter by commit message
-git log -p file.txt                  # show patches for a file
-git log --follow file.txt            # follow file renames
-
-git show abc1234                     # show a commit
-git show HEAD~2:src/app.js           # show file at specific commit
+git cherry-pick abc1234                             # copy one commit onto the current branch
+git cherry-pick abc1234..def5678                    # copy a range of commits
+git cherry-pick --no-commit abc1234                 # apply changes without creating a commit
+git cherry-pick --abort                             # cancel an in-progress cherry-pick
 ```
 
-## Undoing Changes
+Choose the right strategy for each situation:
 
-Match the undo command to how far the change has traveled. Use `git restore` for unstaged working-tree changes, `git restore --staged` to move a file back out of the index, and `git reset` to rewind commits that have not been shared. Once a commit is on a remote that others have pulled, reach for `git revert` instead — it creates an inverse commit rather than rewriting history.
+| Scenario | Best Approach | Why |
+|----------|---------------|-----|
+| Feature branch to shared main | `merge --no-ff` | Preserves branch topology in history |
+| Cleaning up local commits before PR | `rebase -i` | Linear history, no shared impact |
+| Keeping feature branch current | `rebase main` | Avoids merge commit noise |
+| Applying a targeted fix across branches | `cherry-pick` | Copies only the required commit |
+| Hotfix into a release branch | Cherry-pick or merge | Depends on release branching model |
+
+## Remote Repository Commands
+
+`git fetch` downloads remote commits and refs without touching your working tree — safe to run at any time. `git pull` is fetch followed by merge (or rebase with `--rebase`). Running fetch first and reviewing before merging gives you full control over what lands on your branch.
 
 ```bash
-git restore file.txt                 # discard unstaged changes in file
-git restore --staged file.txt        # unstage file (keep changes)
-git restore .                        # discard all unstaged changes
+git remote -v                                       # list remotes with URLs
+git remote add origin https://github.com/user/repo.git
+git remote rename origin upstream                   # rename a remote
+git remote remove upstream                          # remove a remote
+git remote set-url origin https://...               # update a remote URL
+git remote show origin                              # detailed info about a remote
 
-git reset HEAD~1                     # undo last commit, keep changes staged
-git reset --soft HEAD~1              # undo last commit, keep changes staged
-git reset --mixed HEAD~1             # undo last commit, unstage changes (default)
-git reset --hard HEAD~1              # undo last commit, discard changes (destructive)
+git fetch origin                                    # download new commits, do not apply
+git fetch --all                                     # fetch from all remotes
+git fetch origin --prune                            # remove stale tracking refs
 
-git revert abc1234                   # create new commit that undoes abc1234
-git revert HEAD                      # revert last commit
+git pull                                            # fetch and merge from tracked upstream
+git pull --rebase                                   # fetch and rebase (cleaner, no merge commit)
+git pull origin main                                # pull a specific branch explicitly
+
+git push origin main                                # push branch to remote
+git push -u origin feature/login                    # push and set upstream tracking ref
+git push --force-with-lease                         # safe force-push (fails if remote has new commits)
+git push origin --delete feature/old                # delete a remote branch
+git push origin --tags                              # push all tags to remote
 ```
 
-**When to use reset vs revert:**
-- `git reset`: use for commits that have never been pushed (local history only)
-- `git revert`: use for commits that are already on a shared remote — it adds a new commit, preserving history
+For programmatic interaction with remote HTTP endpoints, see the [curl Command guide](/guides/curl-command-guide/).
 
-## Cherry-Picking
+## Stashing Work in Progress
 
-Cherry-picking copies a commit's changes onto the current branch without merging the entire source branch. It is useful for applying a targeted bug fix from one branch to another, but overusing it can produce duplicate commits that complicate future merges — prefer a full merge when you need most of the commits from a branch.
+The stash is a stack. `git stash pop` applies and removes the top entry; `git stash apply` keeps the entry so you can re-apply it. Label stashes with `push -m` when juggling several tasks — the default `stash@{0}` numbering shifts every time you push a new entry, making unlabeled stashes hard to identify later.
 
 ```bash
-git cherry-pick abc1234              # apply commit to current branch
-git cherry-pick abc1234..def5678     # apply a range of commits
-git cherry-pick --no-commit abc1234  # apply changes without committing
-git cherry-pick --abort              # abort in-progress cherry-pick
+git stash                                           # stash working tree and index changes
+git stash push -m "WIP: login form validation"      # stash with a descriptive label
+git stash push -u                                   # stash including untracked files
+git stash push -a                                   # stash everything including ignored files
+git stash list                                      # list all stash entries
+git stash show stash@{0}                            # summary of a stash entry
+git stash show -p stash@{0}                         # full diff of a stash entry
+git stash pop                                       # apply latest stash and remove it from list
+git stash apply stash@{1}                           # apply a specific stash, keep it in list
+git stash drop stash@{0}                            # delete a specific stash entry
+git stash clear                                     # delete all stash entries
+git stash branch feature/stashed                    # create a branch from the latest stash
 ```
 
-## Tags
+## Viewing History and Searching
 
-Tags mark specific commits as significant — typically release points. Lightweight tags are plain pointers with no metadata; annotated tags (`-a`) store the tagger name, date, and a message, making them preferable for public releases. Tags are not pushed automatically with `git push`; you must push them explicitly or use `--tags` to push all at once.
+`git log` is most powerful when flags are combined: `--oneline --graph --all` renders a full ASCII branch diagram across every ref. Use `--follow` when tracking a renamed file — without it, log stops at the rename boundary.
+
+**Commit log:**
 
 ```bash
-git tag                              # list tags
-git tag v1.0.0                       # lightweight tag on HEAD
-git tag -a v1.0.0 -m "Release 1.0"  # annotated tag
-git tag -a v1.0.0 abc1234           # tag a specific commit
-git push origin v1.0.0              # push tag to remote
-git push origin --tags              # push all tags
-git tag -d v1.0.0                   # delete local tag
-git push origin --delete v1.0.0     # delete remote tag
+git log                                             # full log: author, date, message, SHA
+git log --oneline                                   # one line per commit (short SHA)
+git log --oneline --graph --all                     # ASCII branch and merge graph for all refs
+git log -n 10                                       # last 10 commits only
+git log --author="Name"                             # filter by author name
+git log --since="2 weeks ago"                       # filter by date range
+git log --grep="fix"                                # filter by commit message keyword
+git log -p file.txt                                 # patches for a specific file
+git log --follow file.txt                           # track a file through renames
+git log --stat                                      # files changed and line counts per commit
+git log --no-merges --oneline                       # exclude merge commits
 ```
 
-## Searching and Debugging
-
-`git grep` searches only tracked files and respects `.gitignore` automatically, making it faster than a plain filesystem search in large repositories. `git blame` shows the last commit to touch each line, but combine it with `git log -p` on the identified SHA to see the full context of why that change was made. `git bisect` is the power tool for regressions: it performs a binary search through commit history and identifies the exact commit that introduced a bug, even across thousands of commits.
+**Inspect a specific commit or file state:**
 
 ```bash
-git grep "function login"            # search working tree
-git grep "TODO" -- "*.js"            # search in specific file types
-
-git blame file.txt                   # show who changed each line
-git blame -L 10,20 file.txt          # blame for specific line range
-
-git bisect start                     # start bisect session
-git bisect bad                       # mark current commit as bad
-git bisect good v1.0.0               # mark known good commit
-git bisect reset                     # end bisect session
+git show abc1234                                    # full diff of a commit
+git show HEAD~2                                     # commit two steps back
+git show HEAD~2:src/app.js                          # file content at a specific commit
 ```
 
-`git bisect` performs a binary search through your commit history to find which commit introduced a bug. Git checks out commits automatically; you mark each as good or bad until it identifies the culprit.
-
-## Useful Shortcuts
+**Search tracked files:**
 
 ```bash
-git diff HEAD~1 HEAD -- file.txt     # changes in last commit for a file
-git log --all --full-history -- deleted-file.txt  # find deleted file history
-git reflog                           # all recent HEAD movements (recovery lifeline)
-git shortlog -sn                     # contributor summary by commit count
-git rev-parse HEAD                   # get current commit SHA
-git ls-files --others --exclude-standard  # list untracked files
+git grep "function authenticate"                    # search the working tree
+git grep "TODO" -- "*.ts"                           # search within specific file types
+git grep -n "api_key"                               # results with line numbers
 ```
 
-The [Hash Generator tool](/tools/hash-generator/) can verify file integrity by generating SHA checksums — useful when comparing artifact hashes in CI pipelines.
+**Blame and binary-search for regressions:**
 
-For more on interacting with remote servers programmatically, see the [curl Command guide](/guides/curl-command-guide/).
+`git bisect` performs a binary search through commits to isolate the exact commit that introduced a bug — efficient even across thousands of commits.
 
-## When Things Go Wrong: Recovery Order
+```bash
+git blame file.txt                                  # last commit to touch each line
+git blame -L 10,30 file.txt                         # limit blame to a line range
+git blame --ignore-rev abc1234 file.txt             # skip a known reformatting commit
 
-Recovery follows a predictable priority order — work through it top to bottom before reaching for anything destructive.
+git bisect start                                    # begin a bisect session
+git bisect bad                                      # mark current commit as broken
+git bisect good v1.0.0                              # mark the last known-good commit
+git bisect good                                     # mark this checkout as OK (Git advances)
+git bisect bad                                      # mark this checkout as broken (Git narrows)
+git bisect reset                                    # end session and return to original HEAD
+```
 
-If the change is unstaged, `git restore <file>` discards it instantly. Be aware: the change is gone for good because it was never committed, so Git has no snapshot to recover from.
+## Undoing Changes and Recovering Lost Work
 
-If it is staged but not committed, `git reset HEAD <file>` (or `git restore --staged <file>`) moves it back to the unstaged working tree. Your changes are still intact — just removed from the index.
+Match the undo tool to where the change currently lives. `git restore` handles working-tree and index edits; `git reset` rewinds local commits that have not been shared; `git revert` safely reverses a commit already on a shared remote; `git reflog` recovers seemingly lost work.
 
-If it is committed locally but not yet pushed, `git reset --soft HEAD~1` unwraps the commit back to staged changes, leaving your work fully intact. Use `--mixed` to unstage as well, or `--hard` only when you are certain you want to discard the changes entirely.
+**Discard unstaged changes** (irreversible — no commit snapshot exists):
 
-If the commit is already pushed and shared with others, `git revert <sha>` is the correct tool. It creates a new inverse commit that undoes the original without rewriting shared history — safe for everyone else who has already pulled.
+```bash
+git restore file.txt                                # discard working-tree changes in one file
+git restore .                                       # discard all unstaged changes
+```
 
-If everything looks lost — a branch deleted, a reset taken too far — `git reflog` is your last resort. It logs every HEAD movement for 90 days by default, including branch deletions and hard resets. Find the SHA of the state you want to return to, then `git checkout <sha>` or `git branch recovered-branch <sha>` to restore it.
+**Unstage** (keeps changes in the working tree):
+
+```bash
+git restore --staged file.txt                       # move file from index back to working tree
+git restore --staged .                              # unstage everything
+```
+
+**Reset commits** (rewrites local history — avoid on pushed commits):
+
+```bash
+git reset --soft HEAD~1                             # undo last commit, keep changes staged
+git reset --mixed HEAD~1                            # undo last commit, unstage changes (default)
+git reset --hard HEAD~1                             # undo last commit, discard changes entirely
+```
+
+**Revert** (adds an inverse commit — safe for shared history):
+
+```bash
+git revert abc1234                                  # reverse a specific commit
+git revert HEAD                                     # reverse the last commit
+git revert HEAD~3..HEAD                             # revert a range of commits
+```
+
+**Reflog** — last resort for recovering work that looks permanently lost:
+
+```bash
+git reflog                                          # every HEAD movement for the last 90 days
+git reflog show feature/login                       # reflog for a specific branch
+git checkout abc1234                                # detach HEAD at a recovered SHA
+git branch recovered-branch abc1234                 # create a branch at a recovered SHA
+```
+
+Choose the right approach based on where the change is:
+
+| Situation | Command | Notes |
+|-----------|---------|-------|
+| Unstaged working-tree edit | `git restore` | Instant; discards permanently (not committed) |
+| File accidentally staged | `git restore --staged` | Moves back to working tree, edits preserved |
+| Committed but not yet pushed | `git reset` | Rewrites local history only |
+| Committed and pushed to shared remote | `git revert` | Safe — adds inverse commit |
+| Branch deleted or hard-reset too far | `git reflog` | Recoverable for 90 days by default |
+
+## Tags and Releases
+
+Tags mark specific commits as significant — typically release points. Lightweight tags are plain refs with no metadata; annotated tags (`-a`) store the author, date, and message, making them the standard for public releases. Tags are not pushed automatically with `git push`; push them explicitly.
+
+```bash
+git tag                                             # list all tags
+git tag v1.0.0                                      # lightweight tag at HEAD
+git tag -a v1.0.0 -m "Release 1.0.0"               # annotated tag with a message
+git tag -a v1.0.0 abc1234 -m "Tag a past commit"   # annotated tag at a specific SHA
+git show v1.0.0                                     # show tag metadata and tagged commit
+
+git push origin v1.0.0                              # push a single tag
+git push origin --tags                              # push all tags to remote
+git fetch --tags                                    # fetch all remote tags locally
+
+git tag -d v1.0.0                                   # delete tag locally
+git push origin --delete v1.0.0                     # delete tag on remote
+
+git tag | sort -V                                   # list tags in semantic version order
+git describe --tags                                 # nearest tag, offset count, and SHA
+git describe --tags --abbrev=0                      # nearest tag name only
+git checkout v1.0.0                                 # detach HEAD at a tagged commit (read-only)
+```
+
+## Quick Reference and Useful One-Liners
+
+Less-common commands that save time once you know them.
+
+**File and change inspection:**
+
+```bash
+git diff HEAD~1 HEAD -- file.txt                    # changes introduced by the last commit for one file
+git log --all --full-history -- deleted-file.txt    # find history of a deleted file
+git show HEAD~2:src/app.js                          # file content as it was two commits ago
+git ls-files --others --exclude-standard            # list untracked files
+git ls-files -d                                     # list tracked files deleted from working tree
+```
+
+**Contributor summaries and cleanup:**
+
+```bash
+git shortlog -sn                                    # commit count by author, sorted
+git log --format="%ae" | sort | uniq -c | sort -rn  # commit counts by email
+git clean -n                                        # dry run: show what git clean would remove
+git clean -fd                                       # delete untracked files and directories
+git gc                                              # garbage collect (compress objects)
+```
+
+**Navigation and branch helpers:**
+
+```bash
+git rev-parse HEAD                                  # print current commit SHA
+git rev-parse --abbrev-ref HEAD                     # print current branch name
+git log --merges --oneline                          # list only merge commits
+git log --no-merges --oneline                       # exclude merge commits
+git stash show -p | git apply --reverse             # undo a stash that was already applied
+```
+
+The [Hash Generator tool](/tools/hash-generator/) generates SHA checksums for file verification — useful when auditing artifact hashes in CI/CD pipelines.
+
+For a broader terminal reference, see the [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet/) and the [Docker Commands Cheat Sheet](/cheatsheets/docker-commands-cheatsheet/) for container workflows.
+
+For the authoritative command reference and in-depth explanations, see the [Git documentation](https://git-scm.com/docs) and the free online [Pro Git book](https://git-scm.com/book/en/v2).
