@@ -1,6 +1,6 @@
 ---
 title: HTML Formatter & Minifier — Free Online Tool
-description: Beautify messy HTML with proper indentation or minify it for production. Free browser-based HTML formatter with no server uploads.
+description: Beautify or minify HTML instantly in your browser. Includes an HTML Quick Reference for divider lines, comments, blink, marquee, and more — free, no server uploads.
 category: tools
 tool_slug: html-formatter
 template_id: tool-exp-v1
@@ -10,6 +10,9 @@ tags:
 - minifier
 - beautifier
 - html cleaner
+- html-reference
+- html-divider
+- html-comments
 related_tools:
 - json-formatter
 - sql-formatter
@@ -23,6 +26,10 @@ faqs:
     answer: "The formatter uses a token-based approach and will attempt to process the input even if it is not perfectly valid. Severely malformed HTML may produce unexpected indentation but will not throw an error."
   - question: "Does minification affect JavaScript or CSS inside script or style tags?"
     answer: "Only whitespace between HTML tags is removed. The content inside script and style blocks is preserved exactly as written. For full script/style minification, use a dedicated JavaScript or CSS minifier."
+  - question: "What is the HTML divider tag?"
+    answer: "The HTML divider is the <hr> (horizontal rule) element. It renders as a full-width horizontal line with no closing tag required. You can style it with CSS: border, color, width, and margin. Use it to visually separate sections of content."
+  - question: "Is blink HTML still supported?"
+    answer: "No. The <blink> element was a non-standard Netscape extension that made text flash on and off. It was never part of any HTML standard and was removed from all major browsers by 2013–2015. It is listed in the HTML Quick Reference below for historical reference only. Use CSS animations if you need a blinking effect today."
 ---
 
 ## What is the HTML Formatter & Minifier?
@@ -54,12 +61,80 @@ The character count is shown for both the input and output, so you can immediate
 - **Code review** — Beautify minified HTML from a live site to understand its structure, including embedded [JSON data](/tools/json-formatter/) in script blocks
 - **Build pipelines** — Quickly test what your minified output will look like before running a build step
 
+## HTML Quick Reference
+
+The HTML Quick Reference panel (click "HTML Quick Reference" below the formatter) lists common elements with click-to-insert snippets. Here are the most-searched ones:
+
+### HTML Divider Line
+
+The HTML divider is the `<hr>` (horizontal rule) element — a self-closing tag that renders as a full-width horizontal line:
+
+```html
+<hr>
+```
+
+Style it with CSS to change color, thickness, or width:
+
+```css
+hr {
+  border: none;
+  border-top: 2px solid #e5e7eb;
+  margin: 2rem 0;
+}
+```
+
+`<hr>` is a block-level element. It has no text content and no closing tag in HTML5.
+
+### HTML Comments
+
+HTML comments are hidden from the browser's rendered output but visible in source code:
+
+```html
+<!-- This is a comment -->
+
+<!-- 
+  Multi-line comment.
+  Useful for temporarily disabling markup.
+-->
+```
+
+The minifier strips all HTML comments by default — useful for removing dev notes before production.
+
+### Blink HTML
+
+`<blink>` was a non-standard Netscape extension from the mid-1990s that made text flash on and off. It was removed from all major browsers by 2013–2015 and is not part of any HTML standard:
+
+```html
+<blink>This text used to blink</blink>  <!-- no longer works -->
+```
+
+If you need a blinking effect today, use a CSS animation instead:
+
+```css
+@keyframes blink {
+  50% { opacity: 0; }
+}
+.blink {
+  animation: blink 1s step-start infinite;
+}
+```
+
 ## Frequently Asked Questions
 
-**Does the formatter handle malformed HTML?**  
+### What is the HTML divider tag?
+
+The HTML divider is the `<hr>` (horizontal rule) element. It renders as a full-width horizontal line with no closing tag required. You can style it with CSS: border, color, width, and margin. Use it to visually separate sections of content.
+
+### Is blink HTML still supported?
+
+No. The `<blink>` element was a non-standard Netscape extension that made text flash on and off. It was never part of any HTML standard and was removed from all major browsers by 2013–2015. It is listed in the HTML Quick Reference below for historical reference only. Use CSS animations if you need a blinking effect today.
+
+### Does the formatter handle malformed HTML?
+
 The formatter uses a token-based approach and will attempt to process the input even if it is not perfectly valid. Severely malformed HTML may produce unexpected indentation but will not throw an error.
 
-**Does minification affect JavaScript or CSS inside `<script>` or `<style>` tags?**  
+### Does minification affect JavaScript or CSS inside `<script>` or `<style>` tags?
+
 Only whitespace between HTML tags is removed. The content inside `<script>` and `<style>` blocks is preserved exactly as written. For full script/style minification, use a dedicated JavaScript or CSS minifier.
 
 For production optimization best practices, read our [HTML Minification Guide](/guides/html-minification-compression-guide/).

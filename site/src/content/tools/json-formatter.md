@@ -1,8 +1,6 @@
 ---
 category: tools
-description: Use this json formatter online to format, validate, and minify JSON
-  instantly in your browser. No data sent to servers — validate JSON online with
-  syntax error detection and instant feedback.
+description: "Use this JSON formatter online to format, validate, and minify JSON instantly. Also converts XML to JSON and JSON to XML — all free, no server uploads."
 og_image: /og/tools/json-formatter.png
 published_date: '2026-04-13'
 related_content:
@@ -17,6 +15,10 @@ tags:
 - validator
 - minify
 - beautify
+- xml-to-json
+- json-to-xml
+- xml
+- json-minify
 template_id: tool-exp-v1
 title: "JSON Formatter Online: Format, Validate & Minify Instantly"
 tool_slug: json-formatter
@@ -33,6 +35,10 @@ faqs:
     answer: "Common causes include trailing commas after the last array or object entry, single quotes instead of double quotes around keys or strings, unescaped special characters (like a bare backslash), and missing or mismatched brackets. Use the Validate button to pinpoint the exact line, then check our guide to debugging invalid JSON syntax for detailed fixes."
   - question: "Is this json formatter online free?"
     answer: "Yes, completely free. No subscription, no sign-up, and no usage limits. The tool runs entirely in your browser with zero server costs or data transfer on your end, so it stays free indefinitely."
+  - question: "How do I convert XML to JSON online?"
+    answer: "Click the XML ↔ JSON tab, paste your XML into the input area, and click XML → JSON. The converter uses your browser's built-in DOMParser to walk the XML tree and output clean, indented JSON — no libraries, no server upload."
+  - question: "What is JSON minify used for?"
+    answer: "JSON minify strips all whitespace (spaces, newlines, indentation) from JSON, reducing file size by 20–40% for typical payloads. It's used before shipping JSON in API responses, config bundles, or frontend builds where every byte counts. The minified output is valid JSON — just without formatting."
 ---
 
 ## What is JSON Formatter & Validator?
@@ -57,6 +63,30 @@ The validator shows exactly where errors occur, making it fast to fix malformed 
 - **Cleaning config files**: Standardize indentation across team JSON configs
 - **Preparing for production**: Minify JSON to reduce file size before deployment
 - **Learning JSON syntax**: Validate examples while learning JSON structure and rules
+
+## JSON Minify
+
+JSON minify removes all whitespace — spaces, line breaks, and indentation — from JSON while keeping it fully valid. The result is the smallest possible representation of your data.
+
+**When to minify JSON:**
+- API responses: shave 20–40% off typical payloads before they hit the network
+- Production builds: minified config files and data bundles load faster
+- Embedding JSON in HTML or JS: compact form avoids accidental truncation
+
+Click **Minify** in the JSON Tools tab to minify any valid JSON instantly. The output copies with one click.
+
+## XML to JSON Converter
+
+Switch to the **XML ↔ JSON** tab to convert between XML and JSON in either direction.
+
+**XML to JSON** — paste any XML document and click `XML → JSON`. The converter walks the XML tree with the browser's built-in `DOMParser`, mapping elements to object keys, repeated elements to arrays, and attributes to an `@attributes` object.
+
+**JSON to XML** — paste a JSON object and click `JSON → XML`. The converter wraps each key in a matching XML tag and handles nested objects and arrays recursively.
+
+**Common use cases:**
+- Converting legacy SOAP/XML API responses to JSON for modern frontends
+- Transforming RSS or Atom feeds into JSON for JavaScript consumption
+- Migrating data from XML-based configs (Maven `pom.xml`, Android manifests) to JSON equivalents
 
 ## FAQ
 
@@ -83,5 +113,13 @@ Common causes include trailing commas after the last array or object entry, sing
 ### Is this json formatter online free?
 
 Yes, completely free. No subscription, no sign-up, and no usage limits. The tool runs entirely in your browser with zero server costs or data transfer on your end, so it stays free indefinitely.
+
+### How do I convert XML to JSON online?
+
+Click the XML ↔ JSON tab, paste your XML into the input area, and click **XML → JSON**. The converter uses your browser's built-in DOMParser to walk the XML tree and output clean, indented JSON — no libraries, no server upload.
+
+### What is JSON minify used for?
+
+JSON minify strips all whitespace (spaces, newlines, indentation) from JSON, reducing file size by 20–40% for typical payloads. It's used before shipping JSON in API responses, config bundles, or frontend builds where every byte counts. The minified output is valid JSON — just without formatting.
 
 Inspecting a JWT? The payload is JSON — [decode it here](/tools/jwt-decoder/). Try the [JSON Formatter & Validator](/tools/json-formatter/) now — completely free, no sign-up required.

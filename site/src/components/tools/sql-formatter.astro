@@ -64,6 +64,32 @@
   </div>
 
   <div class="tool-status" aria-live="polite" aria-atomic="true"></div>
+
+  <div class="sql-ref">
+    <button class="sql-ref-toggle" id="sql-ref-toggle" aria-expanded="false" aria-controls="sql-ref-panel">
+      SQL Quick Reference <span class="sql-ref-arrow" aria-hidden="true">▼</span>
+    </button>
+    <div class="sql-ref-panel" id="sql-ref-panel" hidden>
+      <p class="sql-ref-hint">Click any row to insert the snippet into the formatter.</p>
+      <table class="sql-ref-table">
+        <thead>
+          <tr><th>Function / Clause</th><th>Example</th></tr>
+        </thead>
+        <tbody>
+          <tr data-snippet="COALESCE(col, 'default')"><td>COALESCE</td><td><code>COALESCE(col, 'default')</code></td></tr>
+          <tr data-snippet="ROW_NUMBER() OVER (PARTITION BY col ORDER BY id)"><td>Window Function</td><td><code>ROW_NUMBER() OVER (PARTITION BY col ORDER BY id)</code></td></tr>
+          <tr data-snippet="SELECT col, COUNT(*) FROM t GROUP BY col"><td>GROUP BY</td><td><code>SELECT col, COUNT(*) FROM t GROUP BY col</code></td></tr>
+          <tr data-snippet="GROUP BY col HAVING COUNT(*) &gt; 1"><td>HAVING</td><td><code>GROUP BY col HAVING COUNT(*) &gt; 1</code></td></tr>
+          <tr data-snippet="WHERE col BETWEEN 1 AND 10"><td>BETWEEN</td><td><code>WHERE col BETWEEN 1 AND 10</code></td></tr>
+          <tr data-snippet="TRIM(col)"><td>TRIM</td><td><code>TRIM(col)</code></td></tr>
+          <tr data-snippet="SUBSTRING(col, 1, 3)"><td>SUBSTRING</td><td><code>SUBSTRING(col, 1, 3)</code></td></tr>
+          <tr data-snippet="DATEDIFF(day, start_date, end_date)"><td>DATEDIFF</td><td><code>DATEDIFF(day, start_date, end_date)</code></td></tr>
+          <tr data-snippet="DELETE FROM t WHERE condition"><td>DELETE</td><td><code>DELETE FROM t WHERE condition</code></td></tr>
+          <tr data-snippet="WHERE col LIKE '%pattern%'"><td>LIKE</td><td><code>WHERE col LIKE '%pattern%'</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -240,6 +266,29 @@
   formatBtn.addEventListener('click', handleFormat);
   clearBtn.addEventListener('click', handleClear);
   copyBtn.addEventListener('click', handleCopy);
+
+  const sqlRefToggle = document.getElementById('sql-ref-toggle');
+  const sqlRefPanel = document.getElementById('sql-ref-panel');
+  if (sqlRefToggle && sqlRefPanel) {
+    sqlRefToggle.addEventListener('click', () => {
+      const isHidden = sqlRefPanel.hasAttribute('hidden');
+      if (isHidden) {
+        sqlRefPanel.removeAttribute('hidden');
+        sqlRefToggle.setAttribute('aria-expanded', 'true');
+        sqlRefToggle.querySelector('.sql-ref-arrow').textContent = '▲';
+      } else {
+        sqlRefPanel.setAttribute('hidden', '');
+        sqlRefToggle.setAttribute('aria-expanded', 'false');
+        sqlRefToggle.querySelector('.sql-ref-arrow').textContent = '▼';
+      }
+    });
+    sqlRefPanel.querySelectorAll('tr[data-snippet]').forEach(row => {
+      row.addEventListener('click', () => {
+        inputTextarea.value += (inputTextarea.value ? '\n' : '') + row.dataset.snippet;
+        showStatus('Snippet inserted.');
+      });
+    });
+  }
 
   // Format on Enter (Ctrl/Cmd + Enter)
   inputTextarea.addEventListener('keydown', (e) => {
@@ -442,3 +491,119 @@ textarea {
 
 textarea:focus {
   outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.tool-status {
+  display: none;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.875rem;
+  margin-top: var(--space-3);
+}
+
+.tool-status.success {
+  display: block;
+  background: var(--color-green-light);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.tool-status.error {
+  display: block;
+  background: var(--color-coral-light);
+  color: var(--color-coral);
+  border: 1px solid var(--color-coral);
+}
+
+.sql-ref {
+  margin-top: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.sql-ref-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+  border-radius: 0;
+  transition: background 0.15s ease;
+}
+
+.sql-ref-toggle:hover { background: var(--color-border); }
+
+.sql-ref-panel {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.sql-ref-hint {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.sql-ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.sql-ref-table th {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.sql-ref-table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.sql-ref-table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.sql-ref-table tbody tr:hover { background: var(--color-surface); }
+
+.sql-ref-table code {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  background: var(--color-surface);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .tool-body {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-controls {
+    flex-direction: column;
+  }
+
+  .control-group select {
+    min-width: 100%;
+  }
+
+  .sql-ref-table code {
+    white-space: normal;
+  }
+}
+</style>

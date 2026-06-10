@@ -80,6 +80,28 @@
     </div>
   </div>
   <div class="tool-status" id="status-message" aria-live="polite"></div>
+  <div class="html-ref">
+    <button class="html-ref-toggle" id="html-ref-toggle" aria-expanded="false" aria-controls="html-ref-panel">
+      HTML Quick Reference <span class="html-ref-arrow" aria-hidden="true">▼</span>
+    </button>
+    <div class="html-ref-panel" id="html-ref-panel" hidden>
+      <p class="html-ref-hint">Click any row to insert the snippet into the formatter.</p>
+      <table class="html-ref-table">
+        <thead>
+          <tr><th>Element</th><th>Syntax</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr data-snippet="&lt;hr&gt;"><td>Divider</td><td><code>&lt;hr&gt;</code></td><td>HTML divider line</td></tr>
+          <tr data-snippet="&lt;!-- comment --&gt;"><td>Comment</td><td><code>&lt;!-- comment --&gt;</code></td><td>HTML comments</td></tr>
+          <tr data-snippet="&lt;strong&gt;text&lt;/strong&gt;"><td>Bold</td><td><code>&lt;strong&gt;text&lt;/strong&gt;</code></td><td>HTML bold</td></tr>
+          <tr data-snippet="&lt;em&gt;text&lt;/em&gt;"><td>Italic</td><td><code>&lt;em&gt;text&lt;/em&gt;</code></td><td>HTML italics</td></tr>
+          <tr data-snippet="&lt;blink&gt;text&lt;/blink&gt;"><td>Blink (legacy)</td><td><code>&lt;blink&gt;text&lt;/blink&gt;</code></td><td>deprecated — blink html</td></tr>
+          <tr data-snippet="&lt;marquee&gt;text&lt;/marquee&gt;"><td>Marquee (legacy)</td><td><code>&lt;marquee&gt;text&lt;/marquee&gt;</code></td><td>deprecated</td></tr>
+          <tr data-snippet="&lt;!DOCTYPE html&gt;"><td>Doctype</td><td><code>&lt;!DOCTYPE html&gt;</code></td><td>HTML5 declaration</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -274,6 +296,31 @@
 
   updateCharCount(inputArea, inputCount);
   updateCharCount(outputArea, outputCount);
+
+  const refToggle = document.getElementById('html-ref-toggle');
+  const refPanel = document.getElementById('html-ref-panel');
+  if (refToggle && refPanel) {
+    refToggle.addEventListener('click', () => {
+      const isHidden = refPanel.hasAttribute('hidden');
+      if (isHidden) {
+        refPanel.removeAttribute('hidden');
+        refToggle.setAttribute('aria-expanded', 'true');
+        refToggle.querySelector('.html-ref-arrow').textContent = '▲';
+      } else {
+        refPanel.setAttribute('hidden', '');
+        refToggle.setAttribute('aria-expanded', 'false');
+        refToggle.querySelector('.html-ref-arrow').textContent = '▼';
+      }
+    });
+
+    refPanel.querySelectorAll('tr[data-snippet]').forEach(row => {
+      row.addEventListener('click', () => {
+        inputArea.value += (inputArea.value ? '\n' : '') + row.dataset.snippet;
+        updateCharCount(inputArea, inputCount);
+        showStatus('Snippet inserted.');
+      });
+    });
+  }
 })();
 </script>
 
@@ -453,4 +500,126 @@
   font-size: 0.8125rem;
   color: var(--color-text);
   background: var(--color-bg);
-  border: 1px solid var(
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+.tool-btn-small:hover {
+  background: var(--color-surface);
+}
+
+.copied {
+  background: var(--color-surface) !important;
+  color: var(--color-accent) !important;
+  border-color: var(--color-accent) !important;
+}
+
+.tool-status {
+  display: none;
+  padding: var(--space-2) var(--space-3);
+  margin-top: var(--space-2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.tool-status.success {
+  background: var(--color-green-light);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+}
+
+.tool-status.error {
+  background: var(--color-coral-light);
+  color: var(--color-coral);
+  border: 1px solid var(--color-coral);
+}
+
+.html-ref {
+  margin-top: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.html-ref-toggle {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.html-ref-toggle:hover {
+  background: var(--color-bg);
+}
+
+.html-ref-arrow {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.html-ref-panel {
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.html-ref-hint {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-3) 0;
+}
+
+.html-ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+}
+
+.html-ref-table th {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  font-weight: 600;
+  color: var(--color-text);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.html-ref-table td {
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.html-ref-table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.html-ref-table tbody tr:hover {
+  background: var(--color-surface);
+}
+
+.html-ref-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.html-ref-table code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  background: var(--color-surface);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+</style>

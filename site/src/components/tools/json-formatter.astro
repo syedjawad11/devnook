@@ -2,80 +2,128 @@
 // No server-side props needed — all tools are client-side
 ---
 <div class="tool-container" id="tool-json-formatter">
-  <div class="tool-header">
-    <h2>JSON Formatter & Validator</h2>
-    <p class="tool-desc">Format, validate, and minify JSON instantly in your browser. No data sent to servers.</p>
-  </div>
-  
-  <div class="tool-body">
-    <div class="tool-input-section">
-      <label for="json-input" class="tool-label">Paste JSON here</label>
-      <textarea 
-        id="json-input" 
-        class="tool-textarea"
-        placeholder='{"name": "example", "value": 123}'
-        rows="12"
-        aria-label="JSON input"
-        spellcheck="false"
-      ></textarea>
-    </div>
-
-    <div class="tool-controls">
-      <div class="control-group">
-        <button id="btn-format" class="tool-button primary" aria-label="Format JSON">
-          Format
-        </button>
-        <button id="btn-minify" class="tool-button" aria-label="Minify JSON">
-          Minify
-        </button>
-        <button id="btn-validate" class="tool-button" aria-label="Validate JSON">
-          Validate
-        </button>
-      </div>
-      
-      <div class="control-group">
-        <label for="indent-select" class="indent-label">Indent:</label>
-        <select id="indent-select" class="tool-select" aria-label="Select indentation style">
-          <option value="2">2 spaces</option>
-          <option value="4">4 spaces</option>
-          <option value="tab">Tabs</option>
-        </select>
-      </div>
-      
-      <div class="control-group">
-        <button id="btn-copy" class="tool-button secondary" aria-label="Copy formatted JSON to clipboard">
-          Copy
-        </button>
-        <button id="btn-clear" class="tool-button secondary" aria-label="Clear all content">
-          Clear
-        </button>
-      </div>
-    </div>
-
-    <div class="tool-output-section">
-      <label for="json-output" class="tool-label">Formatted JSON</label>
-      <textarea 
-        id="json-output" 
-        class="tool-textarea"
-        rows="12"
-        readonly
-        aria-label="JSON output"
-        spellcheck="false"
-      ></textarea>
-    </div>
+  <div class="tool-tabs">
+    <button class="tab-btn active" data-panel="panel-json-tools">JSON Tools</button>
+    <button class="tab-btn" data-panel="panel-xml-json">XML ↔ JSON</button>
   </div>
 
-  <div class="tool-status" id="status-message" aria-live="polite" aria-atomic="true"></div>
+  <div class="tab-panel" id="panel-json-tools">
+    <div class="tool-header">
+      <h2>JSON Formatter & Validator</h2>
+      <p class="tool-desc">Format, validate, and minify JSON instantly in your browser. No data sent to servers.</p>
+    </div>
+
+    <div class="tool-body">
+      <div class="tool-input-section">
+        <label for="json-input" class="tool-label">Paste JSON here</label>
+        <textarea
+          id="json-input"
+          class="tool-textarea"
+          placeholder='{"name": "example", "value": 123}'
+          rows="12"
+          aria-label="JSON input"
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <div class="tool-controls">
+        <div class="control-group">
+          <button id="btn-format" class="tool-button primary" aria-label="Format JSON">
+            Format
+          </button>
+          <button id="btn-minify" class="tool-button" aria-label="Minify JSON">
+            Minify
+          </button>
+          <button id="btn-validate" class="tool-button" aria-label="Validate JSON">
+            Validate
+          </button>
+        </div>
+
+        <div class="control-group">
+          <label for="indent-select" class="indent-label">Indent:</label>
+          <select id="indent-select" class="tool-select" aria-label="Select indentation style">
+            <option value="2">2 spaces</option>
+            <option value="4">4 spaces</option>
+            <option value="tab">Tabs</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <button id="btn-copy" class="tool-button secondary" aria-label="Copy formatted JSON to clipboard">
+            Copy
+          </button>
+          <button id="btn-clear" class="tool-button secondary" aria-label="Clear all content">
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <div class="tool-output-section">
+        <label for="json-output" class="tool-label">Formatted JSON</label>
+        <textarea
+          id="json-output"
+          class="tool-textarea"
+          rows="12"
+          readonly
+          aria-label="JSON output"
+          spellcheck="false"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="tool-status" id="status-message" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <div class="tab-panel hidden" id="panel-xml-json">
+    <div class="tool-header">
+      <h2>XML to JSON Converter</h2>
+      <p class="tool-desc">Convert XML to JSON or JSON to XML instantly in your browser. No data sent to servers.</p>
+    </div>
+    <div class="converter-body">
+      <div class="tool-input-section">
+        <label for="xml-input" class="tool-label">Input (XML or JSON)</label>
+        <textarea id="xml-input" class="tool-textarea" rows="12" placeholder="<root><item>value</item></root>" spellcheck="false" aria-label="XML or JSON input"></textarea>
+      </div>
+      <div class="tool-controls">
+        <div class="control-group">
+          <button id="btn-xml-to-json" class="tool-button primary" aria-label="Convert XML to JSON">XML → JSON</button>
+          <button id="btn-json-to-xml" class="tool-button" aria-label="Convert JSON to XML">JSON → XML</button>
+        </div>
+        <div class="control-group">
+          <button id="btn-conv-copy" class="tool-button secondary" aria-label="Copy output">Copy</button>
+          <button id="btn-conv-clear" class="tool-button secondary" aria-label="Clear">Clear</button>
+        </div>
+      </div>
+      <div class="tool-output-section">
+        <label for="conv-output" class="tool-label">Output</label>
+        <textarea id="conv-output" class="tool-textarea" rows="12" readonly spellcheck="false" aria-label="Conversion output"></textarea>
+      </div>
+    </div>
+    <div class="tool-status" id="conv-status" aria-live="polite" aria-atomic="true"></div>
+  </div>
 </div>
 
 <script>
 (function() {
+  // Tab switching
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabPanels.forEach(p => p.classList.add('hidden'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.panel).classList.remove('hidden');
+    });
+  });
+
+  // JSON formatter/validator logic
   const inputEl = document.getElementById('json-input');
   if (!inputEl) return;
   const outputEl = document.getElementById('json-output');
   const statusEl = document.getElementById('status-message');
   const indentSelect = document.getElementById('indent-select');
-  
+
   const btnFormat = document.getElementById('btn-format');
   const btnMinify = document.getElementById('btn-minify');
   const btnValidate = document.getElementById('btn-validate');
@@ -88,7 +136,7 @@
     clearTimeout(statusTimeout);
     statusEl.textContent = message;
     statusEl.className = `tool-status ${type}`;
-    
+
     if (type === 'success' || type === 'info') {
       statusTimeout = setTimeout(() => {
         statusEl.textContent = '';
@@ -111,7 +159,7 @@
     } catch (error) {
       const match = error.message.match(/position (\d+)/);
       let errorMsg = error.message;
-      
+
       if (match) {
         const position = parseInt(match[1], 10);
         const lines = jsonString.substring(0, position).split('\n');
@@ -121,14 +169,14 @@
       } else {
         errorMsg = `Invalid JSON: ${error.message}`;
       }
-      
+
       return { success: false, error: errorMsg };
     }
   }
 
   function formatJSON() {
     const input = inputEl.value.trim();
-    
+
     if (!input) {
       showStatus('Please enter some JSON to format', 'error');
       outputEl.value = '';
@@ -136,7 +184,7 @@
     }
 
     const result = parseJSON(input);
-    
+
     if (!result.success) {
       showStatus(result.error, 'error');
       outputEl.value = '';
@@ -155,7 +203,7 @@
 
   function minifyJSON() {
     const input = inputEl.value.trim();
-    
+
     if (!input) {
       showStatus('Please enter some JSON to minify', 'error');
       outputEl.value = '';
@@ -163,7 +211,7 @@
     }
 
     const result = parseJSON(input);
-    
+
     if (!result.success) {
       showStatus(result.error, 'error');
       outputEl.value = '';
@@ -182,14 +230,14 @@
 
   function validateJSON() {
     const input = inputEl.value.trim();
-    
+
     if (!input) {
       showStatus('Please enter some JSON to validate', 'error');
       return;
     }
 
     const result = parseJSON(input);
-    
+
     if (!result.success) {
       showStatus(result.error, 'error');
     } else {
@@ -199,7 +247,7 @@
 
   function copyToClipboard() {
     const output = outputEl.value;
-    
+
     if (!output) {
       showStatus('Nothing to copy', 'error');
       return;
@@ -215,12 +263,12 @@
         const originalText = btnCopy.textContent;
         btnCopy.textContent = 'Copied!';
         btnCopy.classList.add('copied');
-        
+
         setTimeout(() => {
           btnCopy.textContent = originalText;
           btnCopy.classList.remove('copied');
         }, 2000);
-        
+
         showStatus('Copied to clipboard', 'success');
       })
       .catch((error) => {
@@ -248,6 +296,93 @@
       formatJSON();
     }
   });
+
+  // XML <-> JSON converter logic
+  function xmlToJson(xmlStr) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xmlStr.trim(), 'text/xml');
+    const errNode = doc.querySelector('parsererror');
+    if (errNode) throw new Error('Invalid XML');
+    function nodeToObj(node) {
+      const obj = {};
+      if (node.attributes && node.attributes.length) {
+        obj['@attributes'] = {};
+        for (const a of node.attributes) obj['@attributes'][a.name] = a.value;
+      }
+      for (const child of node.childNodes) {
+        if (child.nodeType === 3) { // TEXT_NODE
+          const t = child.nodeValue.trim();
+          if (t) obj['#text'] = t;
+        } else if (child.nodeType === 1) { // ELEMENT_NODE
+          const c = nodeToObj(child);
+          if (obj[child.nodeName] !== undefined) {
+            if (!Array.isArray(obj[child.nodeName])) obj[child.nodeName] = [obj[child.nodeName]];
+            obj[child.nodeName].push(c);
+          } else {
+            obj[child.nodeName] = c;
+          }
+        }
+      }
+      // If only #text, unwrap
+      const keys = Object.keys(obj);
+      if (keys.length === 1 && keys[0] === '#text') return obj['#text'];
+      return obj;
+    }
+    const result = {};
+    result[doc.documentElement.nodeName] = nodeToObj(doc.documentElement);
+    return result;
+  }
+
+  function jsonToXml(data, tagName, depth) {
+    const indent = '  '.repeat(depth);
+    if (data === null || data === undefined) return indent + '<' + tagName + '/>';
+    if (typeof data !== 'object') return indent + '<' + tagName + '>' + String(data) + '</' + tagName + '>';
+    if (Array.isArray(data)) return data.map(item => jsonToXml(item, tagName, depth)).join('\n');
+    const children = Object.entries(data).map(([k, v]) => jsonToXml(v, k, depth + 1)).join('\n');
+    return indent + '<' + tagName + '>\n' + children + '\n' + indent + '</' + tagName + '>';
+  }
+
+  function objToXml(obj) {
+    const entries = Object.entries(obj);
+    if (entries.length === 1) return jsonToXml(entries[0][1], entries[0][0], 0);
+    return entries.map(([k, v]) => jsonToXml(v, k, 0)).join('\n');
+  }
+
+  const xmlInput = document.getElementById('xml-input');
+  const convOutput = document.getElementById('conv-output');
+  const convStatus = document.getElementById('conv-status');
+
+  document.getElementById('btn-xml-to-json').addEventListener('click', () => {
+    const input = xmlInput.value.trim();
+    if (!input) { convStatus.textContent = 'Please enter XML to convert'; convStatus.className = 'tool-status error'; return; }
+    try {
+      const result = xmlToJson(input);
+      convOutput.value = JSON.stringify(result, null, 2);
+      convStatus.textContent = 'Converted to JSON'; convStatus.className = 'tool-status success';
+    } catch(e) { convStatus.textContent = 'Invalid XML: ' + e.message; convStatus.className = 'tool-status error'; }
+  });
+
+  document.getElementById('btn-json-to-xml').addEventListener('click', () => {
+    const input = xmlInput.value.trim();
+    if (!input) { convStatus.textContent = 'Please enter JSON to convert'; convStatus.className = 'tool-status error'; return; }
+    try {
+      const obj = JSON.parse(input);
+      convOutput.value = '<?xml version="1.0" encoding="UTF-8"?>\n' + objToXml(obj);
+      convStatus.textContent = 'Converted to XML'; convStatus.className = 'tool-status success';
+    } catch(e) { convStatus.textContent = 'Invalid JSON: ' + e.message; convStatus.className = 'tool-status error'; }
+  });
+
+  document.getElementById('btn-conv-copy').addEventListener('click', () => {
+    if (!convOutput.value) { convStatus.textContent = 'Nothing to copy'; convStatus.className = 'tool-status error'; return; }
+    navigator.clipboard.writeText(convOutput.value).then(() => {
+      convStatus.textContent = 'Copied!'; convStatus.className = 'tool-status success';
+    });
+  });
+
+  document.getElementById('btn-conv-clear').addEventListener('click', () => {
+    xmlInput.value = ''; convOutput.value = '';
+    convStatus.textContent = ''; convStatus.className = 'tool-status';
+  });
 })();
 </script>
 
@@ -256,6 +391,41 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--space-4);
+}
+
+.tool-tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  border-bottom: 2px solid var(--color-border);
+  padding-bottom: 0;
+}
+
+.tab-btn {
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: var(--color-text);
+}
+
+.tab-btn.active {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.tab-panel.hidden {
+  display: none;
 }
 
 .tool-header {
@@ -278,6 +448,12 @@
 }
 
 .tool-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.converter-body {
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -457,6 +633,29 @@
   }
 
   .tool-controls {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-content: center;
+  }
+
+  .converter-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: var(--space-5);
+  }
+
+  .converter-body .tool-input-section {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .converter-body .tool-output-section {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .converter-body .tool-controls {
     grid-column: 1 / -1;
     grid-row: 2;
     justify-content: center;
