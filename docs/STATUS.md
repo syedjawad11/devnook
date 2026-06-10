@@ -42,7 +42,8 @@ Verify against the DB (from `pipeline/`):
 
 ## Pending one-off tasks
 
-- [ ] **Phase 2 plan — Steps 3 & 4 (next session)** — Steps 0 (seeding) and 1 (keyword insertion) are done. Step 2 (CCR agent + 9 triggers) completed 2026-06-10. Resume with steps 3 and 4 in the next session.
+- [ ] **Phase 2 plan — Step 3 (next session)** — Expand 3 existing pages with targeted content: (a) HTTP Status Codes → add full 1xx–5xx reference sections (targets `http 503` 8.1k, `http 302` 6.6k); (b) ChatGPT vs Claude → add alternatives section (targets `chatgpt alternative` 27.1k / KD0); (c) Python List Comprehension → add map + enumerate sections (targets `python map` 14.8k/KD3, `python enumerate` 8.1k/KD3). Find exact slugs/files at session start.
+- [ ] **Phase 2 plan — Step 4 (next session)** — Phase 0 quick wins: 7 cusp-of-page-1 pages currently at pos 30–90 need targeted edits or editorial queue entry. Pages: C++ try-catch, markdown-to-html, Ruby JSON, Swift closures, Kotlin data class, Python URL-encode, Python regex cheatsheet. Full plan: `.claude/plans/hi-lets-see-what-cozy-turing.md` → Step 3.
 - [ ] **Monitor Phase 2 CCR runs** — 9 one-shot triggers active. Test run (`html-reference-guide`, `trig_01632qYF7JLCL7zqPGktmogx`) fired 2026-06-10 ~19:02 UTC. URL when live: `https://devnook.dev/guides/html-reference-guide/`. Next scheduled: `markdown-cheatsheet` 2026-06-11 01:00 UTC. Verify each by checking git log after fire time.
 - [ ] **Remove `DEVNOOK_REPO_PAT` secret** from `syedjawad11/devnook` — no longer needed
   in the monorepo.
