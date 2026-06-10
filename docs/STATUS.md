@@ -4,7 +4,7 @@
 > one-off tasks. The `CLAUDE.md` files hold durable instructions only and point here.
 > Keep this file current; when an item is done, remove it (git history is the record).
 
-**Last updated:** 2026-06-09 (evening)
+**Last updated:** 2026-06-10
 
 ---
 
@@ -53,6 +53,8 @@ Verify against the DB (from `pipeline/`):
 ---
 
 ## Recently completed (rolling — prune freely)
+
+- 2026-06-10 — **Phase 1 Part 2 complete.** Expanded 3 tool pages with Quick Reference panels + SEO content (`7325c4c`). json-formatter: XML↔JSON converter tab + JSON Minify section (targets `json minify` KD2/$47 CPC, `xml to json` KD1). html-formatter: HTML Quick Reference panel + fixed longstanding CSS truncation (targets `html divider` KD4, `blink html` KD10). sql-formatter: SQL Quick Reference panel + fixed CSS truncation (targets `coalesce sql` KD10, `sql window functions` KD14, `group by sql` KD8).
 
 - 2026-06-09 — Cheatsheet rewrite routine confirmed working. `regex-cheatsheet` fully rewritten and live (`5d617dd`). Drain runs 2–5 scheduled to complete by 14:45 UTC Jun 10. Root cause of initial failed run: CCR was fired 9 min before the push landed on origin/main (merge conflict delayed the push to 18:46 UTC; CCR cloned at ~18:37 UTC). Second fire succeeded cleanly.
 
