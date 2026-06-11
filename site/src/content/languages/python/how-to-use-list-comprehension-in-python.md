@@ -1,7 +1,7 @@
 ---
 title: "What is List Comprehension in Python? A Complete Guide with Examples"
 description: "Learn how to use list comprehension in Python to write concise, readable loops. Includes practical examples, performance tips, and common pitfalls."
-published_date: "2026-04-22"
+published_date: "2026-06-11"
 category: "languages"
 language: "python"
 concept: "list-comprehension"
@@ -138,6 +138,145 @@ However, `map()` has a performance edge when you are applying an existing functi
 | Memory | Returns list | Returns iterator (Python 3) |
 
 The Python community's convention is clear: use list comprehension as the default for building lists, and reserve `map()` for cases where you are applying a single existing function with no filtering needed.
+
+## Python map() Function
+
+Python's built-in `map()` applies a function to every element of an iterable and returns a map object — a lazy iterator. You convert it to a list when you need the full result in memory.
+
+**Basic syntax:**
+
+```python
+result = list(map(function, iterable))
+```
+
+`map()` is fastest when you have an existing named function and want to apply it to an entire sequence without writing a lambda or comprehension expression. Built-in functions like `str()`, `int()`, `float()`, and `abs()` pair naturally with `map()`:
+
+```python
+numbers = ['1', '2', '3', '4', '5']
+
+# map() with a built-in — converts each string to int
+as_ints = list(map(int, numbers))
+# Result: [1, 2, 3, 4, 5]
+
+# Equivalent list comprehension
+as_ints = [int(n) for n in numbers]
+
+# map() with a named function
+def fahrenheit_to_celsius(f):
+    return (f - 32) * 5 / 9
+
+temps_f = [32, 68, 98.6, 212]
+temps_c = list(map(fahrenheit_to_celsius, temps_f))
+# Result: [0.0, 20.0, 37.0, 100.0]
+```
+
+**Mapping over multiple iterables:**
+
+`map()` accepts more than one iterable. It passes corresponding elements from each as arguments to the function:
+
+```python
+prices = [10.0, 25.5, 8.99]
+quantities = [3, 1, 5]
+
+totals = list(map(lambda price, qty: price * qty, prices, quantities))
+# Result: [30.0, 25.5, 44.95]
+
+# Equivalent list comprehension using zip()
+totals = [price * qty for price, qty in zip(prices, quantities)]
+```
+
+When working with multiple iterables, `zip()` with a list comprehension tends to read more naturally than multi-argument `map()`. Both are correct.
+
+**When map() is the better choice:**
+
+- You already have a named function — `list(map(str, items))` is cleaner than `[str(x) for x in items]`
+- You want a lazy iterator without materializing the list — `map()` returns an iterator, so it consumes no extra memory until you iterate
+- You are chaining transformations in a functional pipeline — `map` composes cleanly with `filter` and `functools.reduce`
+
+**When list comprehension wins:**
+
+- You need filtering — `[x for x in items if x > 0]` beats `list(filter(lambda x: x > 0, items))`
+- The transformation is a complex expression — readable code is more important than micro-performance
+- You need a literal list (random access, slicing) — comprehensions return lists directly
+
+## Python enumerate() Function
+
+Python's `enumerate()` adds a counter to any iterable, returning pairs of `(index, value)`. It eliminates the `range(len(...))` pattern and removes the need to manage a separate counter variable.
+
+**Basic syntax:**
+
+```python
+for index, value in enumerate(iterable, start=0):
+    ...
+```
+
+**Why enumerate() matters:**
+
+```python
+languages = ['Python', 'JavaScript', 'Go', 'Rust']
+
+# The verbose approach — manual index tracking
+for i in range(len(languages)):
+    print(f"{i}: {languages[i]}")
+
+# The Pythonic approach — enumerate()
+for i, lang in enumerate(languages):
+    print(f"{i}: {lang}")
+
+# Output (both produce the same):
+# 0: Python
+# 1: JavaScript
+# 2: Go
+# 3: Rust
+```
+
+`enumerate()` is preferred because it avoids the indirect `languages[i]` lookup and makes the code's intent explicit: you need both the position and the value.
+
+**enumerate() with list comprehension:**
+
+List comprehensions pair naturally with `enumerate()` when you need the index inside the expression or filter:
+
+```python
+words = ['python', 'is', 'great', 'for', 'data']
+
+# Keep only words longer than 3 characters, alongside their original position
+long_words = [(i, word) for i, word in enumerate(words) if len(word) > 3]
+# Result: [(0, 'python'), (2, 'great'), (4, 'data')]
+
+# Build numbered labels from a list
+labeled = [f"{i + 1}. {word.capitalize()}" for i, word in enumerate(words)]
+# Result: ['1. Python', '2. Is', '3. Great', '4. For', '5. Data']
+
+# Find the indices of all items matching a condition
+short_word_indices = [i for i, word in enumerate(words) if len(word) <= 2]
+# Result: [1, 3]  — positions of 'is' and 'for'
+```
+
+**Custom start value:**
+
+```python
+menu_items = ['Burger', 'Pizza', 'Pasta']
+
+# Number the menu starting from 1, not 0
+menu = [f"{i}. {item}" for i, item in enumerate(menu_items, start=1)]
+# Result: ['1. Burger', '2. Pizza', '3. Pasta']
+```
+
+**Position-aware transformations:**
+
+```python
+scores = [88, 42, 95, 61, 77]
+
+# Flag which positions hold failing scores (< 70)
+fails = [(i, score) for i, score in enumerate(scores) if score < 70]
+# Result: [(1, 42), (3, 61)]
+
+# Keep only the even-indexed elements
+even_indexed = [val for i, val in enumerate(scores) if i % 2 == 0]
+# Result: [88, 95, 77]
+```
+
+`enumerate()` is one of Python's most practical built-ins for list processing. It covers the full range of index-aware transformations — numbered output, position filtering, index lookups — that would otherwise require manual counter management or less readable `range(len(...))` loops.
 
 ## Under the Hood: Performance & Mechanics
 

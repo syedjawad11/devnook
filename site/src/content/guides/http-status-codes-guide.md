@@ -1,10 +1,10 @@
 ---
-actual_word_count: 2336
+actual_word_count: 3180
 category: guides
 description: Every HTTP status code explained with real-world examples. Bookmark this
   as your definitive HTTP reference for debugging and API development.
 og_image: /og/guides/http-status-codes-guide.png
-published_date: '2026-04-13'
+published_date: '2026-06-11'
 related_cheatsheet: ''
 related_content: []
 related_posts: []
@@ -155,6 +155,108 @@ Server error codes indicate the server failed to fulfill a valid request. The pr
 **502 Bad Gateway** — The server is acting as a proxy or gateway and received an invalid response from an upstream server. This often happens when a load balancer can't reach application servers, or when an API gateway gets garbage back from a microservice. Check connectivity between servers.
 
 **503 Service Unavailable** — The server is temporarily unable to handle requests. This usually means the server is overloaded, down for maintenance, or out of resources. Unlike 500 errors, this explicitly says "try again later." The `Retry-After` header may specify when to retry.
+
+## HTTP 302: Temporary Redirect
+
+HTTP 302 Found tells the client that the requested resource is temporarily located at a different URL. Follow the `Location` header for this request only — keep using the original URL for all future requests. Search engines see 302 and do not transfer ranking equity to the new URL, unlike a 301.
+
+### When HTTP 302 Is Used
+
+- **Login redirects** — redirect an unauthenticated user to `/login`, then back to the originally requested page after sign-in
+- **A/B testing** — temporarily send a portion of traffic to an alternate page version
+- **Short URL services** — if the target could change later, 302 keeps the original URL canonical
+- **Maintenance pages** — redirect users to a status page while the primary URL is being updated
+
+### 302 vs 301 vs 307
+
+| Code | Permanence | Method preserved on redirect | SEO equity |
+|------|-----------|------------------------------|-----------|
+| 301 | Permanent | No (POST becomes GET) | Passes to new URL |
+| 302 | Temporary | No (POST becomes GET) | Original URL keeps equity |
+| 307 | Temporary | Yes | Original URL keeps equity |
+| 308 | Permanent | Yes | Passes to new URL |
+
+Use **307** instead of 302 for temporary redirects in modern applications. Both are temporary, but 302 historically allowed browsers to change POST to GET when following the redirect — which causes silent bugs in form submissions and APIs. 307 guarantees the HTTP method is preserved.
+
+### Inspecting a 302 Response in Python
+
+```python
+import requests
+
+# allow_redirects=False stops requests from auto-following the redirect
+response = requests.get('https://example.com/temp-path', allow_redirects=False)
+print(response.status_code)          # 302
+print(response.headers['Location'])  # Temporary destination URL
+
+# Follow manually if needed
+if response.status_code == 302:
+    destination = response.headers.get('Location')
+    final = requests.get(destination)
+    print(final.status_code)         # 200 if the destination is live
+```
+
+---
+
+## HTTP 503: Service Unavailable
+
+HTTP 503 Service Unavailable means the server cannot handle the request right now, but the condition is temporary. Unlike a 500 (Internal Server Error), 503 explicitly signals that the server is healthy but busy, down for maintenance, or waiting on a dependency. It is the correct status code to return whenever you need to tell clients "try again later."
+
+### Common Causes of HTTP 503
+
+- **Server overload** — more concurrent requests than the server can handle at once
+- **Scheduled maintenance** — deliberately taking the service offline for upgrades or migrations
+- **Upstream dependency failure** — the database, cache, or a downstream microservice is unavailable
+- **Resource exhaustion** — out of database connections, memory, or file descriptors
+- **Load balancer health check failures** — a pod or instance fails its health check and is removed from the rotation
+
+### Retry Logic for 503 Responses
+
+The `Retry-After` header indicates when the server expects to recover. When absent, use exponential backoff:
+
+```python
+import requests
+import time
+
+def request_with_retry(url, max_retries=5):
+    for attempt in range(max_retries):
+        response = requests.get(url)
+
+        if response.status_code == 503:
+            retry_after = response.headers.get('Retry-After')
+            wait = int(retry_after) if retry_after else 2 ** attempt
+            print(f"503 — retrying in {wait}s (attempt {attempt + 1}/{max_retries})")
+            time.sleep(wait)
+            continue
+
+        return response
+
+    raise Exception(f"Service unavailable after {max_retries} retries")
+```
+
+### Returning 503 From Your Server
+
+When you put a service into maintenance mode, include a `Retry-After` header so well-behaved clients back off automatically:
+
+```python
+from fastapi import FastAPI, Response
+
+app = FastAPI()
+MAINTENANCE_MODE = False
+
+@app.middleware("http")
+async def maintenance_check(request, call_next):
+    if MAINTENANCE_MODE:
+        return Response(
+            content="Service temporarily unavailable for maintenance.",
+            status_code=503,
+            headers={"Retry-After": "3600"}  # Retry in 1 hour
+        )
+    return await call_next(request)
+```
+
+A 503 during a planned deployment is preferable to a 500 — it tells clients the outage is intentional and temporary, preventing unnecessary alerts and retry storms from downstream services.
+
+---
 
 ## Common Questions
 
