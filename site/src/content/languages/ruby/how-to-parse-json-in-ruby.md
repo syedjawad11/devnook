@@ -10,9 +10,10 @@ linkAnchors:
 difficulty: "beginner"
 template_id: "lang-v2"
 tags: ["ruby", "json", "data-parsing", "api"]
+actual_word_count: 2350
 related_tools: []
 related_posts: []
-published_date: "2026-04-22"
+published_date: "2026-06-11"
 og_image: "/og/languages/ruby/parse-json.png"
 ---
 
@@ -109,6 +110,28 @@ puts "Processed #{count} items successfully."
 ```
 
 By leveraging the `symbolize_names: true` option, the resulting Hash structure utilizes memory-efficient Ruby Symbols for its keys. This pattern drastically improves code readability and aligns the parsed data structure with idiomatic Ruby conventions, especially when passing the parsed payload directly into database models or service objects.
+
+**Pattern 3: High-Performance Parsing with the `oj` Gem**
+
+For applications that parse large volumes of JSON — background workers, data import pipelines, webhook processors handling thousands of events per minute — the standard library `JSON.parse` can become a bottleneck. The `oj` gem (Optimized JSON) provides a C-extension replacement that is typically 2–5× faster and more memory-efficient.
+
+```ruby
+# Gemfile: gem 'oj'
+require 'oj'
+
+raw_payload = '{"id": 1, "name": "Alice", "roles": ["admin", "user"]}'
+
+# mode: :strict matches RFC 8259 — same behaviour as JSON.parse
+data = Oj.load(raw_payload, mode: :strict)
+puts data['name']          # Alice
+puts data['roles'].first   # admin
+
+# Oj.safe_load is the recommended default for untrusted input
+safe_data = Oj.safe_load(raw_payload)
+puts safe_data['roles']    # ["admin", "user"]
+```
+
+Use `mode: :strict` for full RFC 8259 compliance (the same guarantee as `JSON.parse`) or `mode: :compat` for maximum drop-in compatibility with existing call sites. If your application uses Rails, the `multi_json` adapter gem lets you swap the JSON backend globally — set `MultiJson.adapter = :oj` and all existing `JSON.parse` call sites transparently use `oj` without modification.
 
 ## What to Watch Out For
 

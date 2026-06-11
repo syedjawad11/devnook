@@ -3,7 +3,7 @@ category: tools
 description: Convert Markdown to clean HTML instantly in your browser. Supports GitHub
   Flavored Markdown including tables and task lists.
 og_image: /og/tools/markdown-to-html.png
-published_date: '2026-04-13'
+published_date: '2026-06-11'
 related_content:
 - markdown-cheatsheet
 - what-is-markdown
@@ -19,6 +19,7 @@ tags:
 template_id: tool-exp-v1
 title: Markdown to HTML Converter — Free Online Tool
 tool_slug: markdown-to-html
+actual_word_count: 520
 faqs:
   - question: "Does this support GitHub Flavored Markdown?"
     answer: "Yes. This markdown to html converter includes full GFM support: tables, task lists, strikethrough, and autolinked URLs."
@@ -48,6 +49,35 @@ The converter preserves all Markdown formatting including headings, lists, links
 - **Email templates**: Transform Markdown notes into HTML for email newsletters
 - **Documentation**: Convert [README files](/tools/readme-generator/) or technical docs into HTML for web hosting
 - **Static sites**: Generate HTML snippets from Markdown for custom builds without a full SSG
+
+## Markdown Syntax Quick Reference
+
+Common Markdown elements and their HTML equivalents — useful when you need to verify your syntax before converting.
+
+| Markdown | HTML Output |
+|----------|-------------|
+| `# Heading 1` | `<h1>Heading 1</h1>` |
+| `## Heading 2` | `<h2>Heading 2</h2>` |
+| `**bold**` | `<strong>bold</strong>` |
+| `*italic*` | `<em>italic</em>` |
+| `` `inline code` `` | `<code>inline code</code>` |
+| `[Link](https://url.com)` | `<a href="https://url.com">Link</a>` |
+| `![Alt](img.png)` | `<img src="img.png" alt="Alt">` |
+| `> Blockquote` | `<blockquote>…</blockquote>` |
+| `- Item` or `* Item` | `<ul><li>Item</li></ul>` |
+| `1. Item` | `<ol><li>Item</li></ol>` |
+| `---` | `<hr>` |
+
+**GitHub Flavored Markdown extras (fully supported by this tool):**
+
+| Markdown | What It Produces |
+|----------|-----------------|
+| ` ```python … ``` ` | Fenced code block with language class |
+| `- [x] Done` | Checked task list item |
+| `- [ ] Todo` | Unchecked task list item |
+| `~~strikethrough~~` | `<del>strikethrough</del>` |
+| `\| col1 \| col2 \|` + header row | Rendered HTML table |
+| `https://example.com` | Autolinked URL |
 
 ## FAQ
 

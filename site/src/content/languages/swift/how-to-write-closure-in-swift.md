@@ -8,7 +8,7 @@ description: Understand the core mechanics of closures in Swift, including captu
 difficulty: intermediate
 language: swift
 og_image: /og/languages/swift/closures.png
-published_date: '2026-04-15'
+published_date: '2026-06-11'
 related_posts:
 - delegation-vs-closures-in-swift
 - async-await-in-swift
@@ -18,6 +18,7 @@ tags:
 - closures
 - ios-development
 - functional-programming
+actual_word_count: 1750
 template_id: lang-v1
 title: 'How to Write a Closure in Swift: A Modern Guide'
 ---
@@ -141,6 +142,39 @@ func logAssert(_ message: @autoclosure () -> String, isVerbose: Bool) {
 logAssert("Complex string generation: \(heavyCalculation())", isVerbose: false)
 ```
 Using `@autoclosure` defers execution gracefully without forcing the API consumer to write ugly curly braces in their function call.
+
+## Closures and the Result Type
+
+Swift's `Result<Success, Failure>` type pairs naturally with `@escaping` closures, replacing the older `(Value?, Error?) -> Void` completion pattern with a single exhaustive enum that forces the caller to handle both the success and failure cases explicitly.
+
+```swift
+enum NetworkError: Error {
+    case invalidResponse
+    case decodingFailed
+}
+
+// Result<T, E> instead of (data?, error?) — no ambiguous nil combinations
+func fetchProfile(userId: String, completion: @escaping (Result<String, NetworkError>) -> Void) {
+    DispatchQueue.global().asyncAfter(deadline: .now() + 1.0) {
+        if userId == "42" {
+            completion(.success("Profile loaded"))
+        } else {
+            completion(.failure(.invalidResponse))
+        }
+    }
+}
+
+fetchProfile(userId: "42") { result in
+    switch result {
+    case .success(let profile):
+        DispatchQueue.main.async { print(profile) }
+    case .failure(let error):
+        print("Failed with: \(error)")
+    }
+}
+```
+
+Using `Result` eliminates the four possible states that `(data?, error?)` allows — callers can no longer receive `nil, nil` or `data, error` simultaneously. The `switch` is exhaustive; the compiler enforces that both paths are handled. This is the preferred pattern for Swift 5 completion-handler APIs before migrating fully to `async`/`await` (which replaces closure-based concurrency in Swift 5.5+).
 
 ## Testing Closures in Swift
 

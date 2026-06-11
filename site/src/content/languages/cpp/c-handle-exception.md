@@ -11,9 +11,10 @@ linkAnchors:
 difficulty: "intermediate"
 template_id: "lang-v2"
 tags: ["cpp", "exception-handling", "try-catch", "raii", "error-handling"]
+actual_word_count: 2650
 related_tools: []
 related_posts: []
-published_date: "2026-05-09"
+published_date: "2026-06-11"
 og_image: "/og/languages/cpp/c-handle-exception.png"
 ---
 
@@ -285,6 +286,33 @@ TEST(DivideTest, ReturnsCorrectResult) {
 ```
 
 Google Test provides `EXPECT_THROW(expr, ExceptionType)` for verifying that a specific exception type is thrown. For asserting on the exception message or performing other assertions inside the catch block, use the explicit `try`/`catch`/`FAIL()` pattern. Use `EXPECT_NO_THROW(expr)` to assert that a code path is clean. When testing RAII classes and exception safety, pair with AddressSanitizer and LeakSanitizer (`-fsanitize=address,leak`) to detect resource leaks that occur during exception propagation — errors that are otherwise invisible to normal test assertions.
+
+## std::expected — The C++23 Alternative
+
+When errors are part of normal program flow rather than truly exceptional, `std::expected<T, E>` (C++23) is a better tool than exceptions. It carries either a value or an error as an ordinary value — no stack unwinding, no allocation overhead, zero cost on the success path.
+
+```cpp
+#include <expected>
+#include <string>
+#include <iostream>
+
+std::expected<int, std::string> divide(int a, int b) {
+    if (b == 0)
+        return std::unexpected("Division by zero");
+    return a / b;
+}
+
+int main() {
+    auto result = divide(10, 0);
+    if (result)
+        std::cout << "Result: " << *result << "\n";
+    else
+        std::cerr << "Error: " << result.error() << "\n";
+    // => Error: Division by zero
+}
+```
+
+The mental model for when to use each: use `throw`/`catch` for genuinely unexpected conditions — invariant violations, resource exhaustion, contract breaches — where you want the call stack to unwind and RAII destructors to run. Use `std::expected` when the failure case is part of the API contract: parsing user input, reading optional config, performing lookups that may find nothing. `std::expected` keeps the logic flat and the failure visible at the call site without the overhead of exception handling machinery.
 
 ## Summary
 

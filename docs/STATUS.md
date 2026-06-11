@@ -4,7 +4,7 @@
 > one-off tasks. The `CLAUDE.md` files hold durable instructions only and point here.
 > Keep this file current; when an item is done, remove it (git history is the record).
 
-**Last updated:** 2026-06-10
+**Last updated:** 2026-06-11
 
 ---
 
@@ -42,15 +42,15 @@ Verify against the DB (from `pipeline/`):
 
 ## Pending one-off tasks
 
-- [ ] **Phase 2 plan — Step 3 (next session)** — Expand 3 existing pages with targeted content: (a) HTTP Status Codes → add full 1xx–5xx reference sections (targets `http 503` 8.1k, `http 302` 6.6k); (b) ChatGPT vs Claude → add alternatives section (targets `chatgpt alternative` 27.1k / KD0); (c) Python List Comprehension → add map + enumerate sections (targets `python map` 14.8k/KD3, `python enumerate` 8.1k/KD3). Find exact slugs/files at session start.
-- [ ] **Phase 2 plan — Step 4 (next session)** — Phase 0 quick wins: 7 cusp-of-page-1 pages currently at pos 30–90 need targeted edits or editorial queue entry. Pages: C++ try-catch, markdown-to-html, Ruby JSON, Swift closures, Kotlin data class, Python URL-encode, Python regex cheatsheet. Full plan: `.claude/plans/hi-lets-see-what-cozy-turing.md` → Step 3.
-- [ ] **Monitor Phase 2 CCR runs** — 9 one-shot triggers active. Test run (`html-reference-guide`, `trig_01632qYF7JLCL7zqPGktmogx`) fired 2026-06-10 ~19:02 UTC. URL when live: `https://devnook.dev/guides/html-reference-guide/`. Next scheduled: `markdown-cheatsheet` 2026-06-11 01:00 UTC. Verify each by checking git log after fire time.
+- [ ] **Monitor Phase 2 CCR runs** — 9 one-shot triggers active. Test run (`html-reference-guide`, `trig_01632qYF7JLCL7zqPGktmogx`) fired 2026-06-10 ~19:02 UTC. URL when live: `https://devnook.dev/guides/html-reference-guide/`. `markdown-cheatsheet` trigger scheduled for 2026-06-11 01:00 UTC — verify via `git log`. Verify remaining 7 triggers similarly after their scheduled fire times.
 - [ ] **Remove `DEVNOOK_REPO_PAT` secret** from `syedjawad11/devnook` — no longer needed
   in the monorepo.
 
 ---
 
 ## Recently completed (rolling — prune freely)
+
+- 2026-06-11 — **Phase 2 Steps 3 + 4 complete.** Step 3 (`5d107dd`): expanded HTTP Status Codes, ChatGPT vs Claude, Python List Comprehension. Step 4: targeted content additions to 6 cusp-of-page-1 pages — C++ try-catch (`std::expected` section), markdown-to-html (syntax quick reference), Ruby JSON (`oj` gem pattern), Swift closures (`Result` type section), Kotlin data class (`@JvmRecord` section), Python URL-encode (`requests` library section). Regex cheatsheet skipped (rewritten 2026-06-09, already sufficient). Build: 123 pages, no errors.
 
 - 2026-06-10 — **Phase 2 seeded.** 9 new articles queued in registry (html-reference-guide, markdown-cheatsheet, css-basics-cheatsheet, python-math-numbers, cpp-data-structures-stl, cpp-string-methods, cpp-loops-control-flow, java-data-structures, tmux-cheatsheet). Pipeline B blocker resolved: keyword_set_id=5 marked skip.
 - 2026-06-10 — **Phase 1 Part 2 complete.** Expanded 3 tool pages with Quick Reference panels + SEO content (`7325c4c`). json-formatter: XML↔JSON converter tab + JSON Minify section (targets `json minify` KD2/$47 CPC, `xml to json` KD1). html-formatter: HTML Quick Reference panel + fixed longstanding CSS truncation (targets `html divider` KD4, `blink html` KD10). sql-formatter: SQL Quick Reference panel + fixed CSS truncation (targets `coalesce sql` KD10, `sql window functions` KD14, `group by sql` KD8).

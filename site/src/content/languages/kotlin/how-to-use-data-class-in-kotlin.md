@@ -9,7 +9,7 @@ description: Discover how to cleanly model object structures and state using Kot
 difficulty: beginner
 language: kotlin
 og_image: /og/languages/kotlin/data-class.png
-published_date: '2026-04-16'
+published_date: '2026-06-11'
 related_posts:
 - /languages/kotlin/classes
 - /languages/kotlin/null-safety
@@ -19,6 +19,7 @@ tags:
 - data-class
 - oop
 - architecture
+actual_word_count: 2350
 template_id: lang-v2
 title: How to Use Data Classes in Kotlin?
 word_count_target: 1500
@@ -199,6 +200,17 @@ println(decoded.status) // "ok"
 ```
 
 Because the serialization contract is derived from the constructor, adding or removing a field automatically updates the serialized format — no separate schema definition required. Use `@SerialName("snake_case")` on properties when the JSON field name differs from the Kotlin property name, and `@Required` to enforce that a key must be present during deserialization. This tight coupling between the data model and its wire format is one reason data classes are the default choice for Kotlin API clients and server-side response models.
+
+## Java Interop: `@JvmRecord`
+
+Since Kotlin 1.5, you can annotate a data class with `@JvmRecord` to compile it as a Java record on the JVM. This matters when your Kotlin code must integrate with Java libraries or frameworks that perform reflection-based introspection on record types — Spring, Jackson, Hibernate, and jOOQ all have dedicated handling for Java records.
+
+```kotlin
+@JvmRecord
+data class Point(val x: Double, val y: Double)
+```
+
+The resulting bytecode is a proper Java record: Java callers can use the `x()` and `y()` accessor methods that the record specification defines, and frameworks that look for `RecordComponent` annotations during deserialization will recognize the class correctly. Constraints apply: all properties must be `val` (immutable), declared only in the primary constructor, with no superclass other than `Any`. For pure-Kotlin codebases with no Java interop requirement, `@JvmRecord` provides no benefit — the standard data class bytecode is already optimal for Kotlin callers.
 
 ## Testing Data Classes in Kotlin
 
