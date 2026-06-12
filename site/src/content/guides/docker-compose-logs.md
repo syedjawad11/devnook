@@ -244,7 +244,7 @@ For offline analysis or sharing with teammates, redirect output to a file:
 docker compose logs --timestamps > compose-debug.log 2>&1
 ```
 
-This captures all services with Docker's UTC timestamps. For searching and filtering long log files, see the [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet) for `grep`, `awk`, and `sed` patterns suited to log analysis work.
+This captures all services with Docker's UTC timestamps. For searching and filtering long log files, see the [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet/) for `grep`, `awk`, and `sed` patterns suited to log analysis work.
 
 ### CI/CD Log Capture
 
@@ -273,7 +273,7 @@ The `if: failure()` condition ensures log capture only runs when a prior step ha
 
 After tests complete — pass or fail — run `docker compose down` to tear down all containers and networks. A failed run that leaves containers running will interfere with the next run on the same host, especially if services bind to fixed ports.
 
-For a broader reference on configuring workflows, triggers, and runners, see the [GitHub Actions Guide](/blog/github-actions-guide-status-checkout-runners).
+For a broader reference on configuring workflows, triggers, and runners, see the [GitHub Actions Guide](https://docs.github.com/actions).
 
 ## Log Drivers and Production Configuration
 
@@ -308,9 +308,9 @@ services:
 
 This keeps the last three rotated log files of 10 MB each — 30 MB maximum per container. Without rotation, a high-throughput service can fill available disk space within hours. The `max-size` and `max-file` options are only available on `json-file` and `local` drivers.
 
-When you're debugging API services alongside their logs, the [curl command guide](/guides/curl-command-guide) covers sending test HTTP requests, inspecting response headers, and measuring connection timing — a useful companion to `docker compose logs --follow` when tracing a request through your stack.
+When you're debugging API services alongside their logs, the [curl command guide](/guides/curl-command-guide/) covers sending test HTTP requests, inspecting response headers, and measuring connection timing — a useful companion to `docker compose logs --follow` when tracing a request through your stack.
 
-For a broader reference on Docker container management — `docker ps`, `docker exec`, `docker inspect`, and image commands — see the [Docker Commands Cheat Sheet](/cheatsheets/docker-commands-cheatsheet).
+For a broader reference on Docker container management — `docker ps`, `docker exec`, `docker inspect`, and image commands — see the [Docker Commands Cheat Sheet](/cheatsheets/docker-commands-cheatsheet/).
 
 ## Frequently Asked Questions
 

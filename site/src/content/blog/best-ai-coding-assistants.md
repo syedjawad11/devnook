@@ -219,7 +219,7 @@ Claude Code is Anthropic's terminal-based AI coding agent. It operates primarily
 
 **Pricing:** Usage-based on the Anthropic API, also available via claude.ai subscription.
 
-**Best for:** Complex multi-step tasks, agentic workflows, and developers comfortable working in the terminal. It pairs particularly well with a solid grasp of [git commands](/cheatsheets/git-commands-cheatsheet) since it manages branches and commits autonomously. See our guide on [how to use Claude Code for software development](/blog/how-to-use-claude-code) for a hands-on breakdown.
+**Best for:** Complex multi-step tasks, agentic workflows, and developers comfortable working in the terminal. It pairs particularly well with a solid grasp of [git commands](/cheatsheets/git-commands-cheatsheet/) since it manages branches and commits autonomously. See our guide on [how to use Claude Code for software development](/blog/how-to-use-claude-code/) for a hands-on breakdown.
 
 ---
 
@@ -239,7 +239,7 @@ Supermaven was built by a Tabnine co-founder with a single focus: inline complet
 
 **Pricing:** Free tier, $10/month Pro.
 
-**Best for:** Speed-focused developers who primarily want the fastest, most context-aware inline completions and don't need a chat interface. See the [Supermaven documentation](https://supermaven.com/docs) for IDE setup instructions.
+**Best for:** Speed-focused developers who primarily want the fastest, most context-aware inline completions and don't need a chat interface. See the [Supermaven documentation](https://supermaven.com/) for IDE setup instructions.
 
 ---
 
@@ -301,7 +301,7 @@ If you're not sure where to start, use this decision tree:
 
 **Budget is the primary constraint:** Codeium's free tier. It won't feel like a compromise.
 
-**You work in the terminal and want agentic execution:** Claude Code. Combine it with reading our [comparison of ChatGPT vs Gemini for AI-assisted development](/blog/chatgpt-vs-gemini-for-developers) to understand the underlying model differences.
+**You work in the terminal and want agentic execution:** Claude Code. Combine it with reading our [comparison of ChatGPT vs Gemini for AI-assisted development](/blog/chatgpt-vs-gemini-for-developers/) to understand the underlying model differences.
 
 Most of these tools offer enough in their free tiers to make an informed decision. Try two or three with real work before paying for anything. The best AI coding assistant is the one that stays out of your way on simple tasks and actually helps on hard ones.
 

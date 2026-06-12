@@ -189,7 +189,7 @@ int main() {
 }
 ```
 
-STL algorithms accept comparators as template parameters. The lambda's `operator()` gets inlined into the sort loop at compile time — no virtual dispatch, no indirection. The [sorting algorithms comparison](/blog/sorting-algorithms-comparison) shows how this pattern compares to equivalent sort idioms in Python, Go, and Java.
+STL algorithms accept comparators as template parameters. The lambda's `operator()` gets inlined into the sort loop at compile time — no virtual dispatch, no indirection. The [sorting algorithms comparison](/blog/sorting-algorithms-comparison/) shows how this pattern compares to equivalent sort idioms in Python, Go, and Java.
 
 When writing your own function that accepts a callable, you have two options:
 
@@ -342,9 +342,9 @@ Comparator<Order> byPrice = (a, b) -> Double.compare(a.price, b.price);
 orders.sort(byPrice);
 ```
 
-Java's captured variables must be effectively final — the compiler rejects code that modifies a captured outer variable after capture. This eliminates the dangling-reference class of bugs automatically. The [Java lambda functions guide](/languages/java/lambda-functions) covers the functional interface model and how the JVM implements capture.
+Java's captured variables must be effectively final — the compiler rejects code that modifies a captured outer variable after capture. This eliminates the dangling-reference class of bugs automatically. The [Java lambda functions guide](/languages/java/lambda-functions/) covers the functional interface model and how the JVM implements capture.
 
-C++'s explicit capture list is more expressive than both: you control value vs reference per variable, and you can move into captures. It's also more error-prone for the same reason — the compiler doesn't prevent dangling references. Understanding [how closures work in JavaScript](/languages/javascript/closures) adds another useful data point: JavaScript's implicit-by-reference capture model is the closest parallel to Python's, and comparing it to C++'s explicit model shows why explicit capture is the right choice for a language where object lifetimes aren't managed automatically.
+C++'s explicit capture list is more expressive than both: you control value vs reference per variable, and you can move into captures. It's also more error-prone for the same reason — the compiler doesn't prevent dangling references. Understanding [how closures work in JavaScript](/languages/javascript/closures/) adds another useful data point: JavaScript's implicit-by-reference capture model is the closest parallel to Python's, and comparing it to C++'s explicit model shows why explicit capture is the right choice for a language where object lifetimes aren't managed automatically.
 
 ## Frequently Asked Questions
 
@@ -372,4 +372,4 @@ Not directly — in a member function, lambdas can capture `this` (by pointer) o
 
 Working with a c++ lambda function becomes natural once the capture model is solid. The next concept to understand is `std::function` and its type-erasure overhead — knowing when that cost is acceptable versus when a template parameter performs better is a decision you'll make frequently in modern C++ code.
 
-For a broader view of how callable patterns translate across languages, the [Python design patterns guide](/languages/python/design-patterns) covers the strategy and command patterns — both map directly to lambda-based designs in C++. The evolution of C++ lambda semantics from C++11 through C++23, including the proposal papers behind init captures and generic lambdas, is tracked publicly at [isocpp.org](https://isocpp.org).
+For a broader view of how callable patterns translate across languages, the [Python design patterns guide](/languages/python/design-patterns/) covers the strategy and command patterns — both map directly to lambda-based designs in C++. The evolution of C++ lambda semantics from C++11 through C++23, including the proposal papers behind init captures and generic lambdas, is tracked publicly at [isocpp.org](https://isocpp.org).

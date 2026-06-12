@@ -68,7 +68,7 @@ async function fetchUserProfile(userId: string): Promise<UserProfile> {
 
 Two details worth noting here. First, if a branch throws instead of returning, TypeScript correctly handles that — thrown errors exit the function, so they don't affect the return type. Second, `response.json()` returns `Promise<any>` in the browser Fetch API; the explicit `: UserProfile` annotation narrows that `any` at the assignment site.
 
-If you're building [arrow functions in TypeScript](/languages/typescript/write-lambda-function) rather than function declarations, the async syntax is identical — add `async` before the parameter list:
+If you're building [arrow functions in TypeScript](/languages/typescript/write-lambda-function/) rather than function declarations, the async syntax is identical — add `async` before the parameter list:
 
 ```typescript
 const createInvoice = async (
@@ -129,7 +129,7 @@ for (const result of results) {
 
 `Promise.allSettled` always resolves. Each element is either `{ status: 'fulfilled', value: T }` or `{ status: 'rejected', reason: unknown }`. You trade the simplicity of `Promise.all` for the guarantee that one failure doesn't block the rest.
 
-The [MDN reference on Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) covers the full static API, including `Promise.race` and `Promise.any`, which are less common but useful in specific scenarios like race conditions and fallback patterns. Understanding [JavaScript Promises](/languages/javascript/promises) — how `.then()`, `.catch()`, and chaining work — makes these parallel patterns more predictable. TypeScript's `Promise<T>` is the typed version of the same primitive.
+The [MDN reference on Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) covers the full static API, including `Promise.race` and `Promise.any`, which are less common but useful in specific scenarios like race conditions and fallback patterns. Understanding [JavaScript Promises](/languages/javascript/promises/) — how `.then()`, `.catch()`, and chaining work — makes these parallel patterns more predictable. TypeScript's `Promise<T>` is the typed version of the same primitive.
 
 ## Async/Await vs Promise Chains: A Direct Comparison
 
@@ -166,7 +166,7 @@ async function loadUserDashboard(userId: string): Promise<Dashboard> {
 
 When operations are sequential and dependent — each step uses the result of the previous one — async/await reads more naturally. When you want a functional pipeline of transformations, `.then()` chains can be more concise.
 
-The TypeScript compiler knows the type of `user` from `fetchUser`'s return type, the type of `permissions` from `fetchPermissions`'s return type, and the final return type of `loadUserDashboard` — without additional annotations. The same typed inference applies in both styles. For the runtime foundations, see [how async/await works in JavaScript](/languages/javascript/async-await) — TypeScript inherits that behavior directly.
+The TypeScript compiler knows the type of `user` from `fetchUser`'s return type, the type of `permissions` from `fetchPermissions`'s return type, and the final return type of `loadUserDashboard` — without additional annotations. The same typed inference applies in both styles. For the runtime foundations, see [how async/await works in JavaScript](/languages/javascript/async-await/) — TypeScript inherits that behavior directly.
 
 ## Three Gotchas That Catch TypeScript Developers
 
@@ -314,4 +314,4 @@ At runtime, no meaningful difference exists — async/await compiles to Promise 
 
 `typescript async await` is the foundation for nearly all async code you'll write — but mastering it means going beyond syntax. The patterns worth learning next: typed error handling with wrapper types using a library like `neverthrow` for errors-as-values instead of exceptions, schema validation with Zod to replace unsafe `as MyType` assertions at API boundaries, and `Promise.all` / `Promise.allSettled` composition for efficient parallel data loading.
 
-If you're working on TypeScript type design more broadly, understanding [how interface and type differ](/languages/typescript/interfaces-vs-types) will sharpen how you model the data structures your async functions return. And if you're building TypeScript utilities that work with web resources — including tools that process [URLs and sitemaps](/tools/sitemap-generator-from-url) — the typed fetch pattern from this guide is the right foundation to start from.
+If you're working on TypeScript type design more broadly, understanding [how interface and type differ](/languages/typescript/interfaces-vs-types/) will sharpen how you model the data structures your async functions return. And if you're building TypeScript utilities that work with web resources — including tools that process [URLs and sitemaps](/tools/sitemap-generator/) — the typed fetch pattern from this guide is the right foundation to start from.

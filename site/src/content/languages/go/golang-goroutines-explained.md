@@ -73,7 +73,7 @@ go func(jobID string) {
 }("order-8821")
 ```
 
-The `("order-8821")` at the end immediately invokes the anonymous function with that argument. Note the argument being passed explicitly — goroutines that close over loop variables instead of accepting them as parameters run into a variable capture bug covered later. For a full treatment of how closures and captures work in Go, [anonymous functions in Go](/languages/go/use-lambda-function) covers the mechanics in detail.
+The `("order-8821")` at the end immediately invokes the anonymous function with that argument. Note the argument being passed explicitly — goroutines that close over loop variables instead of accepting them as parameters run into a variable capture bug covered later. For a full treatment of how closures and captures work in Go, [anonymous functions in Go](/languages/go/use-lambda-function/) covers the mechanics in detail.
 
 ## Waiting for All Goroutines to Finish
 
@@ -171,7 +171,7 @@ func main() {
 
 Closing `jobCh` is the shutdown signal. Workers use `range` over the channel, and `range` exits cleanly when the channel closes with no remaining values. The anonymous goroutine waits for all workers (`wg.Wait()`), then closes `resultCh`, which causes the `for result := range resultCh` loop in main to terminate.
 
-This pattern is the right tool when you're building something like a parallel auditor that checks pages from a generated [sitemap](/tools/sitemap-generator-from-url) against expected routes — you want bounded concurrency, not one goroutine per page.
+This pattern is the right tool when you're building something like a parallel auditor that checks pages from a generated [sitemap](/tools/sitemap-generator/) against expected routes — you want bounded concurrency, not one goroutine per page.
 
 ## Communicating Between Goroutines with Channels
 
@@ -213,7 +213,7 @@ Channel directionality is enforced at compile time. A goroutine that accepts `<-
 
 An **unbuffered channel** (`make(chan T)`) synchronizes sender and receiver: the sender blocks until a receiver is ready, and vice versa. Use it when both sides must acknowledge the exchange. A **buffered channel** (`make(chan T, n)`) holds up to `n` values before blocking, decoupling producer and consumer when they run at different speeds.
 
-When designing channel-based APIs, [Go interfaces](/languages/go/interfaces) define the contracts that larger systems rely on — libraries often accept a channel-producing function rather than a concrete channel, making the code testable and the implementation swappable.
+When designing channel-based APIs, [Go interfaces](/languages/go/interfaces/) define the contracts that larger systems rely on — libraries often accept a channel-producing function rather than a concrete channel, making the code testable and the implementation swappable.
 
 The [sync package](https://pkg.go.dev/sync) covers cases where shared state is unavoidable: `sync.Mutex` for exclusive locks, `sync.RWMutex` for read-heavy workloads, `sync.Once` for one-time initialization, and `sync.Map` for concurrent map access without a custom mutex.
 
@@ -315,7 +315,7 @@ For I/O-heavy workloads — HTTP servers, database clients, message queue consum
 
 For CPU-bound work, goroutines distribute across real CPU cores because the Go scheduler maps them to OS threads that can run on any core. Setting `runtime.GOMAXPROCS(n)` controls how many OS threads Go uses for goroutine execution — it defaults to the number of available CPU cores.
 
-Compared to JavaScript's [async/await model](/languages/javascript/async-await), goroutines offer true parallelism. JavaScript's event loop is single-threaded and interleaves callbacks rather than running them simultaneously. Two goroutines can execute at exactly the same wall-clock moment on different cores; two JavaScript async functions cannot.
+Compared to JavaScript's [async/await model](/languages/javascript/async-await/), goroutines offer true parallelism. JavaScript's event loop is single-threaded and interleaves callbacks rather than running them simultaneously. Two goroutines can execute at exactly the same wall-clock moment on different cores; two JavaScript async functions cannot.
 
 ## Frequently Asked Questions
 

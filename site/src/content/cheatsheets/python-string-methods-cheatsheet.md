@@ -67,7 +67,7 @@ ts, sep, msg    = log.partition(' ')    # ts='2026-06-10T08:30:00Z', msg='INFO..
 
 `split()` with no argument collapses any run of consecutive whitespace and strips leading/trailing spaces — far more robust than `split(' ')` for normalizing messy input. `splitlines()` is safer than `split('\n')` when processing files with mixed Windows/Unix line endings.
 
-Building strings by joining a list is always faster than concatenation in a loop. See [What is List Comprehension in Python?](/languages/python/list-comprehension) for list-building patterns that pair naturally with `join()`.
+Building strings by joining a list is always faster than concatenation in a loop. See [What is List Comprehension in Python?](/languages/python/list-comprehension/) for list-building patterns that pair naturally with `join()`.
 
 ## Searching and Finding Substrings
 
@@ -102,7 +102,7 @@ error_count = log.count('ERROR')    # 1
 
 **`find()` vs `index()`:** `find()` returns `-1` when the substring is absent; `index()` raises `ValueError`. Use `find()` when missing text is a normal condition; use `index()` when absence means something is wrong and you want the exception to say so.
 
-For pattern-based searches beyond literal substrings — matching any email format, any run of digits, or conditional patterns — the [Regex Cheat Sheet](/cheatsheets/regex-cheatsheet) covers `re.search()`, `re.findall()`, and `re.sub()` syntax.
+For pattern-based searches beyond literal substrings — matching any email format, any run of digits, or conditional patterns — the [Regex Cheat Sheet](/cheatsheets/regex-cheatsheet/) covers `re.search()`, `re.findall()`, and `re.sub()` syntax.
 
 ## Replacing and Stripping Text
 
@@ -177,7 +177,7 @@ Always use `casefold()` — not `lower()` — when comparing strings for equalit
 
 ## String Formatting and Alignment
 
-Python provides three string formatting approaches. f-strings (Python 3.6+) are the preferred style for clarity. See [Python String Formatting: f-strings, format(), and %](/languages/python/string-formatting) for the complete format spec reference.
+Python provides three string formatting approaches. f-strings (Python 3.6+) are the preferred style for clarity. See [Python String Formatting: f-strings, format(), and %](/languages/python/string-formatting/) for the complete format spec reference.
 
 | Task | Method & Syntax |
 |---|---|
@@ -244,7 +244,7 @@ age = int(raw_age) if raw_age.isdecimal() else None
 "2bad_name".isidentifier()    # False — starts with digit
 ```
 
-Use `isdecimal()` — not `isdigit()` — when validating numeric input before calling `int()`, because superscripts and other Unicode "digits" pass `isdigit()` but cause `int()` to raise `ValueError`. When validation logic grows complex, see [How to Handle Errors in Python?](/languages/python/error-handling) for patterns that integrate cleanly with input validation.
+Use `isdecimal()` — not `isdigit()` — when validating numeric input before calling `int()`, because superscripts and other Unicode "digits" pass `isdigit()` but cause `int()` to raise `ValueError`. When validation logic grows complex, see [How to Handle Errors in Python?](/languages/python/error-handling/) for patterns that integrate cleanly with input validation.
 
 ## Encoding and Byte Conversion
 
@@ -274,7 +274,7 @@ no_punct = str.maketrans('', '', '.,!?;:')
 "col1\tcol2\tcol3".expandtabs(12)    # 'col1        col2        col3'
 ```
 
-When reading files that may have mixed or unknown encodings, always pass the `encoding` parameter to `open()` and choose an `errors` strategy. See [How to File Handling in Python + Examples](/languages/python/file-handling) for patterns that prevent `UnicodeDecodeError` at file read time.
+When reading files that may have mixed or unknown encodings, always pass the `encoding` parameter to `open()` and choose an `errors` strategy. See [How to File Handling in Python + Examples](/languages/python/file-handling/) for patterns that prevent `UnicodeDecodeError` at file read time.
 
 ## Common Pitfalls and Performance Tips
 
@@ -307,4 +307,4 @@ clean  = tag.removeprefix('<h1>').removesuffix('</h1>')  # 'title' — exact, un
 wrong  = tag.strip('<h1>')    # strips CHARS '<','h','1','>' not the literal tag string
 ```
 
-For batch string transformations across a collection of items, [How to Do Dictionary Comprehension in Python?](/languages/python/dictionary-comprehension) shows patterns that compose well with `str` method chains. The [Python string module documentation](https://docs.python.org/3/library/string.html) also provides `string.punctuation`, `string.ascii_letters`, and `string.Template` for cases where the built-in `str` methods are not quite enough.
+For batch string transformations across a collection of items, [How to Do Dictionary Comprehension in Python?](/languages/python/dictionary-comprehension/) shows patterns that compose well with `str` method chains. The [Python string module documentation](https://docs.python.org/3/library/string.html) also provides `string.punctuation`, `string.ascii_letters`, and `string.Template` for cases where the built-in `str` methods are not quite enough.

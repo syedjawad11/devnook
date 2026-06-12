@@ -102,13 +102,13 @@ url_map = {}
 for row in pub_rows:
     s, t, cat = row
     if cat == 'blog':
-        url_map[s] = f"/blog/{s}"
+        url_map[s] = f"/blog/{s}/"
     elif cat == 'guides':
-        url_map[s] = f"/guides/{s}"
+        url_map[s] = f"/guides/{s}/"
     elif cat == 'cheatsheets':
-        url_map[s] = f"/cheatsheets/{s}"
+        url_map[s] = f"/cheatsheets/{s}/"
     elif cat == 'tools':
-        url_map[s] = f"/tools/{s}"
+        url_map[s] = f"/tools/{s}/"
 
 print(f"Internal link candidates: {len(url_map)}")
 # Print first 10 for reference

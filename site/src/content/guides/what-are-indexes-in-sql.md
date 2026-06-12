@@ -50,7 +50,7 @@ Here is a concrete scenario. You have an `orders` table with five million rows. 
 
 ### Indexes and Primary Keys
 
-Every table with a [primary key](/guides/primary-key-in-database) gets an index on that column automatically. Primary key lookups are the most common database operation, so all major SQL engines create the index when the primary key is defined. When you write `WHERE id = 42`, you are almost certainly hitting that automatic index.
+Every table with a [primary key](/guides/primary-key-in-database/) gets an index on that column automatically. Primary key lookups are the most common database operation, so all major SQL engines create the index when the primary key is defined. When you write `WHERE id = 42`, you are almost certainly hitting that automatic index.
 
 What you define manually are indexes on other columns — foreign keys, frequently filtered fields, columns used in `ORDER BY`, columns used in `JOIN` conditions. These are explicit choices, and each one carries a real cost.
 
@@ -235,7 +235,7 @@ Not every table or column benefits from an index. Skip it when:
 
 **You are loading data in bulk.** Dropping indexes before a bulk load and rebuilding them afterward is a standard performance pattern. Building the index once from loaded data is faster than maintaining it incrementally through thousands or millions of individual inserts.
 
-When [choosing between SQL and NoSQL databases](/blog/sql-vs-nosql-differences-examples), indexing control is one factor that favours relational databases: SQL engines give you precise per-column index control with full query planner visibility, while many document stores apply indexing more automatically with less tuning surface.
+When [choosing between SQL and NoSQL databases](/blog/sql-vs-nosql-differences-examples/), indexing control is one factor that favours relational databases: SQL engines give you precise per-column index control with full query planner visibility, while many document stores apply indexing more automatically with less tuning surface.
 
 ## Frequently Asked Questions
 
@@ -257,10 +257,10 @@ Focus on columns that appear in `WHERE` clauses, `JOIN` conditions, and `ORDER B
 
 ### What is a composite index and when should I use one?
 
-A composite index covers multiple columns in a specified order. Use one when a query consistently filters or sorts on a combination of columns. The leftmost prefix rule applies: an index on `(customer_id, created_at)` helps queries filtering on `customer_id` alone or both columns together, but not on `created_at` alone. Define column order based on which single-column filter appears most frequently. Understanding multi-table query patterns, including operations like [cross joins in SQL](/guides/what-is-cross-join-in-sql), helps clarify which column combinations are worth covering.
+A composite index covers multiple columns in a specified order. Use one when a query consistently filters or sorts on a combination of columns. The leftmost prefix rule applies: an index on `(customer_id, created_at)` helps queries filtering on `customer_id` alone or both columns together, but not on `created_at` alone. Define column order based on which single-column filter appears most frequently. Understanding multi-table query patterns, including operations like [cross joins in SQL](/guides/what-is-cross-join-in-sql/), helps clarify which column combinations are worth covering.
 
 ## Conclusion
 
 Understanding what are indexes in SQL is the foundation of database performance tuning. An index is the database engine's shortcut from a query condition to matching rows — built on a B-tree structure that makes lookups O(log n) instead of O(n). Clustered indexes control the physical row order on disk; non-clustered indexes are separate structures with row pointers. Composite indexes follow the leftmost prefix rule and must be defined with actual query patterns in mind. Every index adds write overhead, so create them deliberately based on `EXPLAIN ANALYZE` output rather than instinct.
 
-For a closely related concept, the [primary key in a database](/guides/primary-key-in-database) is automatically indexed in every SQL engine — understanding that connection clarifies why clustered index lookups are fast and how primary key design shapes overall query performance.
+For a closely related concept, the [primary key in a database](/guides/primary-key-in-database/) is automatically indexed in every SQL engine — understanding that connection clarifies why clustered index lookups are fast and how primary key design shapes overall query performance.

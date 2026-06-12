@@ -167,12 +167,12 @@ url_map = {}
 for s, t, cat, lang, concept in pub_rows:
     if s == SLUG:
         continue
-    if cat == 'blog':          url_map[t] = f"/blog/{s}"
-    elif cat == 'guides':      url_map[t] = f"/guides/{s}"
-    elif cat == 'cheatsheets': url_map[t] = f"/cheatsheets/{s}"
-    elif cat == 'tools':       url_map[t] = f"/tools/{s}"
+    if cat == 'blog':          url_map[t] = f"/blog/{s}/"
+    elif cat == 'guides':      url_map[t] = f"/guides/{s}/"
+    elif cat == 'cheatsheets': url_map[t] = f"/cheatsheets/{s}/"
+    elif cat == 'tools':       url_map[t] = f"/tools/{s}/"
     elif cat == 'languages' and lang and concept:
-        url_map[t] = f"/languages/{lang}/{concept}"
+        url_map[t] = f"/languages/{lang}/{concept}/"
 
 print(f"Internal link candidates: {len(url_map)}")
 ```

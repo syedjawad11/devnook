@@ -4,7 +4,7 @@
 > one-off tasks. The `CLAUDE.md` files hold durable instructions only and point here.
 > Keep this file current; when an item is done, remove it (git history is the record).
 
-**Last updated:** 2026-06-11
+**Last updated:** 2026-06-12
 
 ---
 
@@ -42,13 +42,16 @@ Verify against the DB (from `pipeline/`):
 
 ## Pending one-off tasks
 
-- [ ] **Monitor Phase 2 CCR runs** — 9 one-shot triggers active. Test run (`html-reference-guide`, `trig_01632qYF7JLCL7zqPGktmogx`) fired 2026-06-10 ~19:02 UTC. URL when live: `https://devnook.dev/guides/html-reference-guide/`. `markdown-cheatsheet` trigger scheduled for 2026-06-11 01:00 UTC — verify via `git log`. Verify remaining 7 triggers similarly after their scheduled fire times.
 - [ ] **Remove `DEVNOOK_REPO_PAT` secret** from `syedjawad11/devnook` — no longer needed
   in the monorepo.
 
 ---
 
 ## Recently completed (rolling — prune freely)
+
+- 2026-06-12 — **Ahrefs SEO audit fixes (2026-06-08 crawl).** Resolved all four issue categories: (A) 5 broken internal 404 links fixed — `/tools/regex-tester-online-java` → `/tools/regex-tester/` (2 files), `/tools/sitemap-generator-from-url` → `/tools/sitemap-generator/` (3 files, tool_slug mismatch); (B) 2 dead blog links repointed to `https://docs.github.com/actions`; (C) 1 broken external link fixed (`supermaven.com/docs` → `supermaven.com/`); (D) `fix_trailing_slashes.py` ran — 105 trailing-slash fixes across 25 content files; (E) all 5 CCR agent prompts updated so `url_map` now emits trailing-slash URLs — recurrence prevented. Build: 123 pages, 0 errors.
+
+- 2026-06-11 — **Full 3-phase SEO implementation plan complete** (`developer_site_seo_case study/13-implementation-priority-plan.md`). All phases done: Phase 0 (6 cusp-of-page-1 optimizations), Phase 1 (cheatsheet + tool page expansions), Phase 2 (9 new gap articles + 3 existing-page expansions). No further tasks from that plan.
 
 - 2026-06-11 — **Phase 2 Steps 3 + 4 complete.** Step 3 (`5d107dd`): expanded HTTP Status Codes, ChatGPT vs Claude, Python List Comprehension. Step 4: targeted content additions to 6 cusp-of-page-1 pages — C++ try-catch (`std::expected` section), markdown-to-html (syntax quick reference), Ruby JSON (`oj` gem pattern), Swift closures (`Result` type section), Kotlin data class (`@JvmRecord` section), Python URL-encode (`requests` library section). Regex cheatsheet skipped (rewritten 2026-06-09, already sufficient). Build: 123 pages, no errors.
 

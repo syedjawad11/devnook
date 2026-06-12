@@ -267,7 +267,7 @@ const line = `Order ${orderId}: $${total.toFixed(2)}`;
 
 Java 21 added text blocks for multiline strings but doesn't support inline expression interpolation like `${variable}`. String formatting in Java stays explicitly template-plus-arguments — you can't put a `toFixed(2)` call inside the format string itself.
 
-For a broader look at how Java approaches familiar problems compared to other languages, [sorting algorithms explained across Python, JavaScript, Go, and Java](/blog/sorting-algorithms-comparison) shows the same comparative pattern for another core topic.
+For a broader look at how Java approaches familiar problems compared to other languages, [sorting algorithms explained across Python, JavaScript, Go, and Java](/blog/sorting-algorithms-comparison/) shows the same comparative pattern for another core topic.
 
 ## Frequently Asked Questions
 
@@ -295,11 +295,11 @@ The specifier type must match the variable type. `%s` for strings and objects, `
 
 ### What does %n mean in Java string formatting?
 
-`%n` is a platform-appropriate newline. On Windows it produces `\r\n`; on macOS and Linux it produces `\n`. Using `%n` keeps format strings portable across operating systems. When you write formatted output to a [Java file with BufferedWriter](/languages/java/file-handling), `%n` produces the correct line ending for the target platform automatically, without you having to detect the OS or hardcode `System.lineSeparator()`.
+`%n` is a platform-appropriate newline. On Windows it produces `\r\n`; on macOS and Linux it produces `\n`. Using `%n` keeps format strings portable across operating systems. When you write formatted output to a [Java file with BufferedWriter](/languages/java/file-handling/), `%n` produces the correct line ending for the target platform automatically, without you having to detect the OS or hardcode `System.lineSeparator()`.
 
 ### Can I use String.format to build JSON output?
 
-You can, but it's the wrong tool. `String.format` has no awareness of JSON structure — it won't escape quotes within string values, handle null correctly, or validate nesting depth. For [JSON handling in Java](/languages/java/json-parse), use Jackson or Gson. Those libraries serialize objects safely and handle all the escaping rules. Reserve `String.format` for human-readable output: log lines, console reports, and display strings.
+You can, but it's the wrong tool. `String.format` has no awareness of JSON structure — it won't escape quotes within string values, handle null correctly, or validate nesting depth. For [JSON handling in Java](/languages/java/json-parse/), use Jackson or Gson. Those libraries serialize objects safely and handle all the escaping rules. Reserve `String.format` for human-readable output: log lines, console reports, and display strings.
 
 ### Why does String.format output different decimal separators on different machines?
 
@@ -317,10 +317,10 @@ Use `Locale.US` for any output that will be parsed by another system, written to
 
 ## What to Learn Next
 
-String formatting handles how data looks on its way out. The next useful step is how it comes in: [JSON parsing in Java](/languages/java/json-parse) covers Jackson's `ObjectMapper`, which is the standard way to deserialize API responses into Java objects that you then format for display or logs.
+String formatting handles how data looks on its way out. The next useful step is how it comes in: [JSON parsing in Java](/languages/java/json-parse/) covers Jackson's `ObjectMapper`, which is the standard way to deserialize API responses into Java objects that you then format for display or logs.
 
-If you're building HTTP services, [Java REST APIs](/languages/java/rest-api) shows how response bodies are constructed and where string formatting fits into the output pipeline. For writing formatted output directly to disk, [Java file I/O](/languages/java/file-handling) covers `BufferedWriter` and `PrintWriter` — including when each is the better fit for formatted text files.
+If you're building HTTP services, [Java REST APIs](/languages/java/rest-api/) shows how response bodies are constructed and where string formatting fits into the output pipeline. For writing formatted output directly to disk, [Java file I/O](/languages/java/file-handling/) covers `BufferedWriter` and `PrintWriter` — including when each is the better fit for formatted text files.
 
-When your format strings involve patterns you want to test before committing — date patterns, order ID formats, postal codes — the [Java Regex Tester](/tools/regex-tester-online-java) lets you verify patterns against sample data interactively.
+When your format strings involve patterns you want to test before committing — date patterns, order ID formats, postal codes — the [Java Regex Tester](/tools/regex-tester/) lets you verify patterns against sample data interactively.
 
 Java string formatting with `String.format` and `printf` covers the majority of output needs. Knowing the format specifier syntax, the locale trap, and when a logging framework or `StringBuilder` serves better puts you past the rough edges that trip up developers new to the API.

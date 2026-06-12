@@ -71,7 +71,7 @@ If Alice returns one laptop, which row do you delete? There is no answer the dat
 
 Beyond uniqueness enforcement, primary keys serve three additional purposes in a relational database:
 
-**Referential integrity**: Foreign keys in other tables point to primary key values. An `orders` table typically has a `user_id` column referencing `users.user_id`, creating a verified, enforced link between a customer and their orders. Without a primary key to reference, this relationship cannot be expressed correctly. Our comparison of [SQL vs NoSQL differences](/blog/sql-vs-nosql-differences-examples) explains how this kind of structured reference is the defining feature that separates relational from document databases.
+**Referential integrity**: Foreign keys in other tables point to primary key values. An `orders` table typically has a `user_id` column referencing `users.user_id`, creating a verified, enforced link between a customer and their orders. Without a primary key to reference, this relationship cannot be expressed correctly. Our comparison of [SQL vs NoSQL differences](/blog/sql-vs-nosql-differences-examples/) explains how this kind of structured reference is the defining feature that separates relational from document databases.
 
 **Query performance**: The automatic index on the primary key makes `WHERE user_id = 42` one of the fastest operations in a relational database. Lookups by primary key bypass full table scans entirely, regardless of how many rows the table contains.
 
@@ -97,7 +97,7 @@ A surrogate key is an artificial identifier with no business meaning — generat
 
 **Auto-increment integers** are the most widely used surrogate key. The database generates them automatically (`SERIAL` in PostgreSQL, `AUTO_INCREMENT` in MySQL). They are compact (4–8 bytes), inserted in sequential order, fast to index and join, and easy to read in debugging sessions and SQL logs. The downside: they are predictable. Exposing `user_id=42` in a URL reveals how many users you have and makes ID enumeration possible.
 
-**UUIDs** (Universally Unique Identifiers) are 128-bit pseudo-random values. They are globally unique — two independent servers can generate records simultaneously that will never collide when merged. This matters for distributed systems and applications that synchronize data across devices or regions. The concept of globally unique identifiers also appears in authentication: [JSON Web Tokens](/guides/what-is-jwt) rely on unique, unguessable values for exactly this reason. The trade-offs for UUIDs: they are larger (16 bytes vs 4 bytes for an `INT`), harder to read in debug output, and random insertion order can fragment B-tree indexes in MySQL InnoDB at very high write rates.
+**UUIDs** (Universally Unique Identifiers) are 128-bit pseudo-random values. They are globally unique — two independent servers can generate records simultaneously that will never collide when merged. This matters for distributed systems and applications that synchronize data across devices or regions. The concept of globally unique identifiers also appears in authentication: [JSON Web Tokens](/guides/what-is-jwt/) rely on unique, unguessable values for exactly this reason. The trade-offs for UUIDs: they are larger (16 bytes vs 4 bytes for an `INT`), harder to read in debug output, and random insertion order can fragment B-tree indexes in MySQL InnoDB at very high write rates.
 
 **Auto-increment INT vs UUID — at a glance**:
 
@@ -192,7 +192,7 @@ CREATE TABLE api_keys (
 );
 ```
 
-`gen_random_uuid()` generates a cryptographically random UUID for each new row. This is appropriate for anything that should not be guessable from adjacent values. Note that [Unix timestamps](/guides/unix-timestamp-explained) are an alternative when you need time-ordered identifiers — they are sortable by creation time, unlike random UUIDs.
+`gen_random_uuid()` generates a cryptographically random UUID for each new row. This is appropriate for anything that should not be guessable from adjacent values. Note that [Unix timestamps](/guides/unix-timestamp-explained/) are an alternative when you need time-ordered identifiers — they are sortable by creation time, unlike random UUIDs.
 
 **Adding a primary key to an existing table:**
 
@@ -226,7 +226,7 @@ Understanding what the database does with a primary key under the hood helps exp
 
 **PostgreSQL — heap + B-tree index**: PostgreSQL stores rows in insertion order in a heap. The primary key creates a separate B-tree index alongside the heap. Because physical row placement is not tied to the key value, UUID primary keys have much less fragmentation impact in PostgreSQL than in InnoDB. The B-tree index simply stores `(key_value, heap_page_location)` pairs, and random insertion order only shuffles those pairs in the index, not the heap.
 
-**B-tree complexity**: Both systems use B-tree indexes for primary keys by default. A balanced B-tree guarantees O(log n) lookup time regardless of insert order. This is the same algorithmic foundation covered in [sorting algorithms](/blog/sorting-algorithms-comparison): the tree's balanced structure ensures the path from root to any leaf is at most log₂(n) levels. For a table with 10 million rows, locating a row by primary key takes at most 24 comparisons.
+**B-tree complexity**: Both systems use B-tree indexes for primary keys by default. A balanced B-tree guarantees O(log n) lookup time regardless of insert order. This is the same algorithmic foundation covered in [sorting algorithms](/blog/sorting-algorithms-comparison/): the tree's balanced structure ensures the path from root to any leaf is at most log₂(n) levels. For a table with 10 million rows, locating a row by primary key takes at most 24 comparisons.
 
 ## How to Choose the Right Primary Key
 
@@ -242,7 +242,7 @@ With types and internals covered, here is practical guidance for making the righ
 
 **Keep key columns narrow.** Every foreign key referencing your primary key stores a copy of it. An `INT` (4 bytes) means each child row carries 4 bytes for the reference. A `BIGINT` (8 bytes), a UUID (16 bytes). Over millions of rows across multiple child tables, narrower keys mean less storage, smaller indexes, and better buffer cache utilization. Use `INT` until you expect more than 2 billion rows in the parent table; upgrade to `BIGINT` if that threshold is realistic.
 
-**Plan before production.** Changing a primary key type after data is live — from `INT` to `UUID`, or from a natural key to a surrogate — is costly. It requires migrating the column, rewriting foreign key constraints, updating application code, and invalidating caches. When a later API endpoint returns a [409 Conflict](/guides/http-status-codes-guide) due to a duplicate key error at scale, migrating to UUIDs retroactively is far harder than choosing them upfront.
+**Plan before production.** Changing a primary key type after data is live — from `INT` to `UUID`, or from a natural key to a surrogate — is costly. It requires migrating the column, rewriting foreign key constraints, updating application code, and invalidating caches. When a later API endpoint returns a [409 Conflict](/guides/http-status-codes-guide/) due to a duplicate key error at scale, migrating to UUIDs retroactively is far harder than choosing them upfront.
 
 ## Frequently Asked Questions
 

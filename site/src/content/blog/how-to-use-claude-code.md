@@ -267,7 +267,7 @@ Claude Code reads the diff, traces it through affected call sites, and returns s
 git diff main...feature/new-auth | claude --print "Review this diff for security issues."
 ```
 
-API changes frequently introduce subtle error-handling mistakes. The [HTTP status codes guide](/guides/http-status-codes-guide) is useful background when checking whether responses — 400 vs 422, 401 vs 403 — are mapped correctly across a changed endpoint.
+API changes frequently introduce subtle error-handling mistakes. The [HTTP status codes guide](/guides/http-status-codes-guide/) is useful background when checking whether responses — 400 vs 422, 401 vs 403 — are mapped correctly across a changed endpoint.
 
 ### Debugging
 
@@ -278,7 +278,7 @@ Describe the symptom, not a guess at the cause:
 > The error is in the server logs. Find the root cause and propose a fix.
 ```
 
-Claude Code reads the stack trace, follows the call chain to the source, and proposes a targeted fix. For auth-specific issues, understanding token structure helps — our guide on [what is JWT](/guides/what-is-jwt) explains the payload format and common parsing failures that appear frequently in OAuth debug sessions.
+Claude Code reads the stack trace, follows the call chain to the source, and proposes a targeted fix. For auth-specific issues, understanding token structure helps — our guide on [what is JWT](/guides/what-is-jwt/) explains the payload format and common parsing failures that appear frequently in OAuth debug sessions.
 
 For race conditions, describe the triggering conditions:
 
@@ -313,7 +313,7 @@ Multi-file refactors are where Claude Code outpaces line-level tools. It tracks 
 > API routes with 100 requests per minute per IP. Write tests and commit.
 ```
 
-Claude Code creates the branch, implements the feature, runs the tests, and commits with a descriptive message — end to end from a single instruction. The [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet) covers the underlying git operations it runs on your behalf if you need to verify or modify the git state manually.
+Claude Code creates the branch, implements the feature, runs the tests, and commits with a descriptive message — end to end from a single instruction. The [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet/) covers the underlying git operations it runs on your behalf if you need to verify or modify the git state manually.
 
 ## MCP Servers: Connecting External Tools
 
@@ -373,7 +373,7 @@ MCP servers are the main mechanism for connecting Claude Code to company-specifi
 | CI / non-interactive mode | Yes | No | No | No |
 | Free tier | No | Yes | Yes | Yes |
 
-Claude Code's differentiated position is terminal access and shell integration. It is the right choice when you need a tool that coordinates your full development toolchain — running builds, tests, linters, and deployment scripts alongside code edits. For a comparison of AI chat tools used in browser-based workflows, see [ChatGPT vs Gemini for Developers](/blog/chatgpt-vs-gemini-for-developers).
+Claude Code's differentiated position is terminal access and shell integration. It is the right choice when you need a tool that coordinates your full development toolchain — running builds, tests, linters, and deployment scripts alongside code edits. For a comparison of AI chat tools used in browser-based workflows, see [ChatGPT vs Gemini for Developers](/blog/chatgpt-vs-gemini-for-developers/).
 
 ## Configuring Permissions and Safe Usage
 

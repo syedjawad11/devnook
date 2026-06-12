@@ -77,7 +77,7 @@ When `main()` begins, a stack frame is created containing space for `x`, `y`, an
 
 ### Key Properties of Stack Memory
 
-**Fixed size.** The stack has a maximum size set by the operating system — typically 1 MB to 8 MB on modern Linux and macOS systems. You can inspect and change this limit with `ulimit -s`. Our [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet) covers `ulimit` and other system resource inspection tools in detail.
+**Fixed size.** The stack has a maximum size set by the operating system — typically 1 MB to 8 MB on modern Linux and macOS systems. You can inspect and change this limit with `ulimit -s`. Our [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet/) covers `ulimit` and other system resource inspection tools in detail.
 
 **Automatic management.** The compiler generates all the instructions needed to push and pop stack frames. You never call `malloc` or `free` for stack memory. The lifetime of every local variable is fully determined by lexical scope.
 
@@ -168,7 +168,7 @@ In C and C++, the decision is explicit and consequential.
 - The data is large: image buffers, network receive queues, arrays of millions of elements
 - You are building pointer-based structures: linked lists, trees, graphs, hash tables
 
-The trade-off between data lifetime and size is a recurring theme in software architecture. Just as our [SQL vs NoSQL comparison](/blog/sql-vs-nosql-differences-examples) explores matching storage strategy to data shape and access patterns, stack vs heap is fundamentally about matching memory strategy to your data's lifetime and size characteristics.
+The trade-off between data lifetime and size is a recurring theme in software architecture. Just as our [SQL vs NoSQL comparison](/blog/sql-vs-nosql-differences-examples/) explores matching storage strategy to data shape and access patterns, stack vs heap is fundamentally about matching memory strategy to your data's lifetime and size characteristics.
 
 ### Escape Analysis in Modern Compilers
 
@@ -260,7 +260,7 @@ The [MDN JavaScript Memory Management guide](https://developer.mozilla.org/en-US
 
 ### Algorithms, Data Structures, and Memory
 
-Memory location shapes algorithmic performance in ways that benchmark measurements often obscure. Consider [sorting algorithms](/blog/sorting-algorithms-comparison) and their relationship to memory allocation: an in-place sort like quicksort modifies the input array directly and requires only O(log n) additional stack space for recursive calls. A naive merge sort that allocates new arrays for each merge step creates O(n) heap allocations per pass, each of which must eventually be collected. In practice, quicksort's stack usage and cache-friendly sequential access pattern often outperform merge sort's theoretically superior worst-case guarantee, partly because the stack is faster and already in cache.
+Memory location shapes algorithmic performance in ways that benchmark measurements often obscure. Consider [sorting algorithms](/blog/sorting-algorithms-comparison/) and their relationship to memory allocation: an in-place sort like quicksort modifies the input array directly and requires only O(log n) additional stack space for recursive calls. A naive merge sort that allocates new arrays for each merge step creates O(n) heap allocations per pass, each of which must eventually be collected. In practice, quicksort's stack usage and cache-friendly sequential access pattern often outperform merge sort's theoretically superior worst-case guarantee, partly because the stack is faster and already in cache.
 
 This is one of many places where understanding stack and heap behavior changes how you reason about algorithmic trade-offs in real systems.
 
@@ -272,7 +272,7 @@ Stack memory is automatically managed, fixed in size, and used for local variabl
 
 ### What causes a stack overflow error?
 
-A stack overflow occurs when the call stack has no remaining space for a new frame. The most common cause is unbounded recursion — a function calling itself without reaching a base case, creating a new stack frame on each invocation until the stack size limit is breached. A function that recurses 100,000 levels deep with no termination condition will exhaust a typical 8 MB stack long before finishing. In C and C++, allocating very large arrays as local variables — tens of megabytes in a single frame — can also overflow the stack. On Linux, you can inspect the current stack limit with `ulimit -s` and raise it for the current shell session. The [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet) covers `ulimit` and related system resource tools.
+A stack overflow occurs when the call stack has no remaining space for a new frame. The most common cause is unbounded recursion — a function calling itself without reaching a base case, creating a new stack frame on each invocation until the stack size limit is breached. A function that recurses 100,000 levels deep with no termination condition will exhaust a typical 8 MB stack long before finishing. In C and C++, allocating very large arrays as local variables — tens of megabytes in a single frame — can also overflow the stack. On Linux, you can inspect the current stack limit with `ulimit -s` and raise it for the current shell session. The [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet/) covers `ulimit` and related system resource tools.
 
 ### Which is faster: stack or heap memory?
 

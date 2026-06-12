@@ -95,10 +95,10 @@ reg.close()
 
 url_map = {}
 for s, t, cat in pub_rows:
-    if cat == 'blog':       url_map[s] = f"/blog/{s}"
-    elif cat == 'guides':   url_map[s] = f"/guides/{s}"
-    elif cat == 'cheatsheets': url_map[s] = f"/cheatsheets/{s}"
-    elif cat == 'tools':    url_map[s] = f"/tools/{s}"
+    if cat == 'blog':       url_map[s] = f"/blog/{s}/"
+    elif cat == 'guides':   url_map[s] = f"/guides/{s}/"
+    elif cat == 'cheatsheets': url_map[s] = f"/cheatsheets/{s}/"
+    elif cat == 'tools':    url_map[s] = f"/tools/{s}/"
 
 print(f"Internal link candidates: {len(url_map)}")
 for k, v in list(url_map.items())[:10]:

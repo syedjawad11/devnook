@@ -144,7 +144,7 @@ The `asdict()` call above produces a fully nested dictionary — `data["address"
 
 For flat dataclasses, `vars(instance)` is a faster alternative that skips recursion, though it returns a live view of `__dict__` rather than a deep copy. The reverse direction has no built-in equivalent. For flat structures, `Customer(**data)` works if `data` contains exactly the right keys. For nested structures where `data["address"]` is a dict rather than an `Address` instance, you need a manual factory or a library like [Pydantic](https://docs.pydantic.dev/) that handles coercion.
 
-If reshaping the resulting dict is part of your workflow, see the [Python dictionary comprehension guide](/languages/python/dictionary-comprehension) for clean transformation patterns.
+If reshaping the resulting dict is part of your workflow, see the [Python dictionary comprehension guide](/languages/python/dictionary-comprehension/) for clean transformation patterns.
 
 ## Using __post_init__ for Validation and Derived Fields
 
@@ -175,7 +175,7 @@ print(addr)              # EmailAddress(raw='  Alice@Example.COM  ')
 
 The `normalized` and `domain` fields use `init=False` — they do not appear in the constructor. The caller passes only `raw`. `normalized` also uses `repr=False`, so the `__repr__` output shows just the raw input.
 
-When inheriting from a parent dataclass, call `super().__post_init__()` at the top of your override so any parent validation runs first. For a broader look at validation patterns and exception handling in Python, see the [Python error handling guide](/languages/python/error-handling).
+When inheriting from a parent dataclass, call `super().__post_init__()` at the top of your override so any parent validation runs first. For a broader look at validation patterns and exception handling in Python, see the [Python error handling guide](/languages/python/error-handling/).
 
 ## frozen=True: Immutable Dataclasses
 
@@ -253,7 +253,7 @@ Python dataclasses are not the universal answer to structured data.
 
 **Reach for Pydantic's `BaseModel`** when you need runtime type coercion and validation. A python dataclass with a `str` annotation will happily accept an integer at runtime — no error. Pydantic validates on construction and raises structured errors. The trade-off is a dependency and slightly higher instantiation overhead.
 
-**Reach for a plain class** when behavior dominates data. If the class has 15 methods and 2 fields, the boilerplate saved by `@dataclass` is negligible, and the decorator becomes noise. Understanding when to reach for different class patterns is covered in depth in the [Python design patterns guide](/languages/python/design-patterns).
+**Reach for a plain class** when behavior dominates data. If the class has 15 methods and 2 fields, the boilerplate saved by `@dataclass` is negligible, and the decorator becomes noise. Understanding when to reach for different class patterns is covered in depth in the [Python design patterns guide](/languages/python/design-patterns/).
 
 ## Frequently Asked Questions
 
@@ -285,8 +285,8 @@ Yes. `@dataclass` only generates dunder methods — it does not remove or restri
 
 Dataclasses handle the structural side of domain modeling. Once your models are in place, two closely related topics tend to come up quickly.
 
-The first is how to format dataclass fields cleanly in output — f-strings and the `__format__` protocol are covered in the [Python string formatting guide](/languages/python/string-formatting), which also explains how format specs work for numeric fields like prices and percentages.
+The first is how to format dataclass fields cleanly in output — f-strings and the `__format__` protocol are covered in the [Python string formatting guide](/languages/python/string-formatting/), which also explains how format specs work for numeric fields like prices and percentages.
 
-The second is design patterns that structure how multiple dataclasses interact. The repository, factory, and value-object patterns each have natural dataclass-based implementations — see the [Python design patterns guide](/languages/python/design-patterns) for worked examples.
+The second is design patterns that structure how multiple dataclasses interact. The repository, factory, and value-object patterns each have natural dataclass-based implementations — see the [Python design patterns guide](/languages/python/design-patterns/) for worked examples.
 
 For a full accounting of what `@dataclass` supports — including `InitVar`, `ClassVar`, `slots=True`, and the `__dataclass_fields__` introspection API — the official [Python dataclasses documentation](https://docs.python.org/3/library/dataclasses.html) is the authoritative reference. [PEP 557](https://peps.python.org/pep-0557/), which introduced dataclasses, explains the design rationale, including why mutable defaults are rejected at class definition time rather than at instantiation.

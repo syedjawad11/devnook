@@ -67,7 +67,7 @@ This is clean and easy to follow: one request, one response, done. If prices cha
 
 Modern versions of HTTP pushed the model further. HTTP/2 multiplexes multiple request-response pairs over one TCP connection and compresses headers — significant savings for APIs with many small responses. HTTP/3 uses QUIC (UDP-based) to eliminate head-of-line blocking under packet loss. The entire ecosystem — CDNs, load balancers, reverse proxies, monitoring tools — is built around HTTP. Every intermediary between a client and server understands it natively.
 
-The [HTTP Status Codes reference](/guides/http-status-codes-guide) explains what each response code means and when to use it. The [MDN HTTP overview](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview) is the authoritative starting point for the protocol itself.
+The [HTTP Status Codes reference](/guides/http-status-codes-guide/) explains what each response code means and when to use it. The [MDN HTTP overview](https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview) is the authoritative starting point for the protocol itself.
 
 ## How WebSockets Work
 
@@ -154,7 +154,7 @@ wss.on('connection', (ws, req) => {
 | Browser support | Universal | All modern browsers |
 | Best for | REST APIs, page loads, file I/O | Chat, live data, collaborative tools, gaming |
 
-**The authentication row is easy to overlook.** With HTTP, every request carries its own `Authorization` header. Token expiry is handled automatically — the next request fails with a 401 and the client refreshes the token. With WebSockets, auth happens at the handshake only. If a user's JWT expires mid-session, the server must detect it and close the connection, or the application must proactively refresh the token over the open channel. The [JWT guide](/guides/what-is-jwt) covers how token-based auth works and where the WebSocket session boundary creates a different problem from standard HTTP flows.
+**The authentication row is easy to overlook.** With HTTP, every request carries its own `Authorization` header. Token expiry is handled automatically — the next request fails with a 401 and the client refreshes the token. With WebSockets, auth happens at the handshake only. If a user's JWT expires mid-session, the server must detect it and close the connection, or the application must proactively refresh the token over the open channel. The [JWT guide](/guides/what-is-jwt/) covers how token-based auth works and where the WebSocket session boundary creates a different problem from standard HTTP flows.
 
 **Proxy configuration is the most common deployment surprise.** Older proxies and some CDN setups strip the `Upgrade` header, which causes the WebSocket handshake to fail silently. If you run behind Nginx, you need explicit WebSocket passthrough configuration:
 
@@ -180,7 +180,7 @@ HTTP is the right default for most applications. It should be your starting poin
 
 **Authentication flows.** Login, token refresh, logout — infrequent, client-initiated, and benefiting from HTTP's stateless request isolation. There is no reason to add a persistent connection for operations that happen a handful of times per session.
 
-**Near-real-time with polling.** Polling every 5–30 seconds handles many notification and dashboard use cases without WebSocket complexity. A deployment status page, a background job completion check, an admin dashboard refreshing every 30 seconds — all work fine with HTTP polling. If the update frequency is low enough, polling is simpler and cheaper than WebSocket infrastructure. Use the [curl command guide](/guides/curl-command-guide) to test your HTTP endpoints and inspect headers during development.
+**Near-real-time with polling.** Polling every 5–30 seconds handles many notification and dashboard use cases without WebSocket complexity. A deployment status page, a background job completion check, an admin dashboard refreshing every 30 seconds — all work fine with HTTP polling. If the update frequency is low enough, polling is simpler and cheaper than WebSocket infrastructure. Use the [curl command guide](/guides/curl-command-guide/) to test your HTTP endpoints and inspect headers during development.
 
 ## When WebSockets Are Worth It
 
@@ -260,7 +260,7 @@ Yes. `wss://` is WebSocket over TLS — the same relationship HTTPS has to HTTP.
 
 ### How do I handle authentication over a long-lived WebSocket connection?
 
-With HTTP, every request carries its own `Authorization` header, so token expiry is handled naturally — the next request fails with a 401 and the client refreshes the token. With WebSockets, authentication happens only at the handshake. After that, the connection is open and the server cannot re-check credentials per-message without application-level logic. The server should track token expiry and close the connection when a token expires, or the application should send a token-refresh message over the open channel. The [JWT guide](/guides/what-is-jwt) covers the token lifecycle and explains how session boundaries differ between HTTP and WebSocket connections.
+With HTTP, every request carries its own `Authorization` header, so token expiry is handled naturally — the next request fails with a 401 and the client refreshes the token. With WebSockets, authentication happens only at the handshake. After that, the connection is open and the server cannot re-check credentials per-message without application-level logic. The server should track token expiry and close the connection when a token expires, or the application should send a token-refresh message over the open channel. The [JWT guide](/guides/what-is-jwt/) covers the token lifecycle and explains how session boundaries differ between HTTP and WebSocket connections.
 
 ## Conclusion
 
@@ -268,4 +268,4 @@ WebSockets vs HTTP is a protocol selection problem with a clear answer for most 
 
 Start with HTTP. Move to WebSockets when polling creates a real problem — the boundary is usually around one server-initiated update every five seconds. And before going straight to WebSockets, check whether Server-Sent Events satisfy the requirement: if the client does not need to send data back, SSE delivers server push over plain HTTP with far simpler deployment.
 
-For testing what your HTTP endpoints actually send and receive, the [curl command guide](/guides/curl-command-guide) covers request headers, authentication patterns, and response inspection. For the full rules on [URL encoding and query parameters](/guides/url-encoding-query-parameters-guide) — which apply to both HTTP requests and the WebSocket handshake URL — the guide covers encoding edge cases and practical browser behavior.
+For testing what your HTTP endpoints actually send and receive, the [curl command guide](/guides/curl-command-guide/) covers request headers, authentication patterns, and response inspection. For the full rules on [URL encoding and query parameters](/guides/url-encoding-query-parameters-guide/) — which apply to both HTTP requests and the WebSocket handshake URL — the guide covers encoding edge cases and practical browser behavior.

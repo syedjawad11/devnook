@@ -182,13 +182,13 @@ This works beautifully for integration — but the ESB becomes problematic when 
 
 ### Direct Communication in Microservices
 
-Microservices prefer direct calls. When the Order Service needs to validate a customer, it makes an HTTP request to the User Service. [HTTP status codes](/guides/http-status-codes-guide) become part of the service contract — a 404 means the customer doesn't exist, a 503 means the User Service is temporarily unavailable, and callers must handle both cases explicitly.
+Microservices prefer direct calls. When the Order Service needs to validate a customer, it makes an HTTP request to the User Service. [HTTP status codes](/guides/http-status-codes-guide/) become part of the service contract — a 404 means the customer doesn't exist, a 503 means the User Service is temporarily unavailable, and callers must handle both cases explicitly.
 
 For asynchronous work, microservices use message queues or event streams. When an order is placed, the Order Service publishes an `order.created` event to Kafka. The Inventory Service, Notification Service, and Analytics Service each subscribe independently. Adding a new consumer doesn't require changing the producer.
 
-Authentication in microservices usually passes identity via [JWT tokens](/guides/what-is-jwt). The API gateway validates the incoming JWT on behalf of all services, then forwards the decoded identity in a trusted header. Individual services trust the gateway rather than each calling a central auth service on every request.
+Authentication in microservices usually passes identity via [JWT tokens](/guides/what-is-jwt/). The API gateway validates the incoming JWT on behalf of all services, then forwards the decoded identity in a trusted header. Individual services trust the gateway rather than each calling a central auth service on every request.
 
-At scale, [API rate limiting](/guides/api-rate-limiting-guide) becomes critical. In a microservices system, a single user request might fan out to eight internal service calls. Without rate limits at each service boundary, a single slow external request can trigger a cascade of internal timeouts.
+At scale, [API rate limiting](/guides/api-rate-limiting-guide/) becomes critical. In a microservices system, a single user request might fan out to eight internal service calls. Without rate limits at each service boundary, a single slow external request can trigger a cascade of internal timeouts.
 
 ## When to Use SOA vs Microservices
 
@@ -212,7 +212,7 @@ The choice between SOA and microservices depends on your starting point and your
 
 **Your services have wildly different scaling needs.** In an e-commerce system, product search gets 100x the traffic of the return-processing service. With microservices, you scale search to 80 pods and leave returns on 2, without any coupling. With a monolith or coarse-grained SOA service, you scale everything.
 
-**You deploy frequently.** If your team deploys to production multiple times per week (or day), coordinating a release across a large service is a bottleneck. Microservices enable each team to ship on their own schedule. Automating individual service pipelines with [GitHub Actions](/blog/github-actions-guide-status-checkout-runners) is a common approach for managing the deployment complexity of many services.
+**You deploy frequently.** If your team deploys to production multiple times per week (or day), coordinating a release across a large service is a bottleneck. Microservices enable each team to ship on their own schedule. Automating individual service pipelines with [GitHub Actions](https://docs.github.com/actions) is a common approach for managing the deployment complexity of many services.
 
 ### The Most Common Mistake
 
@@ -220,7 +220,7 @@ Teams adopting microservices prematurely is one of the most expensive architectu
 
 A monolith is one deployment, one log stream, one database. Thirty microservices are thirty deployments, thirty log streams, and often ten to fifteen separate databases. Getting a coherent picture of what happened during a failed request requires distributed tracing across all services involved. This infrastructure investment is real, and teams that skip it end up debugging production incidents by reading thirty separate log files manually.
 
-Architecture decisions in distributed systems share similarities with data store choices — just as [SQL vs NoSQL tradeoffs](/blog/sql-vs-nosql-differences-examples) depend on your actual access patterns rather than what's fashionable, the SOA vs microservices decision should be driven by your actual deployment and organizational constraints.
+Architecture decisions in distributed systems share similarities with data store choices — just as [SQL vs NoSQL tradeoffs](/blog/sql-vs-nosql-differences-examples/) depend on your actual access patterns rather than what's fashionable, the SOA vs microservices decision should be driven by your actual deployment and organizational constraints.
 
 Start with a simple service structure. Add services as you discover natural seams in the codebase, not upfront. Microservices are the result of successful service decomposition, not the starting point.
 

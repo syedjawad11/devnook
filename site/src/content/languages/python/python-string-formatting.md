@@ -57,7 +57,7 @@ Python refuses to glue a number directly onto text, so you have to wrap it in `s
 print("Hello " + name + ", your balance is $" + str(balance))   # -> Hello Maria, your balance is $1234.56
 ```
 
-It runs now, but look at the result: `$1234.56` has no comma, and if the number had been `1234.5` it would show `$1234.5` instead of `$1234.50`. Controlling decimals or alignment this way is painful, and the line is already cluttered with quotation marks and plus signs. (If a value might be missing or the wrong type, you also end up reaching for [error handling](/languages/python/error-handling) just to keep the program from crashing.) String formatting exists to make all of this clean and readable.
+It runs now, but look at the result: `$1234.56` has no comma, and if the number had been `1234.5` it would show `$1234.5` instead of `$1234.50`. Controlling decimals or alignment this way is painful, and the line is already cluttered with quotation marks and plus signs. (If a value might be missing or the wrong type, you also end up reaching for [error handling](/languages/python/error-handling/) just to keep the program from crashing.) String formatting exists to make all of this clean and readable.
 
 ## f-strings: The Modern, Readable Way
 
@@ -142,7 +142,7 @@ Sandwich       12.00
 Cake            6.75
 ```
 
-Doing this by counting spaces yourself would be tedious and break the instant someone changed a value. (If you are looping over data to build these rows, a [list comprehension](/languages/python/list-comprehension) can often produce the list you iterate over in the first place.)
+Doing this by counting spaces yourself would be tedious and break the instant someone changed a value. (If you are looping over data to build these rows, a [list comprehension](/languages/python/list-comprehension/) can often produce the list you iterate over in the first place.)
 
 ## The Format Specification Mini-Language
 
@@ -245,4 +245,4 @@ f-strings are the fastest because Python compiles them straight into efficient i
 
 Python string formatting turns scattered variables into clean, readable text, and you now have the whole picture: f-strings for almost everything, the `format()` method when you need a reusable template, and the `%` operator for understanding older code. The colon-based mini-language — `.2f`, `,`, `<10`, `.1%` — is shared across all three, so learning it once pays off everywhere.
 
-The fastest way to make it stick is to use it. Take one place in your own code where you join text with `+` and `str()`, and rewrite it as an f-string — perhaps a message you print, or a line you write to a file (see [Python file handling](/languages/python/file-handling) if you are saving output). The readability improvement is immediate, and the syntax becomes second nature far quicker by doing than by reading. For every formatting option Python supports, the [official documentation on f-strings](https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals) is the reference to keep nearby.
+The fastest way to make it stick is to use it. Take one place in your own code where you join text with `+` and `str()`, and rewrite it as an f-string — perhaps a message you print, or a line you write to a file (see [Python file handling](/languages/python/file-handling/) if you are saving output). The readability improvement is immediate, and the syntax becomes second nature far quicker by doing than by reading. For every formatting option Python supports, the [official documentation on f-strings](https://docs.python.org/3/tutorial/inputoutput.html#formatted-string-literals) is the reference to keep nearby.

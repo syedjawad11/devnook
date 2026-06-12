@@ -59,4 +59,4 @@ A live Google Search Preview updates as you type so you can see exactly how your
 - OG images should be at least 1200×630 pixels for best display across social platforms
 - Set `robots` to `noindex, nofollow` only for pages you explicitly do not want indexed (e.g. thank-you pages, admin dashboards)
 
-For complete search engine coverage, pair your meta tags with an [XML Sitemap](/tools/sitemap-generator-from-url/). To understand how crawlers interpret your pages, see our [HTTP Status Codes Guide](/guides/http-status-codes-guide/).
+For complete search engine coverage, pair your meta tags with an [XML Sitemap](/tools/sitemap-generator/). To understand how crawlers interpret your pages, see our [HTTP Status Codes Guide](/guides/http-status-codes-guide/).

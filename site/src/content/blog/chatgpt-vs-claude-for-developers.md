@@ -148,7 +148,7 @@ For most individual coding tasks — writing a function, explaining a module, ge
 
 **Refactoring across files:** Renaming an interface and updating all implementations requires holding all files in context. Claude's larger window means fewer manual chunking steps during complex refactors.
 
-The [best AI coding assistants comparison](/blog/best-ai-coding-assistants) covers GitHub Copilot and Cursor, which handle multi-file context differently through IDE integration rather than conversation context windows.
+The [best AI coding assistants comparison](/blog/best-ai-coding-assistants/) covers GitHub Copilot and Cursor, which handle multi-file context differently through IDE integration rather than conversation context windows.
 
 ## API Access for Developers
 
@@ -229,7 +229,7 @@ with client.messages.stream(
 
 Both APIs support structured tool calls. You define a JSON schema for each tool, and the model returns structured calls for your application to execute. OpenAI calls this "function calling"; Anthropic calls it "tool use." The behavior and implementation complexity are equivalent.
 
-For more on Claude's API and agentic capabilities, the guide on [how to use Claude Code](/blog/how-to-use-claude-code) covers the CLI and API integration patterns in depth.
+For more on Claude's API and agentic capabilities, the guide on [how to use Claude Code](/blog/how-to-use-claude-code/) covers the CLI and API integration patterns in depth.
 
 ## Pricing: ChatGPT vs Claude
 
@@ -331,7 +331,7 @@ For both tools, API usage is billed per token. Free tiers at claude.ai and chatg
 
 The decision often comes down to one question: are you working with large files, multiple files simultaneously, or do you need a terminal agent? If yes, Claude is the stronger choice. For everything else, either tool works well and the practical differences are marginal for day-to-day coding tasks.
 
-For a broader comparison including GitHub Copilot, Cursor, and other tools, see the [best AI coding assistants overview](/blog/best-ai-coding-assistants).
+For a broader comparison including GitHub Copilot, Cursor, and other tools, see the [best AI coding assistants overview](/blog/best-ai-coding-assistants/).
 
 ## ChatGPT Alternatives for Developers
 
@@ -409,4 +409,4 @@ Yes. Claude.ai offers a free tier with rate-limited access to Claude Sonnet. The
 
 ChatGPT vs Claude is not a clear winner across all use cases. Claude wins on context window size, instruction following precision, and agentic CLI tooling through Claude Code. ChatGPT wins on ecosystem maturity, built-in image generation, and the GPT-4o mini price point for high-volume budget workloads. For developers working with large codebases or needing terminal-native AI, Claude is the stronger choice in 2026. For teams already embedded in the OpenAI ecosystem or relying on GitHub Copilot for IDE integration, ChatGPT remains a practical and capable option. Most developers end up using both, choosing based on the specific task at hand.
 
-For more context on the AI coding landscape, see the [ChatGPT vs Gemini comparison](/blog/chatgpt-vs-gemini-for-developers) and the [best AI coding assistants overview](/blog/best-ai-coding-assistants).
+For more context on the AI coding landscape, see the [ChatGPT vs Gemini comparison](/blog/chatgpt-vs-gemini-for-developers/) and the [best AI coding assistants overview](/blog/best-ai-coding-assistants/).

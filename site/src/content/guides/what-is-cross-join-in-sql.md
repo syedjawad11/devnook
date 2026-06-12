@@ -54,7 +54,7 @@ This behaviour is fundamentally different from every other join type in SQL. INN
 
 If you cross join a 100-row table with a 100-row table, you get 10,000 rows. Cross join a 1,000-row table with a 1,000-row table and you are looking at one million rows. Join two tables with 10,000 rows each and the output is 100 million rows.
 
-This growth is not a theoretical concern. Accidental cross joins — where a developer forgets a WHERE clause or a JOIN condition — are among the most common causes of query timeouts and database incidents in production. The query optimiser cannot save you here: a cross join produces its full output before any outer filtering runs. Understanding [SQL vs NoSQL: Key Differences Explained With Examples](/blog/sql-vs-nosql-differences-examples) helps put joins in context — joins are a defining feature of relational databases, and the cross join is the join that strips all relationship logic away.
+This growth is not a theoretical concern. Accidental cross joins — where a developer forgets a WHERE clause or a JOIN condition — are among the most common causes of query timeouts and database incidents in production. The query optimiser cannot save you here: a cross join produces its full output before any outer filtering runs. Understanding [SQL vs NoSQL: Key Differences Explained With Examples](/blog/sql-vs-nosql-differences-examples/) helps put joins in context — joins are a defining feature of relational databases, and the cross join is the join that strips all relationship logic away.
 
 
 ## How Cross Joins Differ from Other SQL Join Types
@@ -192,7 +192,7 @@ ORDER BY p.product_id, m.month_num;
 
 The CROSS JOIN between `active_products` and `months` creates the scaffold — every product for every month. The LEFT JOIN then fills in actual sales figures where they exist, and COALESCE converts NULLs (months with no sales) to zero. This pattern is one of the most practical applications of cross join in business intelligence reporting.
 
-When working with date and time data across different SQL databases, the [Unix Timestamp guide](/guides/unix-timestamp-explained) explains how to convert between SQL date types and epoch integers, which is useful when joining against systems that store timestamps as integer columns.
+When working with date and time data across different SQL databases, the [Unix Timestamp guide](/guides/unix-timestamp-explained/) explains how to convert between SQL date types and epoch integers, which is useful when joining against systems that store timestamps as integer columns.
 
 ### Example 3: Seeding test databases
 
@@ -230,7 +230,7 @@ ORDER BY home.team_name, away.team_name;
 
 This is one of the cases where adding a WHERE clause to a cross join is appropriate — the problem genuinely requires a self-cross-join filtered to remove a team playing itself. The result is every ordered (home, away) combination with self-pairings excluded.
 
-For well-structured query result data, the [JSON Formatter and Validator guide](/guides/json-formatter-validator-best-practices) covers how to validate and transform SQL query output when your application layer needs structured data.
+For well-structured query result data, the [JSON Formatter and Validator guide](/guides/json-formatter-validator-best-practices/) covers how to validate and transform SQL query output when your application layer needs structured data.
 
 
 ## When to Use a Cross Join — and When to Avoid It
@@ -399,4 +399,4 @@ Knowing what is cross join in SQL — that it produces the Cartesian product of 
 
 The danger is accidental use. A cross join with a missing join condition looks identical to a broken INNER JOIN, and on large tables the result set grows explosively. Calculate expected output size before running, verify the execution plan with EXPLAIN on non-trivial tables, and treat comma-separated multi-table FROM clauses without conditions as a mandatory code-review checkpoint.
 
-For broader context on why relational databases are structured around explicit table relationships, the [SQL vs NoSQL: Key Differences Explained With Examples](/blog/sql-vs-nosql-differences-examples) guide covers the architectural reasons that make joins — including cross join — a defining feature of the relational model.
+For broader context on why relational databases are structured around explicit table relationships, the [SQL vs NoSQL: Key Differences Explained With Examples](/blog/sql-vs-nosql-differences-examples/) guide covers the architectural reasons that make joins — including cross join — a defining feature of the relational model.

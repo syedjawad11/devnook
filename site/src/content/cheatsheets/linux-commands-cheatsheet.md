@@ -87,7 +87,7 @@ These bash commands locate files and content across the filesystem — a skill e
 | `wc -l <file>` | Count lines in a file |
 | `wc -w <file>` | Count words in a file |
 
-For pattern-based searches in text files, the [Regex Cheat Sheet](/cheatsheets/regex-cheatsheet) pairs well with `grep` and `sed` — it covers the full regex syntax used across these tools.
+For pattern-based searches in text files, the [Regex Cheat Sheet](/cheatsheets/regex-cheatsheet/) pairs well with `grep` and `sed` — it covers the full regex syntax used across these tools.
 
 ```bash
 ## Find .log files larger than 100 MB under /var/log
@@ -229,7 +229,7 @@ tail -n +2 data.csv | cut -d',' -f2
 
 This section of the linux commands cheatsheet covers connectivity diagnostics, file transfer, and remote operations.
 
-For a deep dive into HTTP from the shell, the [curl Command: The Complete Guide for Developers](/guides/curl-command-guide) covers every flag with real examples.
+For a deep dive into HTTP from the shell, the [curl Command: The Complete Guide for Developers](/guides/curl-command-guide/) covers every flag with real examples.
 
 | Command | Description |
 |---------|-------------|
@@ -425,4 +425,4 @@ done < servers.txt
 command -v docker >/dev/null 2>&1 && echo "Docker found" || echo "Docker not installed"
 ```
 
-This linux commands cheatsheet covers the bash commands and terminal commands that developers and sysadmins reach for every day. For version control at the command line, the [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet) is a natural companion. If you run containers on Linux, the [Docker Commands Cheat Sheet](/cheatsheets/docker-commands-cheatsheet) extends this reference into container and image management.
+This linux commands cheatsheet covers the bash commands and terminal commands that developers and sysadmins reach for every day. For version control at the command line, the [Git Commands Cheat Sheet](/cheatsheets/git-commands-cheatsheet/) is a natural companion. If you run containers on Linux, the [Docker Commands Cheat Sheet](/cheatsheets/docker-commands-cheatsheet/) extends this reference into container and image management.

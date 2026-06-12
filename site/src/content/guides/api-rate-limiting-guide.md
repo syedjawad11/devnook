@@ -80,7 +80,7 @@ A typical rate limit policy might read: "Each API key may make 1,000 requests pe
 
 Nearly every major API enforces rate limits. GitHub limits unauthenticated requests to 60 per hour and authenticated requests to 5,000 per hour. Stripe enforces 100 requests per second in live mode. Twitter (X) restricts how many tweets you can read, post, and search per 15-minute window. These policies protect the provider's infrastructure and create predictable service tiers for consumers.
 
-Rate limiting is closely related to authentication. Most rate limit systems identify clients by API keys or session tokens — you can learn the fundamentals of token-based auth in the [JSON Web Tokens guide](/guides/what-is-jwt).
+Rate limiting is closely related to authentication. Most rate limit systems identify clients by API keys or session tokens — you can learn the fundamentals of token-based auth in the [JSON Web Tokens guide](/guides/what-is-jwt/).
 
 ## Why APIs Need Rate Limiting
 
@@ -282,7 +282,7 @@ Communicating rate limit state clearly is as important as enforcing it. Develope
 
 The correct status code for a rate-limited response is **429 Too Many Requests**, [defined in RFC 6585](https://www.rfc-editor.org/rfc/rfc6585) as an extension to HTTP. Some older APIs return 503 Service Unavailable for rate-limited requests — this is semantically wrong. A 503 signals that the service itself is temporarily down, not that a specific client has exceeded its quota. Returning 503 causes monitoring systems to trigger incident pages for what is normal, expected client behavior.
 
-The [HTTP status codes guide](/guides/http-status-codes-guide) covers the full range of 4xx client error responses, but 429 is uniquely important for API design because it signals a temporary condition: the client should wait and retry, not abandon the request.
+The [HTTP status codes guide](/guides/http-status-codes-guide/) covers the full range of 4xx client error responses, but 429 is uniquely important for API design because it signals a temporary condition: the client should wait and retry, not abandon the request.
 
 ### Standard Rate Limit Headers
 
@@ -371,7 +371,7 @@ Two architectural patterns reduce overall API call volume:
 - **Batching**: combine multiple operations into a single API call where the API supports it. Fetching 50 user profiles in one `POST /users/batch` request uses 1 quota unit instead of 50. GraphQL APIs are specifically designed to enable this — one query can retrieve data that would require dozens of REST round trips.
 - **Caching**: store responses locally and serve from cache until the data is stale. A user profile that changes once per day doesn't need to be fetched on every page load. Pair caching with HTTP cache headers (ETag, Last-Modified, Cache-Control) and you can reduce API calls by 80–90% for read-heavy workloads.
 
-To test rate limit headers interactively, the [curl command guide](/guides/curl-command-guide) shows how to inspect full response headers from the command line. Observing 429 responses and Retry-After values before writing client code saves significant debugging time.
+To test rate limit headers interactively, the [curl command guide](/guides/curl-command-guide/) shows how to inspect full response headers from the command line. Observing 429 responses and Retry-After values before writing client code saves significant debugging time.
 
 ## Best Practices for API Rate Limiting
 
@@ -394,7 +394,7 @@ A single global limit per API key is rarely the right design. Production APIs la
 
 ### Differentiate Authenticated and Unauthenticated Traffic
 
-Unauthenticated requests carry no accountability — you can't identify, contact, or revoke a misbehaving anonymous client. Apply strict limits to unauthenticated requests and generous limits to authenticated ones. GitHub's 60 vs 5,000 per hour split is a widely-copied model. For APIs where rate limits integrate with long-lived connections, the [WebSockets vs HTTP guide](/blog/websockets-vs-http) covers when persistent connections are preferable to polling — WebSocket connections require different limiting strategies.
+Unauthenticated requests carry no accountability — you can't identify, contact, or revoke a misbehaving anonymous client. Apply strict limits to unauthenticated requests and generous limits to authenticated ones. GitHub's 60 vs 5,000 per hour split is a widely-copied model. For APIs where rate limits integrate with long-lived connections, the [WebSockets vs HTTP guide](/blog/websockets-vs-http/) covers when persistent connections are preferable to polling — WebSocket connections require different limiting strategies.
 
 ### Test Rate Limiting Before Launch
 

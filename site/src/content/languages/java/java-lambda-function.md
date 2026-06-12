@@ -215,7 +215,7 @@ public class OrderFilter {
 
 Use a method reference when the predicate logic is complex enough to warrant a name — it keeps the stream pipeline readable while placing the logic in a separately testable method.
 
-This `filter → map → collect` pattern appears throughout production Java code. You will see it in [JSON parsing in Java](/languages/java/json-parse), where stream operations select and transform fields from deserialized objects, and in [building REST APIs in Java](/languages/java/rest-api), where request handlers often process collections with lambdas and streams.
+This `filter → map → collect` pattern appears throughout production Java code. You will see it in [JSON parsing in Java](/languages/java/json-parse/), where stream operations select and transform fields from deserialized objects, and in [building REST APIs in Java](/languages/java/rest-api/), where request handlers often process collections with lambdas and streams.
 
 ## Three Bugs You Will Write First
 
@@ -257,7 +257,7 @@ Function<String, String> readConfig = path -> {
 };
 ```
 
-`UncheckedIOException` (in `java.io`) is the standard idiom for I/O errors in stream pipelines. This wrapping pattern comes up regularly when [handling files in Java](/languages/java/file-handling) inside a stream context.
+`UncheckedIOException` (in `java.io`) is the standard idiom for I/O errors in stream pipelines. This wrapping pattern comes up regularly when [handling files in Java](/languages/java/file-handling/) inside a stream context.
 
 **Trap 3: `this` inside a lambda refers to the enclosing class**
 
@@ -282,9 +282,9 @@ Lambda functions are the right tool for short, stateless operations that transfo
 
 **The body exceeds 5–7 lines.** Once a lambda body needs intermediate variables, nested conditions, or multiple return paths, a named private method is clearer. Named methods also appear by their actual name in stack traces. Lambda stack frames often surface as generated identifiers like `OrderFilter$$Lambda$1/0x00007f...`, which makes debugging harder.
 
-**You need to test the logic independently.** A predicate or transform defined as a named static method can have its own unit tests. A lambda defined inline cannot. For complex filtering logic — the kind that appears in [REST API request handlers in Java](/languages/java/rest-api) — a named, tested method is safer than an inline lambda.
+**You need to test the logic independently.** A predicate or transform defined as a named static method can have its own unit tests. A lambda defined inline cannot. For complex filtering logic — the kind that appears in [REST API request handlers in Java](/languages/java/rest-api/) — a named, tested method is safer than an inline lambda.
 
-**You are repeating the same lambda body across multiple pipelines.** Copy-pasted lambda bodies belong in a shared named method. The way [Java compares to other languages in sorting algorithm implementations](/blog/sorting-algorithms-comparison) illustrates this preference: Java favors explicit, named structure over inline cleverness, especially in code that teams maintain long-term.
+**You are repeating the same lambda body across multiple pipelines.** Copy-pasted lambda bodies belong in a shared named method. The way [Java compares to other languages in sorting algorithm implementations](/blog/sorting-algorithms-comparison/) illustrates this preference: Java favors explicit, named structure over inline cleverness, especially in code that teams maintain long-term.
 
 ## Frequently Asked Questions
 
@@ -312,4 +312,4 @@ No. Anonymous inner classes compile to separate `.class` files and always alloca
 
 With java lambda functions solid, the natural next step is the Java Streams API — the collection-processing pipeline that lambdas were built to drive. Start with `filter`, `map`, and `collect`, then move to `flatMap` for working with nested collections. After that, look at parallel streams (`parallelStream()`), which distributes stream operations across CPU cores. The critical constraint: any lambda in a parallel stream must be stateless and avoid shared mutable state, or it will produce race conditions.
 
-For applying these patterns to real tasks, [JSON parsing in Java](/languages/java/json-parse) shows lambda-driven stream pipelines on deserialized API data, and [handling files in Java](/languages/java/file-handling) covers `Files.lines()`, which turns a file into a stream you can process with the same `filter → map → collect` chain covered here.
+For applying these patterns to real tasks, [JSON parsing in Java](/languages/java/json-parse/) shows lambda-driven stream pipelines on deserialized API data, and [handling files in Java](/languages/java/file-handling/) covers `Files.lines()`, which turns a file into a stream you can process with the same `filter → map → collect` chain covered here.

@@ -232,7 +232,7 @@ class UserRepository implements UserEntity {
 
 Both compile to the same type structure. The readability difference is intent: `extends` communicates "inherits from" in the domain-model sense; `&` communicates structural composition. For deep inheritance hierarchies, `extends` reads more naturally. For composing unrelated capabilities (mixing in timestamps, adding audit fields), `&` can be more explicit about what's happening.
 
-When building TypeScript applications with service layers, you'll see this pattern often: interfaces define service contracts that classes implement, type aliases define the request/response shapes that flow through those services. The [TypeScript async/await guide](/languages/typescript/async-await) shows practical examples of this split in an async service architecture.
+When building TypeScript applications with service layers, you'll see this pattern often: interfaces define service contracts that classes implement, type aliases define the request/response shapes that flow through those services. The [TypeScript async/await guide](/languages/typescript/async-await/) shows practical examples of this split in an async service architecture.
 
 ## Practical Patterns: How Production Code Uses Both
 
@@ -268,7 +268,7 @@ type ApiEnvelope<T> = {
 };
 ```
 
-For function type aliases in particular — callbacks, event handlers, middleware signatures — `type` is cleaner than repeating inline function types across every call site. The [TypeScript arrow functions reference](/languages/typescript/write-lambda-function) covers how type aliases simplify complex callback signatures in detail.
+For function type aliases in particular — callbacks, event handlers, middleware signatures — `type` is cleaner than repeating inline function types across every call site. The [TypeScript arrow functions reference](/languages/typescript/write-lambda-function/) covers how type aliases simplify complex callback signatures in detail.
 
 ## Common Traps When Mixing Both
 
@@ -337,4 +337,4 @@ The working decision rule: use `interface` for open contracts — things classes
 
 The `typescript interface vs type` question doesn't have a universal winner. Each construct signals intent that the other cannot, and that clarity is where the real value lies. An `interface` on a service contract says: this is a named, extensible protocol. A discriminated `type` union on a state value says: these are the exact possible states, closed to extension, each with its own shape.
 
-For the next step in TypeScript's type system, generics extend both constructs to handle reusable type patterns across different data shapes. And if TypeScript's scoping behavior for captured type parameters in nested generic functions feels non-obvious, [understanding how JavaScript closures work](/languages/javascript/closures) provides helpful grounding — TypeScript's type parameter scoping follows the same lexical binding rules as JavaScript's closure variables.
+For the next step in TypeScript's type system, generics extend both constructs to handle reusable type patterns across different data shapes. And if TypeScript's scoping behavior for captured type parameters in nested generic functions feels non-obvious, [understanding how JavaScript closures work](/languages/javascript/closures/) provides helpful grounding — TypeScript's type parameter scoping follows the same lexical binding rules as JavaScript's closure variables.

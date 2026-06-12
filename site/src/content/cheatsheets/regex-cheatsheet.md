@@ -229,7 +229,7 @@ sticky.exec('Order: 42');
 
 ## Common Regex Patterns
 
-Production-ready patterns for frequent validation and extraction tasks. Paste them into the [Java Regex Tester — Free Online Tool](/tools/regex-tester-online-java) to verify matches before shipping.
+Production-ready patterns for frequent validation and extraction tasks. Paste them into the [Java Regex Tester — Free Online Tool](/tools/regex-tester/) to verify matches before shipping.
 
 | Use Case | Pattern |
 |----------|---------|
@@ -310,7 +310,7 @@ slug_re = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
 ## => ['hello-world', 'ok-123']
 ```
 
-For more Python string operations that complement regex, see [Python String Methods Cheat Sheet: split, join, replace & More](/cheatsheets/python-string-methods-cheatsheet).
+For more Python string operations that complement regex, see [Python String Methods Cheat Sheet: split, join, replace & More](/cheatsheets/python-string-methods-cheatsheet/).
 
 ## Regex in JavaScript
 
@@ -349,7 +349,7 @@ emailRe.test('user@example.com');  // true
 emailRe.test('not-an-email');      // false
 ```
 
-For a deeper look at JavaScript's native regex capabilities, see [What is Regex Pattern Checking in JavaScript?](/languages/javascript/check-regex-pattern). If you use regex in shell scripts or with CLI tools like `grep`, `sed`, and `awk`, the [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet) has the flags and syntax for POSIX and extended regex modes.
+For a deeper look at JavaScript's native regex capabilities, see [What is Regex Pattern Checking in JavaScript?](/languages/javascript/check-regex-pattern/). If you use regex in shell scripts or with CLI tools like `grep`, `sed`, and `awk`, the [Linux Commands Cheat Sheet](/cheatsheets/linux-commands-cheatsheet/) has the flags and syntax for POSIX and extended regex modes.
 
 ## Escaping Special Characters
 
