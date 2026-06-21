@@ -73,6 +73,8 @@ Spawn with: `Agent(prompt=open('agents/subagent-prompts/builder.md').read(), ...
 | Related posts auto-derived at render time | `PostLayout.astro` builds related list from `getCollection()` — never from hand-written `## Related` sections. `frontmatter.related_posts` unused; leave as `[]`. |
 | Content pipeline is external | No registry, staging, or publish scripts here. `src/content/` written by `../pipeline/agents/publish/publish.py`. |
 | Language post URLs use `concept`, not filename | Correct path: `/languages/{lang}/{concept}`. `publish.py` has `validate_language_links()` guard. |
+| React is a language category (`/languages/react/`) | Added 2026-06-21. Languages are data-driven: to add one, edit ONLY `src/content/config.ts` (`LANGUAGE_ENUM`) + `src/lib/language-colors.ts` (`LANGUAGE_COLORS`+`LANGUAGE_NAMES`). Index/hub/concept pages auto-generate; `/languages/` index card needs `postCount >= 5`. |
+| Tool slugs: link only canonical built slugs | The registry `tools` rows hold stale slugs (e.g. `regex-tester-online-java`); the real routes are `/tools/regex-tester/` etc. (17 tools, see `public/tools/*.html`). Never derive a `/tools/` link from a registry tool slug — use the canonical built slug or it 404s. |
 | Auto-internal-links covers all categories | Scans full `contentDir` — guides, blog, cheatsheets, languages. Not language-only. |
 | Related callouts plugin (session 32) | Injects up to 3 `<aside class="related-callout">` nodes at interior H2s. Per-post opt-out: `excludeRelatedCallouts: true`. |
 | No H1 in markdown body | `PostLayout.astro` renders title as `<h1>`. Body `# Title` = duplicate H1, Ahrefs flags it. |
