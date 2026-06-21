@@ -11,6 +11,7 @@ export const LANGUAGE_COLORS: Record<string, string> = {
   swift: '#F05138',
   kotlin: '#A97BFF',
   cpp: '#555555',
+  react: '#61DAFB',
 };
 
 export const LANGUAGE_NAMES: Record<string, string> = {
@@ -26,6 +27,7 @@ export const LANGUAGE_NAMES: Record<string, string> = {
   swift: 'Swift',
   kotlin: 'Kotlin',
   cpp: 'C++',
+  react: 'React',
 };
 
 export const langColor = (slug: string): string =>

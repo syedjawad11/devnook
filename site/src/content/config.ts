@@ -1,6 +1,6 @@
 import { z, defineCollection } from 'astro:content';
 
-const LANGUAGE_ENUM = ['python','javascript','typescript','go','rust','java','csharp','php','ruby','swift','kotlin','cpp'] as const;
+const LANGUAGE_ENUM = ['python','javascript','typescript','go','rust','java','csharp','php','ruby','swift','kotlin','cpp','react'] as const;
 
 const languagesCollection = defineCollection({
   type: 'content',
