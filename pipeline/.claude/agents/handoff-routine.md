@@ -142,12 +142,28 @@ for s, t, cat, lang, concept in pub_rows:
     elif cat == 'languages' and lang and concept:
         url_map[t] = f"/languages/{lang}/{concept}/"   # concept-based, never filename
 
-print(f"Internal link candidates: {len(url_map)}")
+# Canonical tool slugs — the registry only has a few `tools` rows, but the SITE ships 17
+# client-side tools. Link ONLY these exact slugs for /tools/ links (never invent a slug like
+# `regex-tester-online-java` — that 404s). All emit as `/tools/{slug}/`.
+CANONICAL_TOOLS = [
+    "base64-encoder","colour-converter","cron-parser","csv-to-json","diff-viewer",
+    "hash-generator","html-formatter","json-formatter","jwt-decoder","markdown-to-html",
+    "meta-tag-generator","readme-generator","regex-tester","sitemap-generator",
+    "sql-formatter","url-encoder","uuid-generator",
+]
+TOOL_URLS = {f"/tools/{s}/" for s in CANONICAL_TOOLS}
+for s in CANONICAL_TOOLS:
+    url_map.setdefault(s, f"/tools/{s}/")
+
+print(f"Internal link candidates: {len(url_map)} (incl. {len(CANONICAL_TOOLS)} canonical tools)")
 ```
 
 **Every internal link MUST end with `/`.** `/languages/` URLs are `/languages/{language}/{concept}/`,
 always derived from the registry `language`+`concept` columns — NEVER from a filename or a guess.
 The only allowed unverified `/languages/` link is this post's own URL (for language posts).
+**`/tools/` links MUST use an exact slug from `CANONICAL_TOOLS`** — any other tool slug is a 404.
+Pick a tool that is genuinely relevant to the topic (e.g. `regex-tester` for string/pattern posts,
+`sql-formatter` for SQL posts, `json-formatter` for JSON, `diff-viewer`/`base64-encoder` etc.).
 
 ---
 
@@ -366,6 +382,9 @@ for anchor, url in internal:
     base = url.split('#')[0]
     if not base.endswith('/'):
         failures.append(f"internal link missing trailing slash: {url}")
+    # /tools/ links must be a canonical slug (else 404)
+    if base.startswith('/tools/') and base not in TOOL_URLS:
+        failures.append(f"non-canonical /tools/ slug (404 risk): {url} — use one of CANONICAL_TOOLS")
 
 # 11. /languages/ links must be registry-verified (or this post's own URL)
 verified_lang = {v.rstrip('/') for v in url_map.values() if v.startswith('/languages/')}

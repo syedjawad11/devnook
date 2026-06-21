@@ -303,7 +303,7 @@ for (int i = 0; i < 10; ) {
 
 **Unintentional fall-through in switch.** Forgetting a `break` in a traditional switch causes the matching case to fall through and execute the next case's code. This is legal Java and occasionally intentional, but it's a frequent source of subtle bugs. If you intend fall-through, add a `// falls through` comment. Better still, switch to arrow-form switch expressions in Java 14+, which have no fall-through at all.
 
-For validating regex patterns used inside loops, the [Java Regex Tester](/tools/regex-tester-online-java/) lets you test expressions against sample strings before embedding them in code. Loop-heavy processing also pairs well with [Java string formatting](/languages/java/string-formatting/) when you're building output or log messages inside loop bodies, and with [Java lambda functions](/languages/java/lambda-function/) when you want stream-based alternatives to explicit iteration.
+For validating regex patterns used inside loops, the [Java Regex Tester](/tools/regex-tester/) lets you test expressions against sample strings before embedding them in code. Loop-heavy processing also pairs well with [Java string formatting](/languages/java/string-formatting/) when you're building output or log messages inside loop bodies, and with [Java lambda functions](/languages/java/lambda-function/) when you want stream-based alternatives to explicit iteration.
 
 ## Frequently Asked Questions
 
