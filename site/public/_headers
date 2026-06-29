@@ -1,0 +1,12 @@
+# Cloudflare Pages custom response headers
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# Sitemaps: let Cloudflare edge-cache them instead of serving DYNAMIC/uncached.
+# max-age=3600 only governs downstream (crawler/browser) reuse BETWEEN deploys —
+# every Pages deploy purges the edge cache, so new posts appear immediately.
+/sitemap-*.xml
+  Cache-Control: public, max-age=3600
+
+# robots.txt: same treatment — stable file, safe to cache for an hour.
+/robots.txt
+  Cache-Control: public, max-age=3600
