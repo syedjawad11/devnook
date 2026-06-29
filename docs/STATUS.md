@@ -4,7 +4,7 @@
 > one-off tasks. The `CLAUDE.md` files hold durable instructions only and point here.
 > Keep this file current; when an item is done, remove it (git history is the record).
 
-**Last updated:** 2026-06-21
+**Last updated:** 2026-06-29
 
 ---
 
@@ -44,6 +44,21 @@ Verify against the DB (from `pipeline/`):
 
 ## Pending one-off tasks
 
+- [ ] **Verify sitemap edge-cache fix took (tomorrow, ~2026-06-30).** After the Pages
+  deploy of `8638db4` lands, re-fetch `curl -sI https://devnook.dev/sitemap-index.xml`
+  and confirm `CF-Cache-Status` flips `DYNAMIC`→`HIT` (after a warm-up hit) and
+  `Cache-Control` shows `max-age=3600`. If it *stays* `DYNAMIC`, Pages is treating `.xml`
+  specially → fall back to a Cloudflare dashboard **Cache Rule** for `/sitemap-*.xml`.
+  User re-submitted the sitemap in GSC on 2026-06-29 (likely hit the old DYNAMIC file);
+  resubmission is NOT mandatory — Google re-fetches on its own — but one optional resubmit
+  *after* headers verify clean would land the nudge on the fixed file.
+- [ ] **Diagnose the site-wide impressions drop (still owed).** Impressions fell to ~zero
+  ~1 week before 2026-06-29 after 2 months of healthy indexing; GSC sitemap showed
+  "couldn't read". Need the user's **Manual Actions** screen + **Page Indexing** report
+  (indexed-count trend) to confirm whether the sitemap-read failure alone explains it or
+  there's a separate manual action / indexing regression. The `_headers` fix addresses the
+  sitemap-read symptom; the impressions cause is not yet confirmed. NOTE: do not declare
+  "fixed" without the GSC data — user has explicitly pushed back on premature conclusions.
 - [ ] **Remove `DEVNOOK_REPO_PAT` secret** from `syedjawad11/devnook` — no longer needed
   in the monorepo.
 
@@ -51,7 +66,17 @@ Verify against the DB (from `pipeline/`):
 
 ## Recently completed (rolling — prune freely)
 
-- 2026-06-21 — **Handoff publisher set up + React language silo added.** Seeded 32 keyword-ready articles from `devnook_handoff.md` into the registry as `status='queued_handoff'` and built one unified CCR routine (`pipeline/.claude/agents/handoff-routine.md`, branches on category) that drains 1/day at 12:00 Malta (`trig_01F8AjndQHT9trS2bhdT3DQB`). **React is now a 13th language category** — added `react` to `LANGUAGE_ENUM` (`site/src/content/config.ts`) + `react: '#61DAFB'`/`'React'` (`site/src/lib/language-colors.ts`); the 9 React handoff articles publish to `/languages/react/{concept}/` (data-driven, no new routes — `/languages/index.astro` card appears once 5 posts exist). Test run published Seq 1 `java-loops-control-flow` (live 200, 2081 words). **Two gotchas captured:** (1) the registry `tools` rows held pre-audit slugs (`regex-tester-online-java`, `sitemap-generator-from-url`) so `url_map` fed a 404 tool link into the article — fixed the slugs to canonical routes AND hardened the routine to inject the 17 canonical site tool slugs + QA-fail any non-canonical `/tools/` slug. (2) CCR makes a trailing run-log commit after the content commit, so a `git pull --rebase` may be needed before pushing local follow-ups.
+- 2026-06-29 — **AI-search `llms.txt` + sitemap edge-cache fix shipped.** (1) Added
+  `site/public/llms.txt` (commit `0b4d8db`) — curated llmstxt.org-format index (17 tools,
+  12 language hubs, guide/cheatsheet/blog links) for AI-search discoverability; all tool
+  URLs curl-verified 200 (caught `sitemap-generator-from-url`→`sitemap-generator` stale-slug
+  trap). (2) Added `site/public/_headers` (commit `8638db4`) setting
+  `Cache-Control: public, max-age=3600` on `/sitemap-*.xml` + `/robots.txt` — the sitemap
+  was serving `CF-Cache-Status: DYNAMIC` / `max-age=0, must-revalidate` (uncached, origin
+  fetched chunked each time), a likely cause of GSC's "couldn't read sitemap". Pages purges
+  edge cache on every deploy, so new posts still appear immediately; the `max-age` only
+  governs downstream reuse between deploys. **Post-deploy verification deferred to ~06-30**
+  (see Pending tasks). Seeded 32 keyword-ready articles from `devnook_handoff.md` into the registry as `status='queued_handoff'` and built one unified CCR routine (`pipeline/.claude/agents/handoff-routine.md`, branches on category) that drains 1/day at 12:00 Malta (`trig_01F8AjndQHT9trS2bhdT3DQB`). **React is now a 13th language category** — added `react` to `LANGUAGE_ENUM` (`site/src/content/config.ts`) + `react: '#61DAFB'`/`'React'` (`site/src/lib/language-colors.ts`); the 9 React handoff articles publish to `/languages/react/{concept}/` (data-driven, no new routes — `/languages/index.astro` card appears once 5 posts exist). Test run published Seq 1 `java-loops-control-flow` (live 200, 2081 words). **Two gotchas captured:** (1) the registry `tools` rows held pre-audit slugs (`regex-tester-online-java`, `sitemap-generator-from-url`) so `url_map` fed a 404 tool link into the article — fixed the slugs to canonical routes AND hardened the routine to inject the 17 canonical site tool slugs + QA-fail any non-canonical `/tools/` slug. (2) CCR makes a trailing run-log commit after the content commit, so a `git pull --rebase` may be needed before pushing local follow-ups.
 
 - 2026-06-12 — **Ahrefs SEO audit fixes (2026-06-08 crawl).** Resolved all four issue categories: (A) 5 broken internal 404 links fixed — `/tools/regex-tester-online-java` → `/tools/regex-tester/` (2 files), `/tools/sitemap-generator-from-url` → `/tools/sitemap-generator/` (3 files, tool_slug mismatch); (B) 2 dead blog links repointed to `https://docs.github.com/actions`; (C) 1 broken external link fixed (`supermaven.com/docs` → `supermaven.com/`); (D) `fix_trailing_slashes.py` ran — 105 trailing-slash fixes across 25 content files; (E) all 5 CCR agent prompts updated so `url_map` now emits trailing-slash URLs — recurrence prevented. Build: 123 pages, 0 errors.
 
