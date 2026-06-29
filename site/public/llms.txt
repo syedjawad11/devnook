@@ -1,0 +1,54 @@
+# DevNook
+
+> DevNook (devnook.dev) is a developer resource site offering free, privacy-friendly browser-based developer tools plus in-depth programming guides, language references, and cheatsheets. All tools run entirely client-side — no data leaves the browser. Content covers 12+ programming languages and practical, beginner-friendly explanations that build from fundamentals to advanced topics.
+
+## Developer Tools
+
+> 17 free, client-side tools. No sign-up, no server processing — all computation happens in the browser.
+
+- [JSON Formatter](https://devnook.dev/tools/json-formatter/): Format, validate, and beautify JSON
+- [SQL Formatter](https://devnook.dev/tools/sql-formatter/): Format and beautify SQL queries
+- [HTML Formatter](https://devnook.dev/tools/html-formatter/): Format and beautify HTML
+- [Regex Tester](https://devnook.dev/tools/regex-tester/): Test and debug regular expressions
+- [JWT Decoder](https://devnook.dev/tools/jwt-decoder/): Decode and inspect JSON Web Tokens
+- [Base64 Encoder/Decoder](https://devnook.dev/tools/base64-encoder/): Encode and decode Base64
+- [URL Encoder/Decoder](https://devnook.dev/tools/url-encoder/): Encode and decode URL components
+- [Hash Generator](https://devnook.dev/tools/hash-generator/): Generate MD5, SHA-1, SHA-256 hashes
+- [UUID Generator](https://devnook.dev/tools/uuid-generator/): Generate UUIDs/GUIDs
+- [Diff Viewer](https://devnook.dev/tools/diff-viewer/): Compare two text blocks side by side
+- [CSV to JSON](https://devnook.dev/tools/csv-to-json/): Convert CSV data to JSON
+- [Markdown to HTML](https://devnook.dev/tools/markdown-to-html/): Convert Markdown to HTML
+- [Cron Parser](https://devnook.dev/tools/cron-parser/): Parse and explain cron expressions
+- [Colour Converter](https://devnook.dev/tools/colour-converter/): Convert between HEX, RGB, HSL
+- [Meta Tag Generator](https://devnook.dev/tools/meta-tag-generator/): Generate SEO and Open Graph meta tags
+- [README Generator](https://devnook.dev/tools/readme-generator/): Generate project README files
+- [Sitemap Generator](https://devnook.dev/tools/sitemap-generator/): Generate an XML sitemap from a URL
+
+## Programming Languages
+
+> Concept-by-concept references for 12 languages, written beginner-first.
+
+- [Python](https://devnook.dev/languages/python/): Python concepts, syntax, and examples
+- [JavaScript](https://devnook.dev/languages/javascript/): JavaScript concepts and patterns
+- [TypeScript](https://devnook.dev/languages/typescript/): TypeScript types and features
+- [Java](https://devnook.dev/languages/java/): Java fundamentals and core concepts
+- [C++](https://devnook.dev/languages/cpp/): C++ concepts and syntax
+- [C#](https://devnook.dev/languages/csharp/): C# language reference
+- [Go](https://devnook.dev/languages/go/): Go (Golang) concepts
+- [Rust](https://devnook.dev/languages/rust/): Rust concepts and ownership model
+- [Ruby](https://devnook.dev/languages/ruby/): Ruby syntax and idioms
+- [PHP](https://devnook.dev/languages/php/): PHP concepts and usage
+- [Kotlin](https://devnook.dev/languages/kotlin/): Kotlin language reference
+- [Swift](https://devnook.dev/languages/swift/): Swift concepts and syntax
+
+## Guides & References
+
+- [Guides](https://devnook.dev/guides/): In-depth programming tutorials and how-to guides
+- [Cheatsheets](https://devnook.dev/cheatsheets/): Quick-reference cheatsheets for common tasks
+- [Blog](https://devnook.dev/blog/): Articles on development practices and tools
+- [All Languages](https://devnook.dev/languages/): Index of all language references
+
+## Optional
+
+- [About](https://devnook.dev/about/): About DevNook
+- [Sitemap](https://devnook.dev/sitemap-index.xml): Full XML sitemap of all pages
