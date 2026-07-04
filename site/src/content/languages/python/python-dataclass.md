@@ -1,24 +1,25 @@
 ---
 title: "Python Dataclass Explained: Fields, Defaults, Frozen"
-description: "Learn how python dataclass works: from basic field declarations to field(), default_factory, __post_init__, and frozen=True. Runnable examples throughout."
+description: "Learn how python dataclass (python data class) works: field(), default_factory, slots=True, dataclass to dict, and frozen=True, with runnable examples."
 category: "languages"
 language: "python"
 concept: "dataclass"
 difficulty: "intermediate"
 template_id: "lang-v2"
-tags: [python, dataclass, oop, fields, frozen]
+tags: [python, dataclass, oop, fields, frozen, slots]
 related_posts: []
 related_tools: []
 linkAnchors:
   - "python dataclass"
   - "dataclass in python"
   - "python dataclass examples"
+  - "python data class"
 published_date: "2026-05-31"
 og_image: "/og/languages/python/dataclass.png"
-word_count_target: 2100
+word_count_target: 2600
 ---
 
-Picture a paper form — the kind HR uses when a new employee joins. The blank form itself holds no data; it just defines which fields exist and what type of information each accepts. Every completed form is an instance that shares the same structure. That's roughly what a python dataclass does for classes.
+Picture a paper form — the kind HR uses when a new employee joins. The blank form itself holds no data; it just defines which fields exist and what type of information each accepts. Every completed form is an instance that shares the same structure. That's roughly what a python dataclass (or python data class) does for classes.
 
 Before dataclasses arrived in Python 3.7, building a data-carrying class meant writing an `__init__` to assign attributes, a `__repr__` to produce readable output, and an `__eq__` to compare instances — roughly 25 lines of boilerplate that contained zero business logic. The `@dataclass` decorator generates all of that from annotated field declarations. The class definition shrinks from 25 lines to 6, and the generated methods stay in sync automatically when you add or rename fields.
 
@@ -57,7 +58,7 @@ print(laptop == Product(name="ThinkPad X1", price=1299.99))  # True
 print(laptop == Product(name="ThinkPad X1", price=999.99))   # False
 ```
 
-`in_stock=True` is a field with a default value. Fields without defaults must come before fields with defaults — the same constraint that applies to function arguments. The generated `__init__` is exactly equivalent to:
+`in_stock=True` is a field with a default value. Fields without defaults must come before fields with defaults — the same constraint that applies to function arguments. The `__init__` method the dataclass Python generates from these annotations is exactly equivalent to:
 
 ```python
 def __init__(self, name: str, price: float, in_stock: bool = True):
@@ -70,9 +71,9 @@ You get this for free. Annotated class variables that start with an underscore a
 
 ## Fields, Defaults, and the field() Function
 
-For scalar defaults — booleans, strings, numbers — assigning them directly works fine. For mutable defaults — lists, dicts, sets — you must use `field(default_factory=...)`. Assigning a mutable directly raises a `ValueError` at class definition time.
+For scalar defaults — booleans, strings, numbers — assigning them directly works fine. For mutable defaults — lists, dicts, sets — you must use `field(default_factory=...)`. Assigning a mutable directly raises a `ValueError` at class definition time. This distinction holds across virtually all python data classes you write — the rule tracks mutability, not which specific field happens to hold the value.
 
-The `field()` function gives you per-field control beyond just the default value. Here is a reference of its most useful options:
+The `field()` function gives you per-field control beyond just the default value. Here is a reference of its most useful options for a dataclass field:
 
 | Option | Type | Purpose |
 |---|---|---|
@@ -207,6 +208,30 @@ print(len(seen))   # 1 — set deduplication works because Point is hashable
 
 One trade-off: `__post_init__` cannot assign attributes using regular syntax in a frozen dataclass — the freeze check fires immediately. The workaround is `object.__setattr__(self, 'field_name', value)`, which bypasses the freeze. If `__post_init__` logic grows complex, consider whether a frozen dataclass is still the right tool or whether a regular class with a `@classmethod` factory is cleaner.
 
+## dataclass slots: Lower Memory, Faster Attribute Access
+
+Python 3.10 added `slots=True` as a decorator argument, distinct from `frozen=True` and combinable with it. Where `frozen=True` controls mutability, dataclass slots controls how the instance stores its attributes in memory.
+
+By default, every instance of a Python class — dataclasses included — carries a `__dict__` to hold its attributes. That `__dict__` is flexible (you can attach new attributes at runtime) but costs memory per instance and adds a dictionary lookup on every attribute access. `slots=True` generates a `__slots__` tuple instead, so instances store fields in a fixed-size, dict-free layout:
+
+```python
+from dataclasses import dataclass
+
+@dataclass(slots=True)
+class Pixel:
+    x: int
+    y: int
+    color: str = "black"
+
+p = Pixel(x=10, y=20)
+print(p.x, p.y, p.color)   # 10 20 black
+
+# p.__dict__ raises AttributeError — there's no per-instance dict to inspect
+# p.z = 5 raises AttributeError — you can't add attributes outside the declared fields
+```
+
+For a class you instantiate thousands or millions of times — parsed log lines, grid cells, graph nodes — slots meaningfully cut per-instance memory and speed up attribute reads, since Python resolves a slot by fixed offset instead of a dict lookup. The trade-off is rigidity: a slotted dataclass can't gain attributes dynamically, and mixing in a plain (non-dataclass) class that itself defines instance attributes without its own `__slots__` silently reintroduces a `__dict__` on the combined class — negating the memory savings without raising an error. If you need `slots`-like behavior on Python versions older than 3.10, you have to declare `__slots__` by hand, which is far more error-prone since a manually written `__slots__` conflicts with any class-level default value sharing the same field name — the built-in `slots=True` handles that interaction for you. The [dataclasses documentation](https://docs.python.org/3/library/dataclasses.html#dataclasses.dataclass) covers the version-gated behavior in detail.
+
 ## Common Bugs with Python Dataclass
 
 **Bug 1: Using a mutable default directly.**
@@ -221,6 +246,8 @@ class Playlist:
 ```
 
 Python raises `ValueError: mutable default <class 'list'> for field tracks is not allowed: use default_factory`. This is protective — if Python silently accepted the list, every `Playlist` instance would share the same list object, and appending to one would affect all. The fix is always `field(default_factory=list)`.
+
+The rule is simpler than it looks once you separate the two cases. An immutable default value — a number, string, `bool`, `None`, or a tuple of immutables — is safe to assign directly, because there's no shared mutable state for two instances to accidentally alias. Only mutable default values — lists, dicts, sets, or other dataclass instances that aren't frozen — need `default_factory` to guarantee each instance gets its own fresh object.
 
 **Bug 2: Inheritance field ordering conflicts.**
 
@@ -247,13 +274,23 @@ If you try to sort a list of dataclass instances without `order=True`, you get `
 
 Python dataclasses are not the universal answer to structured data.
 
-**Reach for `typing.NamedTuple`** when you need tuple unpacking, positional indexing (`record[0]`), or interoperability with code that expects tuples. Named tuples are immutable by default and carry no extra dependency, making them a strong choice for simple records that flow through tuple-expecting APIs.
+**Reach for `typing.NamedTuple`** when you need tuple unpacking, positional indexing (`record[0]`), or interoperability with code that expects tuples. A python namedtuple supports type annotations and default values just like a dataclass, but it's immutable by default, has no per-instance `__dict__`, and ships with built-in `_asdict()`, `_replace()`, and `_fields` helpers instead of a decorator API. That makes a named tuple a strong choice for small, read-only records you pass straight into tuple-expecting functions — CSV rows, coordinate pairs, function results with named fields — where you want positional access and don't need methods beyond simple field access.
 
-**Reach for `TypedDict`** when your data stays as a plain dictionary through its entire lifecycle — JSON parsing, boto3 responses, FastAPI request bodies. Converting a dict to a dataclass and back with `asdict()` just adds overhead when the dict representation is what you actually need.
+**Reach for `TypedDict`** when your data stays as a plain dictionary through its entire lifecycle — JSON parsing, boto3 responses, FastAPI request bodies. A `TypedDict` in Python adds static type checking for dict keys and value types without changing runtime behavior at all: a `TypedDict` instance is still a regular `dict`, so `isinstance(data, dict)` is `True`, and there's no generated `__init__` or attribute access. That's the core difference from a dataclass — `TypedDict` declares shape for the type checker only, while `@dataclass` gives you a real object with attributes, `__eq__`, and room for methods. Converting a dict to a dataclass and back with `asdict()` just adds overhead when the dict representation is what you actually need.
 
-**Reach for Pydantic's `BaseModel`** when you need runtime type coercion and validation. A python dataclass with a `str` annotation will happily accept an integer at runtime — no error. Pydantic validates on construction and raises structured errors. The trade-off is a dependency and slightly higher instantiation overhead.
+**Reach for Pydantic's `BaseModel`** when you need runtime type coercion and validation. A python dataclass with a `str` annotation will happily accept an integer at runtime — no error. Pydantic validates on construction and raises structured errors. The trade-off is a dependency and slightly higher instantiation overhead. Teams that want `@dataclass` syntax without giving up validation can reach for `pydantic.dataclasses.dataclass` instead — a pydantic dataclass decorator that's largely a drop-in replacement for the standard library one, adding coercion and validation while keeping the same field-declaration style. It doesn't inherit from `BaseModel` and skips some `BaseModel`-only features like arbitrary config classes, but it's a practical middle ground when you need dataclass ergonomics with runtime checks.
 
 **Reach for a plain class** when behavior dominates data. If the class has 15 methods and 2 fields, the boilerplate saved by `@dataclass` is negligible, and the decorator becomes noise. Understanding when to reach for different class patterns is covered in depth in the [Python design patterns guide](/languages/python/design-patterns/).
+
+### Dataclass vs NamedTuple vs TypedDict vs Dict vs Pydantic
+
+| Type | Mutable | Runtime validation | Extra methods | Best for |
+|---|---|---|---|---|
+| `@dataclass` | Yes (unless `frozen=True`) | No | Yes | Domain objects that carry behavior |
+| `NamedTuple` | No | No | Limited (`_asdict`, `_replace`) | Small, tuple-compatible read-only records |
+| `TypedDict` | Yes (it's a dict) | No — type-checker only | No | Data that stays a dict (JSON, API payloads) |
+| plain `dict` | Yes | No | No | Dynamic or short-lived key/value data |
+| Pydantic `BaseModel` | Yes | Yes | Yes | Validated data crossing a trust boundary |
 
 ## Frequently Asked Questions
 
