@@ -66,6 +66,32 @@ Verify against the DB (from `pipeline/`):
 
 ## Recently completed (rolling — prune freely)
 
+- 2026-07-11 — **Cannibalization merges + real E-E-A-T (impressions-recovery).**
+  (1) **Merges** — killed two same-topic duplicate pairs found in a full same-topic
+  audit of all content. Java lambda: 301'd `/languages/java/lambda-functions/`
+  (older "How to Call…", lang-v2) → `/languages/java/lambda-function/` (newer,
+  stronger lang-v4 canonical); deleted the old file; repointed 3 inbound body links
+  (cpp-lambda-function, java-data-structures ×2). Base64: 301'd thin tool-landing
+  `/guides/base64-decode-online/` → `/guides/base64-encoding-decoding-guide/`
+  (comprehensive guide); deleted the file; added a link from the canonical guide to
+  the real `/tools/base64-encoder/` for transactional intent. Redirects in
+  `site/public/_redirects`. Audit found **no other true duplicates** — remaining
+  overlaps (JS array-methods guide vs cheatsheet; JSON validation guides;
+  async-await vs promises) are legitimate content-type/intent splits, left as-is.
+  (2) **E-E-A-T** — the site had **zero author attribution and zero Article schema**
+  (the "admin author" was a misdiagnosis; there was nothing). Added a single source
+  of truth `site/src/lib/author.ts` (author = **Syed J.**, "Founder & Editor";
+  `sameAs: []` ready for real profile links). `PostLayout.astro` now renders a
+  visible **"By Syed J."** byline (→ bio) + **Article** JSON-LD (author = Person,
+  publisher = Organization w/ logo) on every guide/blog/cheatsheet/language post.
+  New author bio page `/about/syed-j/` (ProfilePage + Person schema, honest bio —
+  no fabricated credentials). About page gained a "Who's behind DevNook" founder
+  section + Organization schema (`founder` = Person). Added `site/public/logo.svg`
+  as the publisher logo. **User decisions:** named author = first-name+initial
+  ("Syed J."), and **no AI-process disclosure** on the byline. Build: 145 pages, 0
+  errors. **Not yet deployed** — changes are local/uncommitted pending user go-ahead.
+
+
 - 2026-06-29 — **AI-search `llms.txt` + sitemap edge-cache fix shipped.** (1) Added
   `site/public/llms.txt` (commit `0b4d8db`) — curated llmstxt.org-format index (17 tools,
   12 language hubs, guide/cheatsheet/blog links) for AI-search discoverability; all tool

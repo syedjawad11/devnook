@@ -11,3 +11,12 @@
 
 # JSON formatter: thin tool-landing guide merged into comprehensive validator best-practices
 /guides/json-formatter-guide/ /guides/json-formatter-validator-best-practices/ 301
+
+# Cannibalization merges (2026-07-11) — impressions-recovery consolidation
+# Java lambda: "How to Call Lambda Functions" (lambda-functions) merged into the
+# stronger, newer canonical "Java Lambda Functions" (lambda-function, singular)
+/languages/java/lambda-functions/ /languages/java/lambda-function/ 301
+
+# Base64: thin tool-landing "decode online" page merged into the comprehensive
+# encoding/decoding developer guide (transactional intent → /tools/base64-encoder/)
+/guides/base64-decode-online/ /guides/base64-encoding-decoding-guide/ 301

@@ -220,7 +220,7 @@ wordCount.computeIfAbsent("streams", k -> 0);       // initializes key only if a
 
 A common production pattern is caching compiled `Pattern` objects in a `HashMap<String, Pattern>` to avoid recompilation on each request. Use the [online Java regex tester](/tools/regex-tester-online-java) to validate your patterns before adding them to the cache.
 
-Working with maps is where [Java lambda functions](/languages/java/lambda-functions) pay off most clearly — `merge()`, `computeIfAbsent()`, and `forEach()` all accept lambda expressions and replace verbose for-loop patterns with single readable calls.
+Working with maps is where [Java lambda functions](/languages/java/lambda-function/) pay off most clearly — `merge()`, `computeIfAbsent()`, and `forEach()` all accept lambda expressions and replace verbose for-loop patterns with single readable calls.
 
 ### TreeMap
 
@@ -413,4 +413,4 @@ Use `HashMap` by default. It runs `get()` and `put()` in O(1) average time, vers
 
 Java queues, lists, maps, and sets each solve a distinct problem. Picking `PriorityQueue` for ordered task processing, `ArrayList` for indexed sequences, and `HashMap` for fast lookups is not premature optimization — it is choosing the right data structure from the start. The Collections Framework provides all of them; the cost is learning when each fits.
 
-For functional operations across these collections — filtering, grouping, and reducing — the [Java lambda functions guide](/languages/java/lambda-functions) covers `stream()`, `filter()`, `collect()`, and the utility methods that make collection transformations concise.
+For functional operations across these collections — filtering, grouping, and reducing — the [Java lambda functions guide](/languages/java/lambda-function/) covers `stream()`, `filter()`, `collect()`, and the utility methods that make collection transformations concise.

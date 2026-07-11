@@ -1,0 +1,158 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { AUTHOR, ORGANIZATION, SITE_URL } from '../../../lib/author';
+
+const pageTitle = `${AUTHOR.name} — ${AUTHOR.role}, DevNook`;
+const pageDescription = `${AUTHOR.name} is the ${AUTHOR.role.toLowerCase()} of DevNook, a free, ad-free library of developer tools, language guides, and cheat sheets.`;
+
+const profileSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfilePage',
+  mainEntity: {
+    '@type': 'Person',
+    name: AUTHOR.name,
+    jobTitle: AUTHOR.role,
+    url: AUTHOR.url,
+    description: pageDescription,
+    worksFor: {
+      '@type': 'Organization',
+      name: ORGANIZATION.name,
+      url: ORGANIZATION.url,
+    },
+    ...(AUTHOR.sameAs.length ? { sameAs: AUTHOR.sameAs } : {}),
+  },
+};
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={pageDescription}
+  canonicalUrl={AUTHOR.url}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(profileSchema)} />
+
+  <div class="bio-page">
+    <div class="container">
+      <div class="bio-header">
+        <div class="avatar" aria-hidden="true">{AUTHOR.name.charAt(0)}</div>
+        <div>
+          <h1>{AUTHOR.name}</h1>
+          <p class="role">{AUTHOR.role} · DevNook</p>
+        </div>
+      </div>
+
+      <p>{AUTHOR.name} is the {AUTHOR.role.toLowerCase()} of DevNook — a developer who got tired of hunting for a two-line code snippet buried under cookie banners, newsletter popups, and 900 words of preamble, and decided to build the reference site he actually wanted to use.</p>
+
+      <p>He designs and builds everything on DevNook: the browser-based tools that run entirely on your device, the language guides, and the quick-reference cheat sheets. The editorial standard is the same across all of it — get the reader to a correct, working answer fast, with no padding and nothing tracking them along the way.</p>
+
+      <h2>What he works on</h2>
+
+      <ul>
+        <li><strong><a href="/tools/">Developer tools</a></strong> — client-side utilities for formatting, encoding, decoding, and testing. Nothing you paste ever leaves your browser.</li>
+        <li><strong><a href="/languages/">Language guides</a></strong> — focused explanations of the features developers reach for most, across Python, JavaScript, TypeScript, Java, C++, and more.</li>
+        <li><strong><a href="/cheatsheets/">Cheat sheets</a></strong> — one-page references organised by task, for the moment you need them.</li>
+        <li><strong><a href="/guides/">Guides</a></strong> — longer-form articles for topics that genuinely need the space.</li>
+      </ul>
+
+      <h2>Editorial approach</h2>
+
+      <p>Every page on DevNook is checked against a simple test: does it get a working developer unstuck faster than the top search result would? If the answer fits in three lines, the article is three lines. Code samples are written to run, not just to read. When something changes in a language or tool, the reference is updated rather than left to rot.</p>
+
+      <p>DevNook takes no advertising and runs no cross-site tracking, so there is no incentive to pad a page or chase a trend — only to be the reference a developer bookmarks and comes back to.</p>
+
+      <p class="contact">Want to reach out about DevNook, a correction, or a suggestion? Get in touch through the <a href="/about/">about page</a>.</p>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .bio-page {
+    padding: var(--space-7) 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 var(--space-5);
+  }
+
+  .bio-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+  }
+
+  .avatar {
+    flex: 0 0 auto;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--color-accent);
+    color: var(--color-text-inv);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: var(--font-heading, var(--font-body));
+  }
+
+  h1 {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    font-weight: 700;
+    margin: 0 0 var(--space-1);
+    color: var(--color-text);
+  }
+
+  .role {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    color: var(--color-text);
+  }
+
+  p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-4);
+  }
+
+  ul {
+    padding-left: var(--space-5);
+    margin-bottom: var(--space-4);
+  }
+
+  li {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
+  }
+
+  a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  strong {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  .contact {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+    font-size: 0.95rem;
+  }
+</style>

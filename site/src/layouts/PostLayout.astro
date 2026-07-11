@@ -4,6 +4,7 @@ import BaseLayout from './BaseLayout.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
 import RelatedPosts from '../components/RelatedPosts.astro';
 import TagBadge from '../components/TagBadge.astro';
+import { AUTHOR, ORGANIZATION, SITE_URL } from '../lib/author';
 
 interface Props {
   frontmatter: {
@@ -85,6 +86,37 @@ const formattedDate = new Date(frontmatter.published_date).toLocaleDateString('e
   day: 'numeric'
 });
 
+// --- Authorship + Article structured data (E-E-A-T) ---
+const pageUrl = SITE_URL + currentPath;
+const ogAbsolute = frontmatter.og_image
+  ? (frontmatter.og_image.startsWith('http') ? frontmatter.og_image : SITE_URL + frontmatter.og_image)
+  : ORGANIZATION.logo;
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: frontmatter.title,
+  description: frontmatter.description,
+  datePublished: frontmatter.published_date,
+  dateModified: frontmatter.published_date,
+  author: {
+    '@type': 'Person',
+    name: AUTHOR.name,
+    url: AUTHOR.url,
+    jobTitle: AUTHOR.role,
+    ...(AUTHOR.sameAs.length ? { sameAs: AUTHOR.sameAs } : {}),
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: ORGANIZATION.name,
+    url: ORGANIZATION.url,
+    logo: { '@type': 'ImageObject', url: ORGANIZATION.logo },
+  },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+  image: ogAbsolute,
+  url: pageUrl,
+};
+
 const breadcrumbItems: { label: string; href: string | null }[] = [
   { label: 'Home', href: '/' },
 ];
@@ -107,12 +139,15 @@ breadcrumbItems.push({ label: frontmatter.title, href: null });
   description={frontmatter.description}
   ogImage={frontmatter.og_image}
 >
+  <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
   <article class="post-layout">
     <div class="container">
       <div class="post-header">
         <Breadcrumb crumbs={breadcrumbItems} />
         <h1>{frontmatter.title}</h1>
         <div class="meta-bar">
+          <span class="byline">By <a href={AUTHOR.path} rel="author">{AUTHOR.name}</a></span>
+          <span class="meta-sep" aria-hidden="true">·</span>
           <time datetime={frontmatter.published_date}>{formattedDate}</time>
           {frontmatter.tags && frontmatter.tags.length > 0 && (
             <div class="tags">
@@ -250,6 +285,28 @@ breadcrumbItems.push({ label: frontmatter.title, href: null });
 
   .meta-bar time {
     color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .byline {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+  }
+
+  .byline a {
+    color: var(--color-text);
+    font-weight: 500;
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .byline a:hover {
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+
+  .meta-sep {
+    color: var(--color-text-faint);
     font-size: 0.875rem;
   }
 

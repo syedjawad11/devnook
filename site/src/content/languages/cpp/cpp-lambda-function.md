@@ -342,7 +342,7 @@ Comparator<Order> byPrice = (a, b) -> Double.compare(a.price, b.price);
 orders.sort(byPrice);
 ```
 
-Java's captured variables must be effectively final — the compiler rejects code that modifies a captured outer variable after capture. This eliminates the dangling-reference class of bugs automatically. The [Java lambda functions guide](/languages/java/lambda-functions/) covers the functional interface model and how the JVM implements capture.
+Java's captured variables must be effectively final — the compiler rejects code that modifies a captured outer variable after capture. This eliminates the dangling-reference class of bugs automatically. The [Java lambda functions guide](/languages/java/lambda-function/) covers the functional interface model and how the JVM implements capture.
 
 C++'s explicit capture list is more expressive than both: you control value vs reference per variable, and you can move into captures. It's also more error-prone for the same reason — the compiler doesn't prevent dangling references. Understanding [how closures work in JavaScript](/languages/javascript/closures/) adds another useful data point: JavaScript's implicit-by-reference capture model is the closest parallel to Python's, and comparing it to C++'s explicit model shows why explicit capture is the right choice for a language where object lifetimes aren't managed automatically.
 

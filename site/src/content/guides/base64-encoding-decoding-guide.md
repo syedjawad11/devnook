@@ -22,6 +22,8 @@ word_count_target: 1800
 
 Base64 is a binary-to-text encoding scheme that represents binary data using 64 printable ASCII characters. It is the standard way to transmit binary content—images, files, cryptographic keys—through systems designed to handle only text.
 
+If you just need to convert a string right now, the [Base64 encoder and decoder tool](/tools/base64-encoder/) runs entirely in your browser—nothing you paste ever leaves your device. The rest of this guide explains how the encoding actually works and when to reach for it.
+
 ## What Is Base64 Encoding?
 
 Base64 takes arbitrary binary bytes and maps every group of 3 bytes (24 bits) into 4 printable characters drawn from a 64-character alphabet: `A–Z`, `a–z`, `0–9`, `+`, and `/`. A `=` character pads the output when the input is not a multiple of 3 bytes.

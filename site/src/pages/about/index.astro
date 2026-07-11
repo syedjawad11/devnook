@@ -1,8 +1,25 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { AUTHOR, ORGANIZATION, SITE_URL } from '../../lib/author';
 
 const pageTitle = 'About DevNook — Developer Tools & References Built for Speed';
 const pageDescription = "DevNook is a free, ad-free library of developer tools, language guides, and cheat sheets. Learn why it exists and what it's for.";
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: ORGANIZATION.name,
+  url: ORGANIZATION.url,
+  logo: { '@type': 'ImageObject', url: ORGANIZATION.logo },
+  description: pageDescription,
+  founder: {
+    '@type': 'Person',
+    name: AUTHOR.name,
+    jobTitle: AUTHOR.role,
+    url: AUTHOR.url,
+    ...(AUTHOR.sameAs.length ? { sameAs: AUTHOR.sameAs } : {}),
+  },
+};
 ---
 
 <BaseLayout
@@ -10,6 +27,7 @@ const pageDescription = "DevNook is a free, ad-free library of developer tools, 
   description={pageDescription}
   canonicalUrl="https://devnook.dev/about/"
 >
+  <script type="application/ld+json" set:html={JSON.stringify(orgSchema)} />
   <div class="about-page">
     <div class="container">
       <h1>About DevNook</h1>
@@ -40,6 +58,10 @@ const pageDescription = "DevNook is a free, ad-free library of developer tools, 
         <li><strong>The web should be readable.</strong> Clean typography, sensible contrast, keyboard-friendly navigation, and dark mode that actually works.</li>
         <li><strong>Free means free.</strong> No paywalls, no "pro" tier, no email gates. If a resource is listed on DevNook, you can use it.</li>
       </ol>
+
+      <h2>Who's behind DevNook</h2>
+
+      <p>DevNook is built and edited by <a href={AUTHOR.path}>{AUTHOR.name}</a>, its {AUTHOR.role.toLowerCase()}. He designs the tools, writes and reviews the guides and cheat sheets, and keeps the whole thing fast and ad-free. You can read more about his approach on his <a href={AUTHOR.path}>author page</a>.</p>
     </div>
   </div>
 </BaseLayout>
